@@ -1,0 +1,39 @@
+{
+    "id": "24975c53-a693-4ced-914f-ae1e0c65bd5c",
+    "author": "",
+    "widgets": [
+        {
+            "id": "CarbonReportingTool",
+            "name": "CarbonReportingTool",
+            "description": "A sample widget",
+            "icon": "",
+            "tags":[]
+            "category":"",
+            "isTemplate": true/false // this will mark the widget as a template 
+        }
+    ],
+    "sidebarLinks": [
+        {
+            "id": "CarbonReportingToolLink",
+            "label": "",
+            "description": "",
+            "target": "",
+            "icon": "",
+            "roles":[]
+        }
+    ],
+    "uis": [
+        {
+            "id": "CarbonReportingToolLink",
+            "label":"",
+            "description": "",
+            "roles": []
+        }
+    ],
+    "menuItems": [
+        {
+            "id": "CarbonReportingToolLink",
+            "title": "CarbonReportingTool"
+        }
+    ]
+}

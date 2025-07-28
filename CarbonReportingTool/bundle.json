@@ -1,0 +1,24 @@
+{
+    "id": "dfb0f20b-787a-4dc3-f8f9-e3ee85e42314",
+    "author": "",
+    "widgets": [
+        {
+            "id": "carbon_reporting_80rr",
+            "name": "carbon_reporting_80rr",
+            "description": "A sample widget",
+            "icon": "",
+            "tags":[],
+            "category":"",
+            "isTemplate": false
+        }
+    ],
+    "sidebarLinks": [
+        
+    ],
+    "uis": [
+       
+    ],
+    "menuItems": [
+        
+    ]
+}
