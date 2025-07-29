@@ -10,6 +10,8 @@ import { registerWidget, IContextProvider } from './uxp';
 import Papa from 'papaparse';
 
 import './styles.scss';
+import all_data from "./all_data";
+import BarChartComponent from "./bar_cahrt";
 
 export interface IWidgetProps {
     uxpContext?: IContextProvider,
@@ -133,6 +135,32 @@ const carbon_reporting_80rr: React.FunctionComponent<IWidgetProps> = (props) => 
 registerWidget({
     id: "carbon_reporting_80rr",
     widget: carbon_reporting_80rr,
+    configs: {
+        layout: {
+            // w: 12,
+            // h: 12,
+            // minH: 12,
+            // minW: 12
+        }
+    }
+});
+
+registerWidget({
+    id: "all_data",
+    widget: all_data,
+    configs: {
+        layout: {
+            // w: 12,
+            // h: 12,
+            // minH: 12,
+            // minW: 12
+        }
+    }
+});
+
+registerWidget({
+    id: "bar_chart",
+    widget: BarChartComponent,
     configs: {
         layout: {
             // w: 12,
