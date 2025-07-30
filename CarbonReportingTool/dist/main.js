@@ -8,7 +8,7 @@
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"id":"dfb0f20b-787a-4dc3-f8f9-e3ee85e42314","author":"selva","widgets":[{"id":"carbon_reporting_80rr","name":"carbon_reporting_80rr","description":"carbon_reporting_80rr","icon":"","tags":[],"category":"","isTemplate":false},{"id":"all_data","name":"all_data","description":"all_data","icon":"","tags":[],"category":"","isTemplate":false},{"id":"bar_chart","name":"bar_chart","description":"bar_chart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"bar_chart","name":"bar_chart","description":"bar_chart","icon":"","tags":[],"category":"","isTemplate":false}],"sidebarLinks":[],"uis":[],"menuItems":[]}');
+module.exports = /*#__PURE__*/JSON.parse('{"id":"dfb0f20b-787a-4dc3-f8f9-e3ee85e42314","author":"selva","widgets":[{"id":"carbon_reporting_80rr","name":"carbon_reporting_80rr","description":"carbon_reporting_80rr","icon":"","tags":[],"category":"","isTemplate":false},{"id":"all_data","name":"all_data","description":"all_data","icon":"","tags":[],"category":"","isTemplate":false},{"id":"bar_chart","name":"bar_chart","description":"bar_chart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESG_Donut_Chart","name":"ESG_Donut_Chart","description":"ESG_Donut_Chart","icon":"","tags":[],"category":"","isTemplate":false}],"sidebarLinks":[],"uis":[],"menuItems":[]}');
 
 /***/ }),
 
