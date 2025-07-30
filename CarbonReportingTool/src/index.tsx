@@ -1,148 +1,165 @@
 import * as React from "react";
 import {
-    WidgetWrapper,
-    TitleBar,
-    FilterPanel,
-    Button,
-    useToast
+  WidgetWrapper,
+  TitleBar,
+  FilterPanel,
+  Button,
+  useToast
 } from "uxp/components";
-import { registerWidget, IContextProvider } from './uxp';
-import Papa from 'papaparse';
+import { registerWidget, IContextProvider } from "./uxp";
+import Papa from "papaparse";
 
-import './styles.scss';
+import "./styles.scss";
 import all_data from "./all_data";
 import BarChartComponent from "./bar_cahrt";
 import ESGDonutChart from "./carbon_emissions";
 
 export interface IWidgetProps {
-    uxpContext?: IContextProvider,
-    instanceId?: string,
-    uiProps?: any
+  uxpContext?: IContextProvider;
+  instanceId?: string;
+  uiProps?: any;
 }
 
-const LucyPackage = "carbon_reporting_80rr";
+const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [parsedData, setParsedData] = React.useState<any[] | null>(null);
+  const [loading, setLoading] = React.useState(false);
+  const [fileName, setFileName] = React.useState<string | null>(null);
+  const toast = useToast();
 
-const carbon_reporting_80rr: React.FunctionComponent<IWidgetProps> = (props) => {
-    const fileInputRef = React.useRef<HTMLInputElement>(null);
-    const [parsedData, setParsedData] = React.useState<any[] | null>(null);
-    const [loading, setLoading] = React.useState(false);
-    const [fileName, setFileName] = React.useState<string | null>(null);
+  const resetState = () => {
+    setParsedData(null);
+    setFileName(null);
+    setLoading(false);
+  };
 
-    const toast = useToast();
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        Papa.parse(file, {
-            header: true,
-            skipEmptyLines: true,
-            complete: (results: Papa.ParseResult<any>) => {
-                const jsonData = results.data.map((row: any) => {
-                    const cleanedRow: any = {};
-                    for (const key in row) {
-                        cleanedRow[key] = row[key] === null || row[key] === undefined ? "" : row[key];
-                    }
-                    return cleanedRow;
-                });
-                
-                console.log("Parsed JSON Data:", jsonData);
-
-                setParsedData(jsonData);
-                setFileName(file.name);
-            },
-            error: (err) => {
-                console.error("CSV parsing error:", err);
-                toast.error("Failed to parse CSV file");
-            }
+  const parseCSVFile = (file: File) => {
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results: Papa.ParseResult<any>) => {
+        const jsonData = results.data.map((row: any) => {
+          const cleanedRow: any = {};
+          for (const key in row) {
+            cleanedRow[key] = row[key] ?? "";
+          }
+          return cleanedRow;
         });
 
-        // Reset file input so user can re-select the same file again if needed
-        e.target.value = '';
-    };
+        setParsedData(jsonData);
+        setFileName(file.name);
+      },
+      error: (err) => {
+        console.error("CSV parsing error:", err);
+        toast.error("Failed to parse CSV file");
+      }
+    });
+  };
 
-    const uploadToLucy = async () => {
-        if (!props.uxpContext || !parsedData) return;
-        
-        setLoading(true);
-        try {
-            const result = await props.uxpContext.executeAction(
-                LucyPackage,
-                "InsertCarbonReport",
-                { CarbonInputData: parsedData },
-                { json: true }
-            );
+  const uploadToLucy = async () => {
+    if (!props.uxpContext || !parsedData) return;
 
-            console.log("Upload result:", result);
-            toast.success("Data uploaded successfully!");
-            resetState();
-        } catch (error: any) {
-            console.error("Upload error:", error);
-            toast.error(`Upload failed: ${error.message || "Unknown error"}`);
-        } finally {
-            setLoading(false);
-        }
-    };
+    setLoading(true);
+    try {
+      const result = await props.uxpContext.executeAction(
+        "carbon_reporting_80rr", // Backend model name remains
+        "InsertCarbonReport",
+        { CarbonInputData: parsedData },
+        { json: true }
+      );
 
-    const resetState = () => {
-        setParsedData(null);
-        setFileName(null);
-        setLoading(false);
-    };
+      toast.success("Data uploaded successfully!");
+      resetState();
+    } catch (error: any) {
+      toast.error(`Upload failed: ${error.message || "Unknown error"}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <WidgetWrapper>
-            <TitleBar title="Carbon Reporting Tool">
-                <FilterPanel />
-            </TitleBar>
-            {!parsedData && (
-                <Button
-                    title={loading ? "Uploading..." : "Select CSV"}
-                    disabled={loading}
-                    onClick={() => fileInputRef.current?.click()}
-                />
-            )}
+  return (
+    <WidgetWrapper>
+      <TitleBar title="Carbon Reporting Tool">
+        <FilterPanel />
+      </TitleBar>
 
-            {parsedData && (
-                <div style={{ marginTop: "1rem" }}>
-                    <p><strong>File:</strong> {fileName}</p>
-                    <p>{parsedData.length} rows parsed. Proceed to upload?</p>
-                    <div style={{ display: "flex", gap: "10px" }}>
-                        <Button
-                            title={loading ? "Uploading..." : "Upload"}
-                            onClick={uploadToLucy}
-                            disabled={loading}
-                        />
-                        <Button
-                            title="Cancel"
-                            onClick={resetState}
-                            disabled={loading}
-                    
-                        />
-                    </div>
-                </div> 
-            )}
+      <div
+        className={`dropzone ${loading ? "disabled" : ""}`}
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.currentTarget.classList.add("dragover");
+        }}
+        onDragLeave={(e) => {
+          e.preventDefault();
+          e.currentTarget.classList.remove("dragover");
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          e.currentTarget.classList.remove("dragover");
 
-            <input
-                type="file"
-                accept=".csv"
-                style={{ display: 'none' }}
-                ref={fileInputRef}
-                onChange={handleFileChange}
+          const file = e.dataTransfer.files?.[0];
+          if (file) parseCSVFile(file);
+        }}
+        onClick={() => fileInputRef.current?.click()}
+      >
+        {fileName ? (
+          <div className="file-tag">
+            <span>{fileName}</span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                resetState();
+              }}
+              title="Remove file"
+            >
+              ✖
+            </button>
+          </div>
+        ) : (
+          <p>Drag & drop CSV file here, or click to select</p>
+        )}
+      </div>
+
+      <input
+        type="file"
+        accept=".csv"
+        style={{ display: "none" }}
+        ref={fileInputRef}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) parseCSVFile(file);
+          e.target.value = ""; // reset input
+        }}
+      />
+
+      {parsedData && (
+        <div style={{ marginTop: "1rem" }}>
+          <p>{parsedData.length} rows parsed. Proceed to upload?</p>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <Button
+              title={loading ? "Uploading..." : "Upload"}
+              onClick={uploadToLucy}
+              disabled={loading}
             />
-        </WidgetWrapper>
-    );
+            <Button
+              title="Cancel"
+              onClick={resetState}
+              disabled={loading}
+            />
+          </div>
+        </div>
+      )}
+    </WidgetWrapper>
+  );
 };
-
-
 
 
 /**
  * Register as a Widget
  */
 registerWidget({
-    id: "carbon_reporting_80rr",
-    widget: carbon_reporting_80rr,
+    id: "CarbonReportingTool",
+    widget: CarbonReportingTool,
     configs: {
         layout: {
             // w: 12,

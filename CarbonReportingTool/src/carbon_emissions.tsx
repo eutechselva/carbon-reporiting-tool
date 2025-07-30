@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import { IWidgetProps } from "widget-designer/components";
 import Highcharts from 'highcharts';
+import { Label } from "recharts";
+import { WidgetWrapper, TitleBar, FilterPanel, FormField, Select, Input } from "uxp/components";
 
 // ESG Carbon Emissions data (calculated from monthly data)
 const carbonEmissionsData = [
@@ -223,6 +225,11 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
   }, []);
 
   return (
+    <WidgetWrapper>
+    <TitleBar title="Carbon Reporting Tool">
+      <FilterPanel>
+      </FilterPanel>
+    </TitleBar>
     <div style={{ 
       width: '100%', 
       height: '100%', 
@@ -353,6 +360,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
         </div>
       </div>
     </div>
+    </WidgetWrapper>
   );
 };
 

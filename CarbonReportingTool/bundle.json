@@ -3,9 +3,9 @@
     "author": "selva",
     "widgets": [
         {
-            "id": "carbon_reporting_80rr",
-            "name": "carbon_reporting_80rr",
-            "description": "carbon_reporting_80rr",
+            "id": "CarbonReportingTool",
+            "name": "CarbonReportingTool",
+            "description": "CarbonReportingTool",
             "icon": "",
             "tags":[],
             "category":"",

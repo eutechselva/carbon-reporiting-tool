@@ -1,0 +1,43 @@
+.dropzone {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+    background: #fafafa;
+    color: #666;
+    cursor: pointer;
+  }
+  
+  .dropzone.dragover {
+    border-color: #2196f3;
+    background: #e3f2fd;
+    color: #1976d2;
+  }
+  
+  .file-tag {
+    display: inline-flex;
+    align-items: center;
+    background: #e0f7fa;
+    border-radius: 16px;
+    padding: 0.5rem 1rem;
+    margin-top: 1rem;
+    font-size: 14px;
+    color: #006064;
+  }
+  
+  .file-tag span {
+    margin-left: 0.5rem;
+    font-weight: bold;
+  }
+  
+  .file-tag button {
+    margin-left: 10px;
+    background: none;
+    border: none;
+    color: #006064;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0;
+  }
+  
