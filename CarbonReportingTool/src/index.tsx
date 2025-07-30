@@ -37,7 +37,14 @@ const carbon_reporting_80rr: React.FunctionComponent<IWidgetProps> = (props) => 
             header: true,
             skipEmptyLines: true,
             complete: (results: Papa.ParseResult<any>) => {
-                const jsonData = results.data;
+                const jsonData = results.data.map((row: any) => {
+                    const cleanedRow: any = {};
+                    for (const key in row) {
+                        cleanedRow[key] = row[key] === null || row[key] === undefined ? "" : row[key];
+                    }
+                    return cleanedRow;
+                });
+                
                 console.log("Parsed JSON Data:", jsonData);
 
                 setParsedData(jsonData);
