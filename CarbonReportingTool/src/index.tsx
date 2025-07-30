@@ -12,6 +12,7 @@ import Papa from 'papaparse';
 import './styles.scss';
 import all_data from "./all_data";
 import BarChartComponent from "./bar_cahrt";
+import ESGDonutChart from "./carbon_emissions";
 
 export interface IWidgetProps {
     uxpContext?: IContextProvider,
@@ -168,6 +169,19 @@ registerWidget({
 registerWidget({
     id: "bar_chart",
     widget: BarChartComponent,
+    configs: {
+        layout: {
+            // w: 12,
+            // h: 12,
+            // minH: 12,
+            // minW: 12
+        }
+    }
+});
+
+registerWidget({
+    id: "ESG_Donut_Chart",
+    widget: ESGDonutChart,
     configs: {
         layout: {
             // w: 12,
