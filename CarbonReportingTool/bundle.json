@@ -5,7 +5,25 @@
         {
             "id": "carbon_reporting_80rr",
             "name": "carbon_reporting_80rr",
-            "description": "A sample widget",
+            "description": "carbon_reporting_80rr",
+            "icon": "",
+            "tags":[],
+            "category":"",
+            "isTemplate": false
+        },
+        {
+            "id": "all_data",
+            "name": "all_data",
+            "description": "all_data",
+            "icon": "",
+            "tags":[],
+            "category":"",
+            "isTemplate": false
+        },
+        {
+            "id": "bar_chart",
+            "name": "bar_chart",
+            "description": "bar_chart",
             "icon": "",
             "tags":[],
             "category":"",

@@ -6,6 +6,7 @@
     "dev": "webpack serve"
   },
   "dependencies": {
+    "highcharts": "^12.3.0",
     "papaparse": "^5.5.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
