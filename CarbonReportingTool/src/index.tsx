@@ -13,6 +13,9 @@ import "./styles.scss";
 import all_data from "./all_data";
 import BarChartComponent from "./bar_cahrt";
 import ESGDonutChart from "./carbon_emissions";
+import ESGEmissionFactorsTable from "./ESGEmissionFactorsTable";
+import ESGStackedBarChart from "./ESGStackedBarChart";
+import ESGAreaChart from "./ESGAreaChart";
 
 export interface IWidgetProps {
   uxpContext?: IContextProvider;
@@ -199,6 +202,45 @@ registerWidget({
 registerWidget({
     id: "ESG_Donut_Chart",
     widget: ESGDonutChart,
+    configs: {
+        layout: {
+            // w: 12,
+            // h: 12,
+            // minH: 12,
+            // minW: 12
+        }
+    }
+});
+
+registerWidget({
+    id: "ESGEmissionFactorsTable",
+    widget: ESGEmissionFactorsTable,
+    configs: {
+        layout: {
+            // w: 12,
+            // h: 12,
+            // minH: 12,
+            // minW: 12
+        }
+    }
+});
+
+registerWidget({
+    id: "ESGStackedBarChart",
+    widget: ESGStackedBarChart,
+    configs: {
+        layout: {
+            // w: 12,
+            // h: 12,
+            // minH: 12,
+            // minW: 12
+        }
+    }
+});
+
+registerWidget({
+    id: "ESGAreaChart",
+    widget: ESGAreaChart,
     configs: {
         layout: {
             // w: 12,

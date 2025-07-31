@@ -16,14 +16,20 @@ const emissionFactors: { [key: string]: number } = {
   "Electricity Consumption – HVAC": 0.412 // tCO₂e per kWh
 };
 
-const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
+// Month sort helper
+const monthOrder: { [key: string]: number } = {
+  Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6,
+  Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12
+};
+
+const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
   const chartRef = useRef(null);
   const toast = useToast();
   
   const [loading, setLoading] = useState(false);
   const [activityData, setActivityData] = useState<any[]>([]);
   const [monthFilter, setMonthFilter] = useState<any>(null);
-  const [yearFilter, setYearFilter] = useState<any>(new Date().getFullYear()); // Current year as default
+  const [yearFilter, setYearFilter] = useState<any>(new Date().getFullYear());
   const [activityName, setActivityName] = useState<string>("");
 
   const monthOptions = [
@@ -72,26 +78,39 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
         dynamicEmissionData: [], 
         scope1Total: 0, 
         scope2Total: 0, 
-        totalEmissions: 0 
+        totalEmissions: 0,
+        monthlyEmissions: {}
       };
     }
 
+    // Group by month and activity for area chart
+    const monthlyEmissions: { [key: string]: { [key: string]: number } } = {};
+    
+    activityData.forEach(item => {
+      if (!monthlyEmissions[item.month]) {
+        monthlyEmissions[item.month] = {};
+      }
+      if (!monthlyEmissions[item.month][item.activity]) {
+        monthlyEmissions[item.month][item.activity] = 0;
+      }
+      // Apply emission factors immediately
+      const emissionFactor = emissionFactors[item.activity] || 0;
+      monthlyEmissions[item.month][item.activity] += item.value * emissionFactor;
+    });
+
     const emissionsByActivity: { [key: string]: number } = {};
     
-    // Group and sum values by activity from real API data
+    // Calculate total emissions by activity
     activityData.forEach(item => {
       if (!emissionsByActivity[item.activity]) {
         emissionsByActivity[item.activity] = 0;
       }
-      emissionsByActivity[item.activity] += item.value;
+      const emissionFactor = emissionFactors[item.activity] || 0;
+      emissionsByActivity[item.activity] += item.value * emissionFactor;
     });
 
-    // Apply emission factors to calculate real CO2e emissions
     const dynamicEmissionData = Object.keys(emissionsByActivity).map(activity => {
-      const totalActivityValue = emissionsByActivity[activity];
-      const emissionFactor = emissionFactors[activity] || 0;
-      const calculatedCO2e = totalActivityValue * emissionFactor;
-      
+      const calculatedCO2e = emissionsByActivity[activity];
       const isScope1 = activity.includes("Generator") || activity.includes("Refrigerant");
       
       return {
@@ -102,7 +121,6 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
       };
     });
 
-    // Calculate scope totals from dynamic data
     const scope1Total = dynamicEmissionData
       .filter(item => item.scope === 1)
       .reduce((sum, item) => sum + item.totalCO2e, 0);
@@ -113,12 +131,12 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
 
     const totalEmissions = scope1Total + scope2Total;
 
-    return { dynamicEmissionData, scope1Total, scope2Total, totalEmissions };
+    return { dynamicEmissionData, scope1Total, scope2Total, totalEmissions, monthlyEmissions };
   };
 
   // Generate dynamic title based on selected filters
   const generateTitle = () => {
-    let titleParts = ['Carbon Emissions by Scope'];
+    let titleParts = ['Carbon Emissions Trends (Area Chart)'];
     
     if (yearFilter) {
       titleParts.push(yearFilter.toString());
@@ -135,47 +153,53 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
     return titleParts.join(' - ');
   };
 
-  // Get calculated emissions (recalculates when activityData changes)
-  const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions } = calculateEmissions();
+  const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions, monthlyEmissions } = calculateEmissions();
 
   useEffect(() => {
     fetchActivityData();
   }, [monthFilter, yearFilter, activityName]);
 
   useEffect(() => {
-    if (chartRef.current && dynamicEmissionData.length > 0) {
-      // Prepare scope data for outer donut ring
-      const scopeData = [
-        {
-          name: 'Scope 1 Emissions',
-          y: scope1Total,
-          color: '#FF6B6B',
-          description: 'Direct emissions from owned sources'
-        },
-        {
-          name: 'Scope 2 Emissions',
-          y: scope2Total,
-          color: '#4ECDC4',
-          description: 'Indirect emissions from purchased energy'
-        }
-      ].filter(item => item.y > 0); // Only show scopes with actual data
+    if (chartRef.current && Object.keys(monthlyEmissions).length > 0) {
+      // Get sorted months
+      const months = Object.keys(monthlyEmissions).sort((a, b) => monthOrder[a] - monthOrder[b]);
+      
+      // Get all activities
+      const activities = Array.from(new Set(
+        Object.values(monthlyEmissions).flatMap(monthData => Object.keys(monthData))
+      ));
 
-      // Prepare detailed data for inner donut ring with distinct colors
-      const detailedData = dynamicEmissionData.map((item, index) => ({
-        name: item.source,
-        y: item.totalCO2e,
-        color: item.scope === 1 
-          ? (index === 0 ? '#E74C3C' : '#C0392B') // Different reds for Scope 1 activities
-          : '#17A2B8' // Different teal for Scope 2 activities
-      }));
+      // Create series for each activity
+      const series: Highcharts.SeriesAreaOptions[] = activities.map((activity, index) => {
+        const isScope1 = activity.includes("Generator") || activity.includes("Refrigerant");
+        const data = months.map(month => monthlyEmissions[month]?.[activity] || 0);
+        
+        return {
+          name: activity,
+          data: data,
+          type: 'area',
+          color: isScope1 
+            ? (index === 0 ? '#FF6B6B' : '#E74C3C') 
+            : '#4ECDC4',
+          fillOpacity: 0.6,
+          lineWidth: 2,
+          marker: {
+            enabled: true,
+            radius: 4,
+            lineWidth: 2,
+            lineColor: '#ffffff'
+          }
+        };
+      });
 
-      // Highcharts configuration for dynamic ESG donut chart
+      // Highcharts configuration for area chart
       const chartConfig: Highcharts.Options = {
         chart: {
-          type: 'pie',
+          type: 'area',
           height: 450,
           backgroundColor: 'transparent',
-          spacing: [20, 20, 20, 20]
+          spacing: [20, 20, 20, 20],
+         
         },
         title: {
           text: generateTitle(),
@@ -186,121 +210,98 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
           }
         },
         subtitle: {
-          text: `Total: ${totalEmissions.toFixed(1)} tCO₂e | ESG Reporting Dashboard`,
+          text: `Total: ${totalEmissions.toFixed(1)} tCO₂e | Trend Analysis`,
           style: {
             fontSize: '14px',
             color: '#7f8c8d',
             fontWeight: 'normal'
           }
         },
+        xAxis: {
+          categories: months,
+          title: {
+            text: 'Month',
+            style: {
+              fontSize: '14px',
+              fontWeight: 'bold'
+            }
+          },
+          gridLineWidth: 1,
+          gridLineColor: '#f0f0f0',
+          lineWidth: 1,
+          lineColor: '#ccc',
+          tickmarkPlacement: 'on' as const
+        },
+        yAxis: {
+          min: 0,
+          title: {
+            text: 'Carbon Emissions (tCO₂e)',
+            style: {
+              fontSize: '14px',
+              fontWeight: 'bold',
+              color: '#666'
+            }
+          },
+          labels: {
+            style: {
+              color: '#666',
+              fontSize: '11px'
+            }
+          },
+          gridLineWidth: 1,
+          gridLineColor: '#e6e6e6'
+        },
         tooltip: {
+          shared: true,
           backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          borderColor: '#bdc3c7',
+          borderColor: '#ccc',
           borderRadius: 8,
           shadow: true,
-          useHTML: true,
-          formatter: function() {
-            const percentage = ((this.y! / totalEmissions) * 100).toFixed(1);
-            return `
-              <div style="padding: 8px;">
-                <b style="color: ${this.color};">${this.key}</b><br/>
-                <strong>${this.y!.toFixed(1)} tCO₂e</strong><br/>
-                <span style="color: #7f8c8d;">${percentage}% of total emissions</span>
-              </div>
-            `;
+          headerFormat: '<b>{point.x}</b><br/>',
+          pointFormat: '<span style="color:{series.color}">●</span> {series.name}: <b>{point.y:.1f} tCO₂e</b><br/>',
+          footerFormat: '<span style="font-size: 10px">Click and drag to zoom</span>',
+          style: {
+            fontSize: '12px'
           }
         },
         legend: {
-          align: 'right' as const,
-          verticalAlign: 'middle' as const,
-          layout: 'vertical' as const,
-          x: -50,
-          y: 0,
+          align: 'center' as const,
+          verticalAlign: 'bottom' as const,
+          layout: 'horizontal' as const,
           itemStyle: {
-            fontSize: '13px',
-            fontWeight: 'normal',
-            color: '#2c3e50'
+            fontSize: '12px',
+            fontWeight: 'normal'
           },
           itemHoverStyle: {
             color: '#000'
           },
-          symbolRadius: 8,
-          symbolHeight: 16,
-          symbolWidth: 16
+          margin: 20
         },
         plotOptions: {
-          pie: {
-            allowPointSelect: true,
-            cursor: 'pointer',
-            dataLabels: {
-              enabled: true,
-              distance: 20,
-              style: {
-                fontSize: '12px',
-                fontWeight: 'bold',
-                color: '#2c3e50'
-              },
-              formatter: function() {
-                const percentage = ((this.y! / totalEmissions) * 100).toFixed(1);
-                return `<b>${this.key}</b><br/>${percentage}%<br/>${this.y!.toFixed(1)} tCO₂e`;
-              }
-            },
-            showInLegend: true,
-            borderWidth: 3,
-            borderColor: '#ffffff',
-            innerSize: '45%',
-            size: '75%',
-            center: ['40%', '50%'],
-            states: {
-              hover: {
-                halo: {
-                  size: 10,
-                  opacity: 0.25
+          area: {
+            stacking: 'normal' as const,
+            lineColor: '#ffffff',
+            lineWidth: 2,
+            marker: {
+              lineWidth: 2,
+              lineColor: '#ffffff',
+              states: {
+                hover: {
+                  radius: 6
                 }
               }
             },
+            states: {
+              hover: {
+                lineWidth: 3
+              }
+            },
             animation: {
-              duration: 1500
+              duration: 1200
             }
           }
         },
-        series: [{
-          name: 'Carbon Emissions',
-          type: 'pie',
-          data: scopeData.map(item => ({
-            name: item.name,
-            y: item.y,
-            color: item.color,
-            dataLabels: {
-              enabled: true
-            }
-          })),
-          size: '80%',
-          innerSize: '45%'
-        }, {
-          name: 'Emission Sources',
-          type: 'pie',
-          data: detailedData,
-          size: '40%',
-          innerSize: '20%',
-          dataLabels: {
-            enabled: true,
-            distance: -30,
-            style: {
-              fontSize: '10px',
-              fontWeight: 'bold',
-              color: 'white',
-              textOutline: '1px black'
-            },
-            formatter: function() {
-              const percentage = ((this.y! / totalEmissions) * 100).toFixed(0);
-              return `${percentage}%`;
-            }
-          },
-          showInLegend: false,
-          borderWidth: 1,
-          borderColor: '#ffffff'
-        }] as Highcharts.SeriesPieOptions[],
+        series: series,
         credits: {
           enabled: false
         },
@@ -314,31 +315,22 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
                 height: 400
               },
               legend: {
-                align: 'center' as const,
-                verticalAlign: 'bottom' as const,
                 layout: 'horizontal' as const,
-                x: 0,
-                y: 0
-              },
-              plotOptions: {
-                pie: {
-                  center: ['50%', '45%'],
-                  size: '85%'
-                }
+                align: 'center' as const,
+                verticalAlign: 'bottom' as const
               }
             }
           }]
         }
       };
 
-      // Create the dynamic chart
       Highcharts.chart(chartRef.current, chartConfig);
     }
-  }, [activityData, dynamicEmissionData, scope1Total, scope2Total, totalEmissions]);
+  }, [activityData, monthlyEmissions, totalEmissions]);
 
   return (
     <WidgetWrapper>
-      <TitleBar title="Carbon Reporting Tool - ESG Dashboard">
+      <TitleBar title="Carbon Reporting Tool - Area Chart">
         <FilterPanel
           onClear={() => {
             setMonthFilter(null);
@@ -383,7 +375,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
         backgroundColor: '#f8f9fa',
         fontFamily: 'Arial, sans-serif'
       }}>
-        {/* Dynamic ESG Summary Cards - AT THE TOP */}
+        {/* ESG Summary Cards */}
         <div style={{ 
           display: 'flex', 
           gap: '15px', 
@@ -521,7 +513,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
           </div>
         )}
 
-        {/* Dynamic Donut Chart */}
+        {/* Area Chart */}
         {!loading && activityData.length > 0 && (
           <div 
             ref={chartRef} 
@@ -541,4 +533,4 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
   );
 };
 
-export default ESGDonutChart;
+export default ESGAreaChart;
