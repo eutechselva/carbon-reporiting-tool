@@ -1532,14 +1532,38 @@ const monthOrder = {
     Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6,
     Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12
 };
-const all_data = (props) => {
+// 🔧 Style helpers for legend
+const legendItemStyle = (active, color) => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 12px',
+    borderRadius: 4,
+    backgroundColor: active ? '#f0f8ff' : 'transparent',
+    cursor: 'pointer',
+    fontSize: '13px',
+    fontWeight: active ? 'bold' : 'normal',
+    border: active ? `1px solid ${color}` : '1px solid transparent',
+    transition: 'all 0.2s ease'
+});
+const legendDotStyle = (color) => ({
+    width: 12,
+    height: 12,
+    borderRadius: '50%',
+    backgroundColor: color,
+    display: 'inline-block'
+});
+const AllData = (props) => {
     const chartRef = (0, react_1.useRef)(null);
+    const chartInstance = (0, react_1.useRef)(null);
     const toast = (0, components_1.useToast)();
-    const [loading, setLoading] = react_1.default.useState(false);
-    const [activityData, setActivityData] = react_1.default.useState([]);
-    const [monthFilter, setMonthFilter] = react_1.default.useState(null);
-    const [yearFilter, setYearFilter] = react_1.default.useState(new Date().getFullYear());
-    const [activityName, setActivityName] = react_1.default.useState("");
+    const [loading, setLoading] = (0, react_1.useState)(false);
+    const [activityData, setActivityData] = (0, react_1.useState)([]);
+    const [activityNames, setActivityNames] = (0, react_1.useState)([]);
+    const [selectedLegend, setSelectedLegend] = (0, react_1.useState)("all");
+    const [monthFilter, setMonthFilter] = (0, react_1.useState)(null);
+    const [yearFilter, setYearFilter] = (0, react_1.useState)(new Date().getFullYear());
+    const [activityName, setActivityName] = (0, react_1.useState)("");
     const monthOptions = [
         { label: "Jan", value: "Jan" }, { label: "Feb", value: "Feb" },
         { label: "Mar", value: "Mar" }, { label: "Apr", value: "Apr" },
@@ -1554,7 +1578,6 @@ const all_data = (props) => {
         setLoading(true);
         try {
             const result = yield props.uxpContext.executeAction("carbon_reporting_80rr", "GetAllData", { year: yearFilter, month: monthFilter, activityName: activityName }, { json: true });
-            console.log("showing result after executing", result);
             const cleanedData = (result === null || result === void 0 ? void 0 : result.map((row) => ({
                 activity: row.activity,
                 year: row.year,
@@ -1562,6 +1585,7 @@ const all_data = (props) => {
                 value: parseFloat(row.value)
             }))) || [];
             setActivityData(cleanedData);
+            setActivityNames(Array.from(new Set(cleanedData.map((item) => item.activity))));
         }
         catch (error) {
             console.error("Error loading data:", error);
@@ -1610,7 +1634,7 @@ const all_data = (props) => {
                 }];
         const xCategories = activityData.length > 0
             ? Array.from(new Set(activityData.map(d => d.month))).sort((a, b) => monthOrder[a] - monthOrder[b])
-            : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            : months;
         const chartConfig = {
             chart: {
                 type: 'line',
@@ -1619,10 +1643,7 @@ const all_data = (props) => {
             },
             title: {
                 text: 'Monthly Activity Data - 2025',
-                style: {
-                    fontSize: '18px',
-                    fontWeight: 'bold'
-                }
+                style: { fontSize: '18px', fontWeight: 'bold' }
             },
             subtitle: {
                 text: 'Generator Fuel, Refrigerant Leakages, and HVAC Electricity Consumption'
@@ -1634,16 +1655,10 @@ const all_data = (props) => {
                 gridLineColor: '#e6e6e6'
             },
             yAxis: [{
-                    title: {
-                        text: 'Generator Fuel & Refrigerant (Units)',
-                        style: { color: '#666' }
-                    },
+                    title: { text: 'Generator Fuel & Refrigerant (Units)', style: { color: '#666' } },
                     labels: { style: { color: '#666' } }
                 }, {
-                    title: {
-                        text: 'HVAC Electricity (kWh)',
-                        style: { color: '#666' }
-                    },
+                    title: { text: 'HVAC Electricity (kWh)', style: { color: '#666' } },
                     labels: { style: { color: '#666' } },
                     opposite: true
                 }],
@@ -1654,12 +1669,7 @@ const all_data = (props) => {
                 borderRadius: 5,
                 shadow: true
             },
-            legend: {
-                align: 'center',
-                verticalAlign: 'bottom',
-                layout: 'horizontal',
-                itemStyle: { fontSize: '12px' }
-            },
+            legend: { enabled: false },
             plotOptions: {
                 line: {
                     dataLabels: { enabled: false },
@@ -1667,9 +1677,7 @@ const all_data = (props) => {
                     lineWidth: 2,
                     marker: {
                         symbol: 'circle',
-                        states: {
-                            hover: { radius: 6 }
-                        }
+                        states: { hover: { radius: 6 } }
                     }
                 }
             },
@@ -1678,23 +1686,17 @@ const all_data = (props) => {
             responsive: {
                 rules: [{
                         condition: { maxWidth: 500 },
-                        chartOptions: {
-                            legend: {
-                                layout: 'horizontal',
-                                align: 'center',
-                                verticalAlign: 'bottom'
-                            }
-                        }
+                        chartOptions: {}
                     }]
             }
         };
-        highcharts_1.default.chart(chartRef.current, chartConfig);
+        chartInstance.current = highcharts_1.default.chart(chartRef.current, chartConfig);
     }, [activityData]);
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
         react_1.default.createElement(components_1.TitleBar, { title: "Carbon Reporting Tool" },
             react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
                     setMonthFilter(null);
-                    setYearFilter(null);
+                    setYearFilter(new Date().getFullYear());
                     setActivityName("");
                 } },
                 react_1.default.createElement(components_1.FormField, null,
@@ -1703,14 +1705,35 @@ const all_data = (props) => {
                 react_1.default.createElement(components_1.FormField, null,
                     react_1.default.createElement(components_1.Label, null, "Filter by Year"),
                     react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null), placeholder: "e.g., 2025" })))),
+        react_1.default.createElement("div", { style: { display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '12px', marginBottom: '12px', flexWrap: 'wrap' } },
+            react_1.default.createElement("div", { style: legendItemStyle(selectedLegend === "all", "#888"), onClick: () => {
+                    var _a;
+                    setSelectedLegend("all");
+                    (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.series.forEach(s => s.show());
+                } },
+                react_1.default.createElement("span", { style: legendDotStyle("#888") }),
+                "All"),
+            activityNames.map((name) => {
+                var _a, _b;
+                const rawColor = (_b = (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.series.find(s => s.name === name)) === null || _b === void 0 ? void 0 : _b.color;
+                const color = typeof rawColor === "string" ? rawColor : "#ccc";
+                return (react_1.default.createElement("div", { key: name, style: legendItemStyle(selectedLegend === name, color), onClick: () => {
+                        var _a;
+                        setSelectedLegend(name);
+                        (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.series.forEach(s => {
+                            if (s.name === name)
+                                s.show();
+                            else
+                                s.hide();
+                        });
+                    } },
+                    react_1.default.createElement("span", { style: legendDotStyle(color) }),
+                    name));
+            })),
         react_1.default.createElement("div", { style: { width: '100%', height: '100%', padding: '20px' } },
-            react_1.default.createElement("div", { ref: chartRef, style: {
-                    width: '100%',
-                    height: '400px',
-                    minHeight: '400px'
-                } }))));
+            react_1.default.createElement("div", { ref: chartRef, style: { width: '100%', height: '400px', minHeight: '400px' } }))));
 };
-exports["default"] = all_data;
+exports["default"] = AllData;
 
 
 /***/ }),
@@ -1768,20 +1791,19 @@ const monthOrder = {
 };
 const BarChartComponent = (props) => {
     const chartRef = (0, react_1.useRef)(null);
+    const chartInstance = (0, react_1.useRef)(null); // 🔧 chart instance ref
     const toast = (0, components_1.useToast)();
     const [activityData, setActivityData] = (0, react_1.useState)([]);
-    const [monthFilter, setMonthFilter] = (0, react_1.useState)(null); // ✅ NEW
-    const [yearFilter, setYearFilter] = (0, react_1.useState)(new Date().getFullYear()); // ✅ NEW
-    const [activityName, setActivityName] = (0, react_1.useState)(""); // ✅ NEW
-    const monthOptions = Object.keys(monthOrder).map(m => ({ label: m, value: m })); // ✅ NEW
+    const [monthFilter, setMonthFilter] = (0, react_1.useState)(null);
+    const [yearFilter, setYearFilter] = (0, react_1.useState)(new Date().getFullYear());
+    const [activityName, setActivityName] = (0, react_1.useState)("");
+    const [activityNames, setActivityNames] = (0, react_1.useState)([]); // 🔧 for custom legend
+    const monthOptions = Object.keys(monthOrder).map(m => ({ label: m, value: m }));
+    const [selectedLegend, setSelectedLegend] = (0, react_1.useState)("all");
     const fetchActivityData = () => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
         try {
-            const result = yield ((_a = props.uxpContext) === null || _a === void 0 ? void 0 : _a.executeAction("carbon_reporting_80rr", "GetAllData", {
-                year: yearFilter,
-                month: monthFilter,
-                activityName: activityName
-            }, { json: true }));
+            const result = yield ((_a = props.uxpContext) === null || _a === void 0 ? void 0 : _a.executeAction("carbon_reporting_80rr", "GetAllData", { year: yearFilter, month: monthFilter, activityName }, { json: true }));
             const cleanedData = (result === null || result === void 0 ? void 0 : result.map((row) => ({
                 activity: row.activity,
                 year: row.year,
@@ -1789,15 +1811,36 @@ const BarChartComponent = (props) => {
                 value: parseFloat(row.value)
             }))) || [];
             setActivityData(cleanedData);
+            // 🔧 collect distinct activity names for legend
+            const distinctActivities = Array.from(new Set(cleanedData.map((item) => item.activity)));
+            setActivityNames(Array.from(new Set(cleanedData.map((item) => item.activity))));
         }
         catch (error) {
             console.error("Error fetching data:", error);
             toast.error("Failed to load data");
         }
     });
-    (0, react_1.useEffect)(() => {
-        fetchActivityData();
-    }, [monthFilter, yearFilter, activityName]);
+    const legendItemStyle = (active, color) => ({
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        padding: '6px 12px',
+        borderRadius: 4,
+        backgroundColor: active ? '#f0f8ff' : 'transparent',
+        cursor: 'pointer',
+        fontSize: '13px',
+        fontWeight: active ? 'bold' : 'normal',
+        border: active ? `1px solid ${color}` : '1px solid transparent',
+        transition: 'all 0.2s ease'
+    });
+    const legendDotStyle = (color) => ({
+        width: 12,
+        height: 12,
+        borderRadius: '50%',
+        backgroundColor: color,
+        display: 'inline-block'
+    });
+    (0, react_1.useEffect)(() => { fetchActivityData(); }, [monthFilter, yearFilter, activityName]);
     (0, react_1.useEffect)(() => {
         if (!chartRef.current)
             return;
@@ -1895,17 +1938,7 @@ const BarChartComponent = (props) => {
                 pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
                 style: { fontSize: '12px' }
             },
-            legend: {
-                align: 'center',
-                verticalAlign: 'bottom',
-                layout: 'horizontal',
-                itemStyle: {
-                    fontSize: '12px',
-                    fontWeight: 'normal'
-                },
-                itemHoverStyle: { color: '#000' },
-                margin: 20
-            },
+            legend: { enabled: false },
             plotOptions: {
                 column: {
                     dataLabels: { enabled: false },
@@ -1922,24 +1955,26 @@ const BarChartComponent = (props) => {
             responsive: {
                 rules: [{
                         condition: { maxWidth: 600 },
-                        chartOptions: {
-                            chart: { height: 400 },
-                            legend: {
-                                layout: 'horizontal',
-                                align: 'center',
-                                verticalAlign: 'bottom'
-                            },
-                            plotOptions: {
-                                column: {
-                                    dataLabels: { enabled: false }
-                                }
-                            }
-                        }
+                        chartOptions: { chart: { height: 400 } }
                     }]
             }
         };
-        highcharts_1.default.chart(chartRef.current, chartConfig);
+        chartInstance.current = highcharts_1.default.chart(chartRef.current, chartConfig); // 🔧 save chart instance
     }, [activityData]);
+    // 🔧 Legend toggle helpers
+    const showAllSeries = () => {
+        var _a;
+        (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.series.forEach(s => s.show());
+    };
+    const showOnlySeries = (name) => {
+        var _a;
+        (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.series.forEach(s => {
+            if (s.name === name)
+                s.show();
+            else
+                s.hide();
+        });
+    };
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
         react_1.default.createElement(components_1.TitleBar, { title: "Carbon Reporting Tool" },
             react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
@@ -1952,7 +1987,25 @@ const BarChartComponent = (props) => {
                     react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (val) => setMonthFilter(val) })),
                 react_1.default.createElement(components_1.FormField, null,
                     react_1.default.createElement(components_1.Label, null, "Year"),
-                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null), placeholder: "e.g., 2025" })))),
+                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) })))),
+        react_1.default.createElement("div", { style: { display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' } },
+            react_1.default.createElement("div", { style: legendItemStyle(selectedLegend === "all", "#888"), onClick: () => {
+                    setSelectedLegend("all");
+                    showAllSeries();
+                } },
+                react_1.default.createElement("span", { style: legendDotStyle("#888") }),
+                "All"),
+            activityNames.map((name, idx) => {
+                var _a, _b;
+                const rawColor = (_b = (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.series.find(s => s.name === name)) === null || _b === void 0 ? void 0 : _b.color;
+                const color = typeof rawColor === 'string' ? rawColor : "#ccc";
+                return (react_1.default.createElement("div", { key: name, style: legendItemStyle(selectedLegend === name, color), onClick: () => {
+                        setSelectedLegend(name);
+                        showOnlySeries(name);
+                    } },
+                    react_1.default.createElement("span", { style: legendDotStyle(color) }),
+                    name));
+            })),
         react_1.default.createElement("div", { style: { width: '100%', height: '100%', padding: '20px', backgroundColor: '#fafafa' } },
             react_1.default.createElement("div", { ref: chartRef, style: {
                     width: '100%',
@@ -2389,7 +2442,7 @@ const ESGDonutChart = (props) => {
                             color: '#2c3e50'
                         } },
                         scope2Total.toFixed(1),
-                        " tCO\u2082e"),
+                        " KgCo2e"),
                     react_1.default.createElement("p", { style: {
                             fontSize: '12px',
                             color: '#7f8c8d',
@@ -2417,12 +2470,28 @@ const ESGDonutChart = (props) => {
                             color: '#2c3e50'
                         } },
                         totalEmissions.toFixed(1),
-                        " tCO\u2082e"),
+                        " KgCo2e"),
                     react_1.default.createElement("p", { style: {
                             fontSize: '12px',
                             color: '#7f8c8d',
                             margin: 0
-                        } }, "Combined carbon footprint"))),
+                        } }, "Combined carbon footprint")))),
+        react_1.default.createElement("div", { style: {
+                width: '100%',
+                height: '100%',
+                padding: '20px',
+                backgroundColor: '#f8f9fa',
+                fontFamily: 'Arial, sans-serif'
+            } },
+            react_1.default.createElement("div", { ref: chartRef, style: {
+                    width: '100%',
+                    height: '500px',
+                    minHeight: '500px',
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    border: '1px solid #e9ecef'
+                } }),
             loading && (react_1.default.createElement("div", { style: {
                     textAlign: 'center',
                     padding: '40px',
@@ -2485,15 +2554,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -2533,6 +2593,8 @@ const CarbonReportingTool = (props) => {
                     }
                     return cleanedRow;
                 });
+                console.log("parsed data", jsonData);
+                console.log("parse data type", typeof (jsonData));
                 setParsedData(jsonData);
                 setFileName(file.name);
             },
@@ -2542,13 +2604,16 @@ const CarbonReportingTool = (props) => {
             }
         });
     };
-    const uploadToLucy = () => __awaiter(void 0, void 0, void 0, function* () {
-        if (!props.uxpContext || !parsedData)
+    const uploadToLucy = () => {
+        // if (!props.uxpContext || !parsedData) return;
+        if (!parsedData || !Array.isArray(parsedData)) {
+            toast.error("Parsed data is empty or invalid.");
             return;
+        }
         setLoading(true);
         debugger;
         try {
-            const result = yield props.uxpContext.executeAction("carbon_reporting_80rr", // Backend model name remains
+            const result = props.uxpContext.executeAction("carbon_reporting_80rr", // Backend model name remains
             "InsertCarbonReport", { CarbonInputData: JSON.stringify(parsedData) });
             toast.success("Data uploaded successfully!");
             resetState();
@@ -2559,7 +2624,7 @@ const CarbonReportingTool = (props) => {
         finally {
             setLoading(false);
         }
-    });
+    };
     return (React.createElement(components_1.WidgetWrapper, null,
         React.createElement(components_1.TitleBar, { title: "Carbon Reporting Tool" },
             React.createElement(components_1.FilterPanel, null)),

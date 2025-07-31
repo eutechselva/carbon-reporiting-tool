@@ -447,7 +447,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
               margin: '0 0 5px 0',
               color: '#2c3e50'
             }}>
-              {scope2Total.toFixed(1)} tCO₂e
+              {scope2Total.toFixed(1)} KgCo2e
             </p>
             <p style={{ 
               fontSize: '12px', 
@@ -481,7 +481,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
               margin: '0 0 5px 0',
               color: '#2c3e50'
             }}>
-              {totalEmissions.toFixed(1)} tCO₂e
+              {totalEmissions.toFixed(1)} KgCo2e
             </p>
             <p style={{ 
               fontSize: '12px', 
@@ -492,6 +492,28 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
             </p>
           </div>
         </div>
+        </div>
+    <div style={{ 
+      width: '100%', 
+      height: '100%', 
+      padding: '20px', 
+      backgroundColor: '#f8f9fa',
+      fontFamily: 'Arial, sans-serif'
+    }}>
+      <div 
+        ref={chartRef} 
+        style={{ 
+          width: '100%', 
+          height: '500px',
+          minHeight: '500px',
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          border: '1px solid #e9ecef'
+        }}
+      />
+      
+
 
         {/* Loading State */}
         {loading && (

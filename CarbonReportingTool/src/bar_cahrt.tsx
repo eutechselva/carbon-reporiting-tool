@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import Highcharts, { SeriesColumnOptions } from 'highcharts';
+import Highcharts, { SeriesColumnOptions, Chart } from 'highcharts';
 import {
   FilterPanel, FormField, Input, Label, Select, TitleBar, WidgetWrapper, useToast
 } from "uxp/components";
@@ -10,7 +10,12 @@ export interface IWidgetProps {
   instanceId?: string;
   uiProps?: any;
 }
-
+interface ActivityRow {
+  activity: string;
+  year: string;
+  month: string;
+  value: number;
+}
 const monthOrder: { [key: string]: number } = {
   Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6,
   Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12
@@ -18,25 +23,24 @@ const monthOrder: { [key: string]: number } = {
 
 const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
   const chartRef = useRef(null);
+  const chartInstance = useRef<Chart | null>(null); // 🔧 chart instance ref
   const toast = useToast();
 
   const [activityData, setActivityData] = useState([]);
-  const [monthFilter, setMonthFilter] = useState<any>(null);        // ✅ NEW
-  const [yearFilter, setYearFilter] = useState<any>(new Date().getFullYear());  // ✅ NEW
-  const [activityName, setActivityName] = useState<any>("");     // ✅ NEW
+  const [monthFilter, setMonthFilter] = useState<any>(null);
+  const [yearFilter, setYearFilter] = useState<any>(new Date().getFullYear());
+  const [activityName, setActivityName] = useState<any>("");
+  const [activityNames, setActivityNames] = useState<string[]>([]); // 🔧 for custom legend
 
-  const monthOptions = Object.keys(monthOrder).map(m => ({ label: m, value: m }));  // ✅ NEW
+  const monthOptions = Object.keys(monthOrder).map(m => ({ label: m, value: m }));
+  const [selectedLegend, setSelectedLegend] = useState<string | null>("all");
 
   const fetchActivityData = async () => {
     try {
       const result = await props.uxpContext?.executeAction(
         "carbon_reporting_80rr",
         "GetAllData",
-        {
-          year: yearFilter,
-          month: monthFilter,
-          activityName: activityName
-        },
+        { year: yearFilter, month: monthFilter, activityName },
         { json: true }
       );
 
@@ -48,15 +52,46 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
       })) || [];
 
       setActivityData(cleanedData);
+
+      // 🔧 collect distinct activity names for legend
+      const distinctActivities = Array.from(new Set(
+        cleanedData.map((item: { activity: string }) => item.activity)
+      ));
+      
+      setActivityNames(
+        Array.from(new Set(
+          cleanedData.map((item: any) => item.activity as string)
+        ))
+      );
+      
     } catch (error) {
       console.error("Error fetching data:", error);
       toast.error("Failed to load data");
     }
   };
-
-  useEffect(() => {
-    fetchActivityData();
-  }, [monthFilter, yearFilter, activityName]);
+  const legendItemStyle = (active: boolean, color: string): React.CSSProperties => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 12px',
+    borderRadius: 4,
+    backgroundColor: active ? '#f0f8ff' : 'transparent',
+    cursor: 'pointer',
+    fontSize: '13px',
+    fontWeight: active ? 'bold' : 'normal',
+    border: active ? `1px solid ${color}` : '1px solid transparent',
+    transition: 'all 0.2s ease'
+  });
+  
+  const legendDotStyle = (color: string): React.CSSProperties => ({
+    width: 12,
+    height: 12,
+    borderRadius: '50%',
+    backgroundColor: color,
+    display: 'inline-block'
+  });
+  
+  useEffect(() => { fetchActivityData(); }, [monthFilter, yearFilter, activityName]);
 
   useEffect(() => {
     if (!chartRef.current) return;
@@ -81,7 +116,7 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
       ? Array.from(new Set(activityData.map(d => d.month))).sort((a, b) => monthOrder[a] - monthOrder[b])
       : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-      const series: SeriesColumnOptions[] =
+    const series: SeriesColumnOptions[] =
       Object.keys(processedData).length > 0
         ? Object.keys(processedData).map((activity, index) => ({
             name: activity,
@@ -97,8 +132,6 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
             data: [],
             type: 'column'
           }];
-    
-    
 
     const chartConfig: Highcharts.Options = {
       chart: {
@@ -164,17 +197,7 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
         pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
         style: { fontSize: '12px' }
       },
-      legend: {
-        align: 'center',
-        verticalAlign: 'bottom',
-        layout: 'horizontal',
-        itemStyle: {
-          fontSize: '12px',
-          fontWeight: 'normal'
-        },
-        itemHoverStyle: { color: '#000' },
-        margin: 20
-      },
+      legend: { enabled: false }, // 🔧 disable default legend
       plotOptions: {
         column: {
           dataLabels: { enabled: false },
@@ -191,58 +214,81 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
       responsive: {
         rules: [{
           condition: { maxWidth: 600 },
-          chartOptions: {
-            chart: { height: 400 },
-            legend: {
-              layout: 'horizontal',
-              align: 'center',
-              verticalAlign: 'bottom'
-            },
-            plotOptions: {
-              column: {
-                dataLabels: { enabled: false }
-              }
-            }
-          }
+          chartOptions: { chart: { height: 400 } }
         }]
       }
     };
 
-    Highcharts.chart(chartRef.current, chartConfig);
+    chartInstance.current = Highcharts.chart(chartRef.current, chartConfig); // 🔧 save chart instance
   }, [activityData]);
+
+  // 🔧 Legend toggle helpers
+  const showAllSeries = () => {
+    chartInstance.current?.series.forEach(s => s.show());
+  };
+
+  const showOnlySeries = (name: string) => {
+    chartInstance.current?.series.forEach(s => {
+      if (s.name === name) s.show();
+      else s.hide();
+    });
+  };
 
   return (
     <WidgetWrapper>
       <TitleBar title="Carbon Reporting Tool">
-        <FilterPanel
-          onClear={() => {
-            setMonthFilter(null);
-            setYearFilter(new Date().getFullYear());
-            setActivityName("");
-          }}
-        >
+        <FilterPanel onClear={() => {
+          setMonthFilter(null);
+          setYearFilter(new Date().getFullYear());
+          setActivityName("");
+        }}>
           <FormField>
             <Label>Month</Label>
-            <Select
-              options={monthOptions}
-              selected={monthFilter}
-              onChange={(val) => setMonthFilter(val)}
-            />
+            <Select options={monthOptions} selected={monthFilter} onChange={(val) => setMonthFilter(val)} />
           </FormField>
           <FormField>
             <Label>Year</Label>
-            <Input
-              type="number"
-              value={yearFilter}
-              onChange={(val) => setYearFilter(parseInt(val) || null)}
-              placeholder="e.g., 2025"
-            />
+            <Input type="number" value={yearFilter} onChange={(val) => setYearFilter(parseInt(val) || null)} />
           </FormField>
         </FilterPanel>
       </TitleBar>
 
+      {/* 🔧 Custom Legend */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
+  <div
+    style={legendItemStyle(selectedLegend === "all", "#888")}
+    onClick={() => {
+      setSelectedLegend("all");
+      showAllSeries();
+    }}
+  >
+    <span style={legendDotStyle("#888")}></span>
+    All
+  </div>
+
+  {activityNames.map((name, idx) => {
+  const rawColor = chartInstance.current?.series.find(s => s.name === name)?.color;
+  const color = typeof rawColor === 'string' ? rawColor : "#ccc";
+
+    return (
+      <div
+        key={name}
+        style={legendItemStyle(selectedLegend === name, color)}
+        onClick={() => {
+          setSelectedLegend(name);
+          showOnlySeries(name);
+        }}
+      >
+        <span style={legendDotStyle(color)}></span>
+        {name}
+      </div>
+    );
+  })}
+</div>
+
+
       <div style={{ width: '100%', height: '100%', padding: '20px', backgroundColor: '#fafafa' }}>
-        <div 
+        <div
           ref={chartRef}
           style={{
             width: '100%',
