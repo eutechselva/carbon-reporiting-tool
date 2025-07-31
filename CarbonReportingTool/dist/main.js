@@ -810,96 +810,6 @@ const ESGAreaChart = (props) => {
                 backgroundColor: '#f8f9fa',
                 fontFamily: 'Arial, sans-serif'
             } },
-            react_1.default.createElement("div", { style: {
-                    display: 'flex',
-                    gap: '15px',
-                    marginBottom: '20px',
-                    flexWrap: 'wrap'
-                } },
-                react_1.default.createElement("div", { style: {
-                        flex: 1,
-                        minWidth: '200px',
-                        backgroundColor: '#fff5f5',
-                        border: '2px solid #FF6B6B',
-                        borderRadius: '8px',
-                        padding: '15px',
-                        textAlign: 'center'
-                    } },
-                    react_1.default.createElement("h4", { style: {
-                            margin: '0 0 8px 0',
-                            color: '#FF6B6B',
-                            fontSize: '16px',
-                            fontWeight: 'bold'
-                        } }, "Scope 1 Emissions"),
-                    react_1.default.createElement("p", { style: {
-                            fontSize: '24px',
-                            fontWeight: 'bold',
-                            margin: '0 0 5px 0',
-                            color: '#2c3e50'
-                        } },
-                        scope1Total.toFixed(1),
-                        " tCO\u2082e"),
-                    react_1.default.createElement("p", { style: {
-                            fontSize: '12px',
-                            color: '#7f8c8d',
-                            margin: 0
-                        } }, "Direct emissions from fuel & refrigerants")),
-                react_1.default.createElement("div", { style: {
-                        flex: 1,
-                        minWidth: '200px',
-                        backgroundColor: '#f0fdfc',
-                        border: '2px solid #4ECDC4',
-                        borderRadius: '8px',
-                        padding: '15px',
-                        textAlign: 'center'
-                    } },
-                    react_1.default.createElement("h4", { style: {
-                            margin: '0 0 8px 0',
-                            color: '#4ECDC4',
-                            fontSize: '16px',
-                            fontWeight: 'bold'
-                        } }, "Scope 2 Emissions"),
-                    react_1.default.createElement("p", { style: {
-                            fontSize: '24px',
-                            fontWeight: 'bold',
-                            margin: '0 0 5px 0',
-                            color: '#2c3e50'
-                        } },
-                        scope2Total.toFixed(1),
-                        " tCO\u2082e"),
-                    react_1.default.createElement("p", { style: {
-                            fontSize: '12px',
-                            color: '#7f8c8d',
-                            margin: 0
-                        } }, "Indirect emissions from electricity")),
-                react_1.default.createElement("div", { style: {
-                        flex: 1,
-                        minWidth: '200px',
-                        backgroundColor: '#f8f9fa',
-                        border: '2px solid #6c757d',
-                        borderRadius: '8px',
-                        padding: '15px',
-                        textAlign: 'center'
-                    } },
-                    react_1.default.createElement("h4", { style: {
-                            margin: '0 0 8px 0',
-                            color: '#6c757d',
-                            fontSize: '16px',
-                            fontWeight: 'bold'
-                        } }, "Total Emissions"),
-                    react_1.default.createElement("p", { style: {
-                            fontSize: '24px',
-                            fontWeight: 'bold',
-                            margin: '0 0 5px 0',
-                            color: '#2c3e50'
-                        } },
-                        totalEmissions.toFixed(1),
-                        " tCO\u2082e"),
-                    react_1.default.createElement("p", { style: {
-                            fontSize: '12px',
-                            color: '#7f8c8d',
-                            margin: 0
-                        } }, "Combined carbon footprint"))),
             loading && (react_1.default.createElement("div", { style: {
                     textAlign: 'center',
                     padding: '40px',
@@ -918,8 +828,8 @@ const ESGAreaChart = (props) => {
                 } }, "No emission data found for the selected filters.")),
             !loading && activityData.length > 0 && (react_1.default.createElement("div", { ref: chartRef, style: {
                     width: '100%',
-                    height: '450px',
-                    minHeight: '450px',
+                    height: '500px',
+                    minHeight: '500px',
                     backgroundColor: 'white',
                     borderRadius: '12px',
                     boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
@@ -1539,96 +1449,6 @@ const ESGStackedBarChart = (props) => {
                 backgroundColor: '#f8f9fa',
                 fontFamily: 'Arial, sans-serif'
             } },
-            react_1.default.createElement("div", { style: {
-                    display: 'flex',
-                    gap: '15px',
-                    marginBottom: '20px',
-                    flexWrap: 'wrap'
-                } },
-                react_1.default.createElement("div", { style: {
-                        flex: 1,
-                        minWidth: '200px',
-                        backgroundColor: '#fff5f5',
-                        border: '2px solid #FF6B6B',
-                        borderRadius: '8px',
-                        padding: '15px',
-                        textAlign: 'center'
-                    } },
-                    react_1.default.createElement("h4", { style: {
-                            margin: '0 0 8px 0',
-                            color: '#FF6B6B',
-                            fontSize: '16px',
-                            fontWeight: 'bold'
-                        } }, "Scope 1 Emissions"),
-                    react_1.default.createElement("p", { style: {
-                            fontSize: '24px',
-                            fontWeight: 'bold',
-                            margin: '0 0 5px 0',
-                            color: '#2c3e50'
-                        } },
-                        scope1Total.toFixed(1),
-                        " tCO\u2082e"),
-                    react_1.default.createElement("p", { style: {
-                            fontSize: '12px',
-                            color: '#7f8c8d',
-                            margin: 0
-                        } }, "Direct emissions from fuel & refrigerants")),
-                react_1.default.createElement("div", { style: {
-                        flex: 1,
-                        minWidth: '200px',
-                        backgroundColor: '#f0fdfc',
-                        border: '2px solid #4ECDC4',
-                        borderRadius: '8px',
-                        padding: '15px',
-                        textAlign: 'center'
-                    } },
-                    react_1.default.createElement("h4", { style: {
-                            margin: '0 0 8px 0',
-                            color: '#4ECDC4',
-                            fontSize: '16px',
-                            fontWeight: 'bold'
-                        } }, "Scope 2 Emissions"),
-                    react_1.default.createElement("p", { style: {
-                            fontSize: '24px',
-                            fontWeight: 'bold',
-                            margin: '0 0 5px 0',
-                            color: '#2c3e50'
-                        } },
-                        scope2Total.toFixed(1),
-                        " tCO\u2082e"),
-                    react_1.default.createElement("p", { style: {
-                            fontSize: '12px',
-                            color: '#7f8c8d',
-                            margin: 0
-                        } }, "Indirect emissions from electricity")),
-                react_1.default.createElement("div", { style: {
-                        flex: 1,
-                        minWidth: '200px',
-                        backgroundColor: '#f8f9fa',
-                        border: '2px solid #6c757d',
-                        borderRadius: '8px',
-                        padding: '15px',
-                        textAlign: 'center'
-                    } },
-                    react_1.default.createElement("h4", { style: {
-                            margin: '0 0 8px 0',
-                            color: '#6c757d',
-                            fontSize: '16px',
-                            fontWeight: 'bold'
-                        } }, "Total Emissions"),
-                    react_1.default.createElement("p", { style: {
-                            fontSize: '24px',
-                            fontWeight: 'bold',
-                            margin: '0 0 5px 0',
-                            color: '#2c3e50'
-                        } },
-                        totalEmissions.toFixed(1),
-                        " tCO\u2082e"),
-                    react_1.default.createElement("p", { style: {
-                            fontSize: '12px',
-                            color: '#7f8c8d',
-                            margin: 0
-                        } }, "Combined carbon footprint"))),
             loading && (react_1.default.createElement("div", { style: {
                     textAlign: 'center',
                     padding: '40px',
@@ -1647,8 +1467,8 @@ const ESGStackedBarChart = (props) => {
                 } }, "No emission data found for the selected filters.")),
             !loading && activityData.length > 0 && (react_1.default.createElement("div", { ref: chartRef, style: {
                     width: '100%',
-                    height: '450px',
-                    minHeight: '450px',
+                    height: '500px',
+                    minHeight: '500px',
                     backgroundColor: 'white',
                     borderRadius: '12px',
                     boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
