@@ -230,31 +230,12 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
       <FilterPanel>
       </FilterPanel>
     </TitleBar>
-    <div style={{ 
-      width: '100%', 
-      height: '100%', 
-      padding: '20px', 
-      backgroundColor: '#f8f9fa',
-      fontFamily: 'Arial, sans-serif'
-    }}>
-      <div 
-        ref={chartRef} 
-        style={{ 
-          width: '100%', 
-          height: '500px',
-          minHeight: '500px',
-          backgroundColor: 'white',
-          borderRadius: '12px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-          border: '1px solid #e9ecef'
-        }}
-      />
-      
-      {/* ESG Summary Cards */}
+          {/* ESG Summary Cards */}
       <div style={{ 
         display: 'flex', 
         gap: '15px', 
         marginTop: '20px',
+        padding:'20px',
         flexWrap: 'wrap' as const
       }}>
         <div style={{
@@ -280,7 +261,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
             margin: '0 0 5px 0',
             color: '#2c3e50'
           }}>
-            {scope1Total.toLocaleString()} tCO₂e
+            {scope1Total.toLocaleString()} KgCo2e
           </p>
           <p style={{ 
             fontSize: '12px', 
@@ -314,7 +295,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
             margin: '0 0 5px 0',
             color: '#2c3e50'
           }}>
-            {scope2Total.toLocaleString()} tCO₂e
+            {scope2Total.toLocaleString()} KgCo2e
           </p>
           <p style={{ 
             fontSize: '12px', 
@@ -348,7 +329,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
             margin: '0 0 5px 0',
             color: '#2c3e50'
           }}>
-            {totalEmissions.toLocaleString()} tCO₂e
+            {totalEmissions.toLocaleString()} KgCo2e
           </p>
           <p style={{ 
             fontSize: '12px', 
@@ -359,6 +340,27 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
           </p>
         </div>
       </div>
+    <div style={{ 
+      width: '100%', 
+      height: '100%', 
+      padding: '20px', 
+      backgroundColor: '#f8f9fa',
+      fontFamily: 'Arial, sans-serif'
+    }}>
+      <div 
+        ref={chartRef} 
+        style={{ 
+          width: '100%', 
+          height: '500px',
+          minHeight: '500px',
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          border: '1px solid #e9ecef'
+        }}
+      />
+      
+
     </div>
     </WidgetWrapper>
   );

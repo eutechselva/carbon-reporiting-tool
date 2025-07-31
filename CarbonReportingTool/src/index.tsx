@@ -22,7 +22,7 @@ export interface IWidgetProps {
 
 const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const [parsedData, setParsedData] = React.useState<any[] | null>(null);
+  const [parsedData, setParsedData] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(false);
   const [fileName, setFileName] = React.useState<string | null>(null);
   const toast = useToast();
@@ -45,7 +45,8 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
           }
           return cleanedRow;
         });
-
+        console.log("parsed data",jsonData)
+        console.log("parse data type",typeof(jsonData))
         setParsedData(jsonData);
         setFileName(file.name);
       },
@@ -56,25 +57,28 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
     });
   };
 
-  const uploadToLucy = async () => {
-    if (!props.uxpContext || !parsedData) return;
+  const uploadToLucy =  () => {
 
+    // if (!props.uxpContext || !parsedData) return;
+    if (!parsedData || !Array.isArray(parsedData)) {
+        toast.error("Parsed data is empty or invalid.");
+        return;
+      }
     setLoading(true);
-    try {
-      const result = await props.uxpContext.executeAction(
+
+       props.uxpContext.executeAction(
         "carbon_reporting_80rr", // Backend model name remains
         "InsertCarbonReport",
-        { CarbonInputData: parsedData },
+         {CarbonInputData: parsedData } ,
         { json: true }
-      );
-
-      toast.success("Data uploaded successfully!");
-      resetState();
-    } catch (error: any) {
-      toast.error(`Upload failed: ${error.message || "Unknown error"}`);
-    } finally {
-      setLoading(false);
-    }
+      ).then((res)=>{
+        toast.success("Data uploaded successfully!");
+        resetState();
+      })
+      .catch((err)=>{
+        toast.error(`Upload failed: ${err|| "Unknown error"}`);
+      })
+    
   };
 
   return (
@@ -152,6 +156,7 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
     </WidgetWrapper>
   );
 };
+
 
 
 /**
