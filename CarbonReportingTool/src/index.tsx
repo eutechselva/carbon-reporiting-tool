@@ -49,7 +49,7 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
           return cleanedRow;
         });
 
-        setParsedData(jsonData);
+        setParsedData(   jsonData);
         setFileName(file.name);
       },
       error: (err) => {
@@ -63,12 +63,13 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
     if (!props.uxpContext || !parsedData) return;
 
     setLoading(true);
+    debugger;
     try {
       const result = await props.uxpContext.executeAction(
         "carbon_reporting_80rr", // Backend model name remains
         "InsertCarbonReport",
-        { CarbonInputData: parsedData },
-        { json: true }
+        { CarbonInputData: JSON.stringify(parsedData)   },
+       
       );
 
       toast.success("Data uploaded successfully!");

@@ -2546,9 +2546,10 @@ const CarbonReportingTool = (props) => {
         if (!props.uxpContext || !parsedData)
             return;
         setLoading(true);
+        debugger;
         try {
             const result = yield props.uxpContext.executeAction("carbon_reporting_80rr", // Backend model name remains
-            "InsertCarbonReport", { CarbonInputData: parsedData }, { json: true });
+            "InsertCarbonReport", { CarbonInputData: JSON.stringify(parsedData) });
             toast.success("Data uploaded successfully!");
             resetState();
         }
