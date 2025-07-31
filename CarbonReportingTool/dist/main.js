@@ -8,7 +8,7 @@
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"id":"dfb0f20b-787a-4dc3-f8f9-e3ee85e42314","author":"selva","widgets":[{"id":"carbon_reporting_80rr","name":"carbon_reporting_80rr","description":"carbon_reporting_80rr","icon":"","tags":[],"category":"","isTemplate":false},{"id":"all_data","name":"all_data","description":"all_data","icon":"","tags":[],"category":"","isTemplate":false},{"id":"bar_chart","name":"bar_chart","description":"bar_chart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESG_Donut_Chart","name":"ESG_Donut_Chart","description":"ESG_Donut_Chart","icon":"","tags":[],"category":"","isTemplate":false}],"sidebarLinks":[],"uis":[],"menuItems":[]}');
+module.exports = /*#__PURE__*/JSON.parse('{"id":"dfb0f20b-787a-4dc3-f8f9-e3ee85e42314","author":"selva","widgets":[{"id":"CarbonReportingTool","name":"CarbonReportingTool","description":"CarbonReportingTool","icon":"","tags":[],"category":"","isTemplate":false},{"id":"all_data","name":"all_data","description":"all_data","icon":"","tags":[],"category":"","isTemplate":false},{"id":"bar_chart","name":"bar_chart","description":"bar_chart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESG_Donut_Chart","name":"ESG_Donut_Chart","description":"ESG_Donut_Chart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESGEmissionFactorsTable","name":"ESGEmissionFactorsTable","description":"ESGEmissionFactorsTable","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESGStackedBarChart","name":"ESGStackedBarChart","description":"ESGStackedBarChart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESGAreaChart","name":"ESGAreaChart","description":"ESGAreaChart","icon":"","tags":[],"category":"","isTemplate":false}],"sidebarLinks":[],"uis":[],"menuItems":[]}');
 
 /***/ }),
 
@@ -33,7 +33,7 @@ module.exports = {};
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.id, "", ""]);
+exports.push([module.id, ".dropzone {\n  border: 2px dashed #ccc;\n  border-radius: 8px;\n  padding: 2rem;\n  text-align: center;\n  transition: all 0.3s ease-in-out;\n  background: #fafafa;\n  color: #666;\n  cursor: pointer;\n}\n\n.dropzone.dragover {\n  border-color: #2196f3;\n  background: #e3f2fd;\n  color: #1976d2;\n}\n\n.file-tag {\n  display: inline-flex;\n  align-items: center;\n  background: #e0f7fa;\n  border-radius: 16px;\n  padding: 0.5rem 1rem;\n  margin-top: 1rem;\n  font-size: 14px;\n  color: #006064;\n}\n\n.file-tag span {\n  margin-left: 0.5rem;\n  font-weight: bold;\n}\n\n.file-tag button {\n  margin-left: 10px;\n  background: none;\n  border: none;\n  color: #006064;\n  font-size: 16px;\n  cursor: pointer;\n  padding: 0;\n}", ""]);
 // Exports
 module.exports = exports;
 
@@ -460,6 +460,1026 @@ module.exports = function (list, options) {
 
 /***/ }),
 
+/***/ "./src/ESGAreaChart.tsx":
+/*!******************************!*\
+  !*** ./src/ESGAreaChart.tsx ***!
+  \******************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const react_1 = __importStar(__webpack_require__(/*! react */ "react"));
+const highcharts_1 = __importDefault(__webpack_require__(/*! highcharts */ "./node_modules/highcharts/highcharts.js"));
+const components_1 = __webpack_require__(/*! uxp/components */ "uxp/components");
+// Emission factors for calculations
+const emissionFactors = {
+    "Generator Fuel Consumption": 3.761,
+    "Refrigerant Leakages/Refilling": 1.000,
+    "Electricity Consumption – HVAC": 0.412 // tCO₂e per kWh
+};
+// Month sort helper
+const monthOrder = {
+    Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6,
+    Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12
+};
+const ESGAreaChart = (props) => {
+    const chartRef = (0, react_1.useRef)(null);
+    const toast = (0, components_1.useToast)();
+    const [loading, setLoading] = (0, react_1.useState)(false);
+    const [activityData, setActivityData] = (0, react_1.useState)([]);
+    const [monthFilter, setMonthFilter] = (0, react_1.useState)(null);
+    const [yearFilter, setYearFilter] = (0, react_1.useState)(new Date().getFullYear());
+    const [activityName, setActivityName] = (0, react_1.useState)("");
+    const monthOptions = [
+        { label: "Jan", value: "Jan" }, { label: "Feb", value: "Feb" },
+        { label: "Mar", value: "Mar" }, { label: "Apr", value: "Apr" },
+        { label: "May", value: "May" }, { label: "Jun", value: "Jun" },
+        { label: "Jul", value: "Jul" }, { label: "Aug", value: "Aug" },
+        { label: "Sep", value: "Sep" }, { label: "Oct", value: "Oct" },
+        { label: "Nov", value: "Nov" }, { label: "Dec", value: "Dec" },
+    ];
+    const fetchActivityData = () => __awaiter(void 0, void 0, void 0, function* () {
+        if (!props.uxpContext)
+            return;
+        setLoading(true);
+        try {
+            const result = yield props.uxpContext.executeAction("carbon_reporting_80rr", "GetAllData", { year: yearFilter, month: monthFilter, activityName: activityName }, { json: true });
+            console.log("Fetched emission data:", result);
+            const cleanedData = (result === null || result === void 0 ? void 0 : result.map((row) => ({
+                activity: row.activity,
+                year: row.year,
+                month: row.month,
+                value: parseFloat(row.value)
+            }))) || [];
+            setActivityData(cleanedData);
+        }
+        catch (error) {
+            console.error("Error loading emission data:", error);
+            toast.error("Failed to load activity data.");
+        }
+        finally {
+            setLoading(false);
+        }
+    });
+    // Calculate emissions dynamically from API data
+    const calculateEmissions = () => {
+        if (activityData.length === 0) {
+            return {
+                dynamicEmissionData: [],
+                scope1Total: 0,
+                scope2Total: 0,
+                totalEmissions: 0,
+                monthlyEmissions: {}
+            };
+        }
+        // Group by month and activity for area chart
+        const monthlyEmissions = {};
+        activityData.forEach(item => {
+            if (!monthlyEmissions[item.month]) {
+                monthlyEmissions[item.month] = {};
+            }
+            if (!monthlyEmissions[item.month][item.activity]) {
+                monthlyEmissions[item.month][item.activity] = 0;
+            }
+            // Apply emission factors immediately
+            const emissionFactor = emissionFactors[item.activity] || 0;
+            monthlyEmissions[item.month][item.activity] += item.value * emissionFactor;
+        });
+        const emissionsByActivity = {};
+        // Calculate total emissions by activity
+        activityData.forEach(item => {
+            if (!emissionsByActivity[item.activity]) {
+                emissionsByActivity[item.activity] = 0;
+            }
+            const emissionFactor = emissionFactors[item.activity] || 0;
+            emissionsByActivity[item.activity] += item.value * emissionFactor;
+        });
+        const dynamicEmissionData = Object.keys(emissionsByActivity).map(activity => {
+            const calculatedCO2e = emissionsByActivity[activity];
+            const isScope1 = activity.includes("Generator") || activity.includes("Refrigerant");
+            return {
+                source: activity,
+                totalCO2e: calculatedCO2e,
+                scope: isScope1 ? 1 : 2,
+                category: isScope1 ? "Scope 1" : "Scope 2"
+            };
+        });
+        const scope1Total = dynamicEmissionData
+            .filter(item => item.scope === 1)
+            .reduce((sum, item) => sum + item.totalCO2e, 0);
+        const scope2Total = dynamicEmissionData
+            .filter(item => item.scope === 2)
+            .reduce((sum, item) => sum + item.totalCO2e, 0);
+        const totalEmissions = scope1Total + scope2Total;
+        return { dynamicEmissionData, scope1Total, scope2Total, totalEmissions, monthlyEmissions };
+    };
+    // Generate dynamic title based on selected filters
+    const generateTitle = () => {
+        let titleParts = ['Carbon Emissions Trends (Area Chart)'];
+        if (yearFilter) {
+            titleParts.push(yearFilter.toString());
+        }
+        if (monthFilter) {
+            titleParts.push(monthFilter);
+        }
+        if (activityName) {
+            titleParts.push(`(${activityName})`);
+        }
+        return titleParts.join(' - ');
+    };
+    const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions, monthlyEmissions } = calculateEmissions();
+    (0, react_1.useEffect)(() => {
+        fetchActivityData();
+    }, [monthFilter, yearFilter, activityName]);
+    (0, react_1.useEffect)(() => {
+        if (chartRef.current && Object.keys(monthlyEmissions).length > 0) {
+            // Get sorted months
+            const months = Object.keys(monthlyEmissions).sort((a, b) => monthOrder[a] - monthOrder[b]);
+            // Get all activities
+            const activities = Array.from(new Set(Object.values(monthlyEmissions).flatMap(monthData => Object.keys(monthData))));
+            // Create series for each activity
+            const series = activities.map((activity, index) => {
+                const isScope1 = activity.includes("Generator") || activity.includes("Refrigerant");
+                const data = months.map(month => { var _a; return ((_a = monthlyEmissions[month]) === null || _a === void 0 ? void 0 : _a[activity]) || 0; });
+                return {
+                    name: activity,
+                    data: data,
+                    type: 'area',
+                    color: isScope1
+                        ? (index === 0 ? '#FF6B6B' : '#E74C3C')
+                        : '#4ECDC4',
+                    fillOpacity: 0.6,
+                    lineWidth: 2,
+                    marker: {
+                        enabled: true,
+                        radius: 4,
+                        lineWidth: 2,
+                        lineColor: '#ffffff'
+                    }
+                };
+            });
+            // Highcharts configuration for area chart
+            const chartConfig = {
+                chart: {
+                    type: 'area',
+                    height: 450,
+                    backgroundColor: 'transparent',
+                    spacing: [20, 20, 20, 20],
+                },
+                title: {
+                    text: generateTitle(),
+                    style: {
+                        fontSize: '20px',
+                        fontWeight: 'bold',
+                        color: '#2c3e50'
+                    }
+                },
+                subtitle: {
+                    text: `Total: ${totalEmissions.toFixed(1)} tCO₂e | Trend Analysis`,
+                    style: {
+                        fontSize: '14px',
+                        color: '#7f8c8d',
+                        fontWeight: 'normal'
+                    }
+                },
+                xAxis: {
+                    categories: months,
+                    title: {
+                        text: 'Month',
+                        style: {
+                            fontSize: '14px',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    gridLineWidth: 1,
+                    gridLineColor: '#f0f0f0',
+                    lineWidth: 1,
+                    lineColor: '#ccc',
+                    tickmarkPlacement: 'on'
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Carbon Emissions (tCO₂e)',
+                        style: {
+                            fontSize: '14px',
+                            fontWeight: 'bold',
+                            color: '#666'
+                        }
+                    },
+                    labels: {
+                        style: {
+                            color: '#666',
+                            fontSize: '11px'
+                        }
+                    },
+                    gridLineWidth: 1,
+                    gridLineColor: '#e6e6e6'
+                },
+                tooltip: {
+                    shared: true,
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderColor: '#ccc',
+                    borderRadius: 8,
+                    shadow: true,
+                    headerFormat: '<b>{point.x}</b><br/>',
+                    pointFormat: '<span style="color:{series.color}">●</span> {series.name}: <b>{point.y:.1f} tCO₂e</b><br/>',
+                    footerFormat: '<span style="font-size: 10px">Click and drag to zoom</span>',
+                    style: {
+                        fontSize: '12px'
+                    }
+                },
+                legend: {
+                    align: 'center',
+                    verticalAlign: 'bottom',
+                    layout: 'horizontal',
+                    itemStyle: {
+                        fontSize: '12px',
+                        fontWeight: 'normal'
+                    },
+                    itemHoverStyle: {
+                        color: '#000'
+                    },
+                    margin: 20
+                },
+                plotOptions: {
+                    area: {
+                        stacking: 'normal',
+                        lineColor: '#ffffff',
+                        lineWidth: 2,
+                        marker: {
+                            lineWidth: 2,
+                            lineColor: '#ffffff',
+                            states: {
+                                hover: {
+                                    radius: 6
+                                }
+                            }
+                        },
+                        states: {
+                            hover: {
+                                lineWidth: 3
+                            }
+                        },
+                        animation: {
+                            duration: 1200
+                        }
+                    }
+                },
+                series: series,
+                credits: {
+                    enabled: false
+                },
+                responsive: {
+                    rules: [{
+                            condition: {
+                                maxWidth: 600
+                            },
+                            chartOptions: {
+                                chart: {
+                                    height: 400
+                                },
+                                legend: {
+                                    layout: 'horizontal',
+                                    align: 'center',
+                                    verticalAlign: 'bottom'
+                                }
+                            }
+                        }]
+                }
+            };
+            highcharts_1.default.chart(chartRef.current, chartConfig);
+        }
+    }, [activityData, monthlyEmissions, totalEmissions]);
+    return (react_1.default.createElement(components_1.WidgetWrapper, null,
+        react_1.default.createElement(components_1.TitleBar, { title: "Carbon Reporting Tool - Area Chart" },
+            react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
+                    setMonthFilter(null);
+                    setYearFilter(new Date().getFullYear());
+                    setActivityName("");
+                } },
+                react_1.default.createElement(components_1.FormField, null,
+                    react_1.default.createElement(components_1.Label, null, "Filter by Month"),
+                    react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (newMonth) => setMonthFilter(newMonth) })),
+                react_1.default.createElement(components_1.FormField, null,
+                    react_1.default.createElement(components_1.Label, null, "Filter by Year"),
+                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null), placeholder: "e.g., 2025" })),
+                react_1.default.createElement(components_1.FormField, null,
+                    react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
+                    react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" })))),
+        react_1.default.createElement("div", { style: {
+                width: '100%',
+                height: '100%',
+                padding: '20px',
+                backgroundColor: '#f8f9fa',
+                fontFamily: 'Arial, sans-serif'
+            } },
+            loading && (react_1.default.createElement("div", { style: {
+                    textAlign: 'center',
+                    padding: '40px',
+                    color: '#7f8c8d',
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                } }, "Loading emissions data...")),
+            !loading && activityData.length === 0 && (react_1.default.createElement("div", { style: {
+                    textAlign: 'center',
+                    padding: '40px',
+                    color: '#7f8c8d',
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                } }, "No emission data found for the selected filters.")),
+            !loading && activityData.length > 0 && (react_1.default.createElement("div", { ref: chartRef, style: {
+                    width: '100%',
+                    height: '500px',
+                    minHeight: '500px',
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    border: '1px solid #e9ecef'
+                } })))));
+};
+exports["default"] = ESGAreaChart;
+
+
+/***/ }),
+
+/***/ "./src/ESGEmissionFactorsTable.tsx":
+/*!*****************************************!*\
+  !*** ./src/ESGEmissionFactorsTable.tsx ***!
+  \*****************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const react_1 = __importDefault(__webpack_require__(/*! react */ "react"));
+// Emission factors data
+const emissionFactorsData = [
+    {
+        scope: "Scope 1",
+        activity: "Generator Fuel Consumption",
+        unit: "litres",
+        emissionFactor: 3.761,
+        source: "SEFR (Singapore Emission Factors Registry)",
+        category: "Direct Combustion",
+        description: "Diesel fuel combustion in backup generators"
+    },
+    {
+        scope: "Scope 1",
+        activity: "Refrigerant Leakages/Refilling",
+        unit: "litres",
+        emissionFactor: 1.000,
+        source: "Carrier Centrifugal Chiller Spec",
+        category: "Fugitive Emissions",
+        description: "HFC refrigerant leakage and refilling"
+    },
+    {
+        scope: "Scope 2",
+        activity: "Electricity Consumption – HVAC",
+        unit: "kWh",
+        emissionFactor: 0.412,
+        source: "Singapore EMA – Energy Statistics 2023",
+        category: "Purchased Electricity",
+        description: "Grid electricity for HVAC systems"
+    }
+];
+const ESGEmissionFactorsTable = (props) => {
+    const getScopeColor = (scope) => {
+        return scope === "Scope 1" ? "#FF6B6B" : "#4ECDC4";
+    };
+    const getScopeBadgeStyle = (scope) => ({
+        backgroundColor: getScopeColor(scope),
+        color: 'white',
+        padding: '4px 12px',
+        borderRadius: '16px',
+        fontSize: '12px',
+        fontWeight: 'bold',
+        display: 'inline-block',
+        minWidth: '70px',
+        textAlign: 'center'
+    });
+    return (react_1.default.createElement("div", { style: {
+            width: '100%',
+            height: '100%',
+            padding: '20px',
+            backgroundColor: '#f8f9fa',
+            fontFamily: 'Arial, sans-serif'
+        } },
+        react_1.default.createElement("div", { style: {
+                backgroundColor: 'white',
+                borderRadius: '12px 12px 0 0',
+                padding: '20px',
+                borderBottom: '1px solid #e9ecef',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            } },
+            react_1.default.createElement("h2", { style: {
+                    margin: '0 0 8px 0',
+                    color: '#2c3e50',
+                    fontSize: '20px',
+                    fontWeight: 'bold'
+                } }, "Emission Factors Reference"),
+            react_1.default.createElement("p", { style: {
+                    margin: 0,
+                    color: '#7f8c8d',
+                    fontSize: '14px'
+                } }, "Carbon emission factors and data sources for ESG reporting compliance")),
+        react_1.default.createElement("div", { style: {
+                backgroundColor: 'white',
+                borderRadius: '0 0 12px 12px',
+                overflow: 'hidden',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            } },
+            react_1.default.createElement("table", { style: {
+                    width: '100%',
+                    borderCollapse: 'collapse',
+                    fontSize: '14px'
+                } },
+                react_1.default.createElement("thead", null,
+                    react_1.default.createElement("tr", { style: {
+                            backgroundColor: '#f8f9fa',
+                            borderBottom: '2px solid #e9ecef'
+                        } },
+                        react_1.default.createElement("th", { style: {
+                                padding: '16px 12px',
+                                textAlign: 'left',
+                                fontWeight: 'bold',
+                                color: '#2c3e50',
+                                fontSize: '13px',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px'
+                            } }, "Scope"),
+                        react_1.default.createElement("th", { style: {
+                                padding: '16px 12px',
+                                textAlign: 'left',
+                                fontWeight: 'bold',
+                                color: '#2c3e50',
+                                fontSize: '13px',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px'
+                            } }, "Activity"),
+                        react_1.default.createElement("th", { style: {
+                                padding: '16px 12px',
+                                textAlign: 'center',
+                                fontWeight: 'bold',
+                                color: '#2c3e50',
+                                fontSize: '13px',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px'
+                            } }, "Unit"),
+                        react_1.default.createElement("th", { style: {
+                                padding: '16px 12px',
+                                textAlign: 'right',
+                                fontWeight: 'bold',
+                                color: '#2c3e50',
+                                fontSize: '13px',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px'
+                            } },
+                            "Emission Factor",
+                            react_1.default.createElement("br", null),
+                            react_1.default.createElement("span", { style: { fontSize: '11px', fontWeight: 'normal', textTransform: 'none' } }, "(tCO\u2082e per unit)")),
+                        react_1.default.createElement("th", { style: {
+                                padding: '16px 12px',
+                                textAlign: 'left',
+                                fontWeight: 'bold',
+                                color: '#2c3e50',
+                                fontSize: '13px',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px'
+                            } }, "Data Source"))),
+                react_1.default.createElement("tbody", null, emissionFactorsData.map((row, index) => (react_1.default.createElement("tr", { key: index, style: {
+                        borderBottom: '1px solid #f1f3f4',
+                        transition: 'background-color 0.2s ease',
+                        cursor: 'default'
+                    }, onMouseEnter: (e) => {
+                        e.currentTarget.style.backgroundColor = '#f8f9fa';
+                    }, onMouseLeave: (e) => {
+                        e.currentTarget.style.backgroundColor = 'white';
+                    } },
+                    react_1.default.createElement("td", { style: {
+                            padding: '16px 12px',
+                            verticalAlign: 'top'
+                        } },
+                        react_1.default.createElement("span", { style: getScopeBadgeStyle(row.scope) }, row.scope),
+                        react_1.default.createElement("div", { style: {
+                                fontSize: '11px',
+                                color: '#7f8c8d',
+                                marginTop: '4px',
+                                fontStyle: 'italic'
+                            } }, row.category)),
+                    react_1.default.createElement("td", { style: {
+                            padding: '16px 12px',
+                            verticalAlign: 'top'
+                        } },
+                        react_1.default.createElement("div", { style: {
+                                fontWeight: 'bold',
+                                color: '#2c3e50',
+                                marginBottom: '4px'
+                            } }, row.activity),
+                        react_1.default.createElement("div", { style: {
+                                fontSize: '12px',
+                                color: '#7f8c8d',
+                                lineHeight: '1.4'
+                            } }, row.description)),
+                    react_1.default.createElement("td", { style: {
+                            padding: '16px 12px',
+                            textAlign: 'center',
+                            verticalAlign: 'middle'
+                        } },
+                        react_1.default.createElement("span", { style: {
+                                backgroundColor: '#e9ecef',
+                                padding: '4px 8px',
+                                borderRadius: '4px',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                color: '#495057'
+                            } }, row.unit)),
+                    react_1.default.createElement("td", { style: {
+                            padding: '16px 12px',
+                            textAlign: 'right',
+                            verticalAlign: 'middle'
+                        } },
+                        react_1.default.createElement("span", { style: {
+                                fontSize: '16px',
+                                fontWeight: 'bold',
+                                color: getScopeColor(row.scope)
+                            } }, row.emissionFactor.toFixed(3))),
+                    react_1.default.createElement("td", { style: {
+                            padding: '16px 12px',
+                            verticalAlign: 'top'
+                        } },
+                        react_1.default.createElement("div", { style: {
+                                fontSize: '13px',
+                                color: '#2c3e50',
+                                fontWeight: '500',
+                                lineHeight: '1.4'
+                            } }, row.source)))))))),
+        react_1.default.createElement("div", { style: {
+                marginTop: '16px',
+                padding: '16px',
+                backgroundColor: '#e3f2fd',
+                borderRadius: '8px',
+                border: '1px solid #bbdefb'
+            } },
+            react_1.default.createElement("div", { style: {
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginBottom: '8px'
+                } },
+                react_1.default.createElement("span", { style: {
+                        fontSize: '16px'
+                    } }, "\u2139\uFE0F"),
+                react_1.default.createElement("h4", { style: {
+                        margin: 0,
+                        color: '#1565c0',
+                        fontSize: '14px',
+                        fontWeight: 'bold'
+                    } }, "ESG Reporting Notes")),
+            react_1.default.createElement("ul", { style: {
+                    margin: '0',
+                    paddingLeft: '20px',
+                    color: '#1976d2',
+                    fontSize: '13px',
+                    lineHeight: '1.5'
+                } },
+                react_1.default.createElement("li", null,
+                    react_1.default.createElement("strong", null, "Scope 1:"),
+                    " Direct GHG emissions from sources owned or controlled by the organization"),
+                react_1.default.createElement("li", null,
+                    react_1.default.createElement("strong", null, "Scope 2:"),
+                    " Indirect GHG emissions from consumption of purchased electricity, heat, or steam"),
+                react_1.default.createElement("li", null,
+                    react_1.default.createElement("strong", null, "tCO\u2082e:"),
+                    " Tonnes of carbon dioxide equivalent - standardized unit for all greenhouse gases"),
+                react_1.default.createElement("li", null,
+                    react_1.default.createElement("strong", null, "Data Sources:"),
+                    " All emission factors are from recognized ESG reporting standards and local regulatory bodies")))));
+};
+exports["default"] = ESGEmissionFactorsTable;
+
+
+/***/ }),
+
+/***/ "./src/ESGStackedBarChart.tsx":
+/*!************************************!*\
+  !*** ./src/ESGStackedBarChart.tsx ***!
+  \************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const react_1 = __importStar(__webpack_require__(/*! react */ "react"));
+const highcharts_1 = __importDefault(__webpack_require__(/*! highcharts */ "./node_modules/highcharts/highcharts.js"));
+const components_1 = __webpack_require__(/*! uxp/components */ "uxp/components");
+// Emission factors for calculations
+const emissionFactors = {
+    "Generator Fuel Consumption": 3.761,
+    "Refrigerant Leakages/Refilling": 1.000,
+    "Electricity Consumption – HVAC": 0.412 // tCO₂e per kWh
+};
+// Month sort helper
+const monthOrder = {
+    Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6,
+    Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12
+};
+const ESGStackedBarChart = (props) => {
+    const chartRef = (0, react_1.useRef)(null);
+    const toast = (0, components_1.useToast)();
+    const [loading, setLoading] = (0, react_1.useState)(false);
+    const [activityData, setActivityData] = (0, react_1.useState)([]);
+    const [monthFilter, setMonthFilter] = (0, react_1.useState)(null);
+    const [yearFilter, setYearFilter] = (0, react_1.useState)(new Date().getFullYear());
+    const [activityName, setActivityName] = (0, react_1.useState)("");
+    const monthOptions = [
+        { label: "Jan", value: "Jan" }, { label: "Feb", value: "Feb" },
+        { label: "Mar", value: "Mar" }, { label: "Apr", value: "Apr" },
+        { label: "May", value: "May" }, { label: "Jun", value: "Jun" },
+        { label: "Jul", value: "Jul" }, { label: "Aug", value: "Aug" },
+        { label: "Sep", value: "Sep" }, { label: "Oct", value: "Oct" },
+        { label: "Nov", value: "Nov" }, { label: "Dec", value: "Dec" },
+    ];
+    const fetchActivityData = () => __awaiter(void 0, void 0, void 0, function* () {
+        if (!props.uxpContext)
+            return;
+        setLoading(true);
+        try {
+            const result = yield props.uxpContext.executeAction("carbon_reporting_80rr", "GetAllData", { year: yearFilter, month: monthFilter, activityName: activityName }, { json: true });
+            console.log("Fetched emission data:", result);
+            const cleanedData = (result === null || result === void 0 ? void 0 : result.map((row) => ({
+                activity: row.activity,
+                year: row.year,
+                month: row.month,
+                value: parseFloat(row.value)
+            }))) || [];
+            setActivityData(cleanedData);
+        }
+        catch (error) {
+            console.error("Error loading emission data:", error);
+            toast.error("Failed to load activity data.");
+        }
+        finally {
+            setLoading(false);
+        }
+    });
+    // Calculate emissions dynamically from API data
+    const calculateEmissions = () => {
+        if (activityData.length === 0) {
+            return {
+                dynamicEmissionData: [],
+                scope1Total: 0,
+                scope2Total: 0,
+                totalEmissions: 0,
+                monthlyEmissions: {}
+            };
+        }
+        // Group by month and activity for stacked chart
+        const monthlyEmissions = {};
+        activityData.forEach(item => {
+            if (!monthlyEmissions[item.month]) {
+                monthlyEmissions[item.month] = {};
+            }
+            if (!monthlyEmissions[item.month][item.activity]) {
+                monthlyEmissions[item.month][item.activity] = 0;
+            }
+            // Apply emission factors immediately
+            const emissionFactor = emissionFactors[item.activity] || 0;
+            monthlyEmissions[item.month][item.activity] += item.value * emissionFactor;
+        });
+        const emissionsByActivity = {};
+        // Calculate total emissions by activity
+        activityData.forEach(item => {
+            if (!emissionsByActivity[item.activity]) {
+                emissionsByActivity[item.activity] = 0;
+            }
+            const emissionFactor = emissionFactors[item.activity] || 0;
+            emissionsByActivity[item.activity] += item.value * emissionFactor;
+        });
+        const dynamicEmissionData = Object.keys(emissionsByActivity).map(activity => {
+            const calculatedCO2e = emissionsByActivity[activity];
+            const isScope1 = activity.includes("Generator") || activity.includes("Refrigerant");
+            return {
+                source: activity,
+                totalCO2e: calculatedCO2e,
+                scope: isScope1 ? 1 : 2,
+                category: isScope1 ? "Scope 1" : "Scope 2"
+            };
+        });
+        const scope1Total = dynamicEmissionData
+            .filter(item => item.scope === 1)
+            .reduce((sum, item) => sum + item.totalCO2e, 0);
+        const scope2Total = dynamicEmissionData
+            .filter(item => item.scope === 2)
+            .reduce((sum, item) => sum + item.totalCO2e, 0);
+        const totalEmissions = scope1Total + scope2Total;
+        return { dynamicEmissionData, scope1Total, scope2Total, totalEmissions, monthlyEmissions };
+    };
+    // Generate dynamic title based on selected filters
+    const generateTitle = () => {
+        let titleParts = ['Monthly Carbon Emissions (Stacked)'];
+        if (yearFilter) {
+            titleParts.push(yearFilter.toString());
+        }
+        if (monthFilter) {
+            titleParts.push(monthFilter);
+        }
+        if (activityName) {
+            titleParts.push(`(${activityName})`);
+        }
+        return titleParts.join(' - ');
+    };
+    const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions, monthlyEmissions } = calculateEmissions();
+    (0, react_1.useEffect)(() => {
+        fetchActivityData();
+    }, [monthFilter, yearFilter, activityName]);
+    (0, react_1.useEffect)(() => {
+        if (chartRef.current && Object.keys(monthlyEmissions).length > 0) {
+            // Get sorted months
+            const months = Object.keys(monthlyEmissions).sort((a, b) => monthOrder[a] - monthOrder[b]);
+            // Get all activities
+            const activities = Array.from(new Set(Object.values(monthlyEmissions).flatMap(monthData => Object.keys(monthData))));
+            // Create series for each activity
+            const series = activities.map((activity, index) => {
+                const isScope1 = activity.includes("Generator") || activity.includes("Refrigerant");
+                const data = months.map(month => { var _a; return ((_a = monthlyEmissions[month]) === null || _a === void 0 ? void 0 : _a[activity]) || 0; });
+                return {
+                    name: activity,
+                    data: data,
+                    type: 'column',
+                    stack: isScope1 ? 'Scope 1' : 'Scope 2',
+                    color: isScope1
+                        ? (index === 0 ? '#FF6B6B' : '#E74C3C')
+                        : '#4ECDC4',
+                    borderWidth: 0,
+                    borderRadius: 2
+                };
+            });
+            // Highcharts configuration for stacked bar chart
+            const chartConfig = {
+                chart: {
+                    type: 'column',
+                    height: 450,
+                    backgroundColor: 'transparent',
+                    spacing: [20, 20, 20, 20]
+                },
+                title: {
+                    text: generateTitle(),
+                    style: {
+                        fontSize: '20px',
+                        fontWeight: 'bold',
+                        color: '#2c3e50'
+                    }
+                },
+                subtitle: {
+                    text: `Total: ${totalEmissions.toFixed(1)} tCO₂e | Stacked by Scope`,
+                    style: {
+                        fontSize: '14px',
+                        color: '#7f8c8d',
+                        fontWeight: 'normal'
+                    }
+                },
+                xAxis: {
+                    categories: months,
+                    title: {
+                        text: 'Month',
+                        style: {
+                            fontSize: '14px',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    gridLineWidth: 0,
+                    lineWidth: 1,
+                    lineColor: '#ccc'
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Carbon Emissions (tCO₂e)',
+                        style: {
+                            fontSize: '14px',
+                            fontWeight: 'bold',
+                            color: '#666'
+                        }
+                    },
+                    labels: {
+                        style: {
+                            color: '#666',
+                            fontSize: '11px'
+                        }
+                    },
+                    gridLineWidth: 1,
+                    gridLineColor: '#e6e6e6',
+                    stackLabels: {
+                        enabled: true,
+                        style: {
+                            fontWeight: 'bold',
+                            color: '#2c3e50',
+                            fontSize: '10px'
+                        },
+                        formatter: function () {
+                            var _a;
+                            return ((_a = this.total) === null || _a === void 0 ? void 0 : _a.toFixed(1)) + ' tCO₂e';
+                        }
+                    }
+                },
+                tooltip: {
+                    headerFormat: '<b>{point.x}</b><br/>',
+                    pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y:.1f} tCO₂e</b> ({series.options.stack})<br/>',
+                    footerFormat: 'Total: <b>{point.total:.1f} tCO₂e</b>',
+                    shared: false,
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderColor: '#ccc',
+                    borderRadius: 8,
+                    shadow: true
+                },
+                legend: {
+                    align: 'center',
+                    verticalAlign: 'bottom',
+                    layout: 'horizontal',
+                    itemStyle: {
+                        fontSize: '12px',
+                        fontWeight: 'normal'
+                    },
+                    itemHoverStyle: {
+                        color: '#000'
+                    },
+                    margin: 20
+                },
+                plotOptions: {
+                    column: {
+                        stacking: 'normal',
+                        dataLabels: {
+                            enabled: false
+                        },
+                        borderWidth: 0,
+                        groupPadding: 0.1,
+                        pointPadding: 0.05,
+                        states: {
+                            hover: {
+                                brightness: 0.1
+                            }
+                        },
+                        animation: {
+                            duration: 1000
+                        }
+                    }
+                },
+                series: series,
+                credits: {
+                    enabled: false
+                },
+                responsive: {
+                    rules: [{
+                            condition: {
+                                maxWidth: 600
+                            },
+                            chartOptions: {
+                                chart: {
+                                    height: 400
+                                },
+                                legend: {
+                                    layout: 'horizontal',
+                                    align: 'center',
+                                    verticalAlign: 'bottom'
+                                }
+                            }
+                        }]
+                }
+            };
+            highcharts_1.default.chart(chartRef.current, chartConfig);
+        }
+    }, [activityData, monthlyEmissions, totalEmissions]);
+    return (react_1.default.createElement(components_1.WidgetWrapper, null,
+        react_1.default.createElement(components_1.TitleBar, { title: "Carbon Reporting Tool - Stacked Bar Chart" },
+            react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
+                    setMonthFilter(null);
+                    setYearFilter(new Date().getFullYear());
+                    setActivityName("");
+                } },
+                react_1.default.createElement(components_1.FormField, null,
+                    react_1.default.createElement(components_1.Label, null, "Filter by Month"),
+                    react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (newMonth) => setMonthFilter(newMonth) })),
+                react_1.default.createElement(components_1.FormField, null,
+                    react_1.default.createElement(components_1.Label, null, "Filter by Year"),
+                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null), placeholder: "e.g., 2025" })),
+                react_1.default.createElement(components_1.FormField, null,
+                    react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
+                    react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" })))),
+        react_1.default.createElement("div", { style: {
+                width: '100%',
+                height: '100%',
+                padding: '20px',
+                backgroundColor: '#f8f9fa',
+                fontFamily: 'Arial, sans-serif'
+            } },
+            loading && (react_1.default.createElement("div", { style: {
+                    textAlign: 'center',
+                    padding: '40px',
+                    color: '#7f8c8d',
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                } }, "Loading emissions data...")),
+            !loading && activityData.length === 0 && (react_1.default.createElement("div", { style: {
+                    textAlign: 'center',
+                    padding: '40px',
+                    color: '#7f8c8d',
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                } }, "No emission data found for the selected filters.")),
+            !loading && activityData.length > 0 && (react_1.default.createElement("div", { ref: chartRef, style: {
+                    width: '100%',
+                    height: '500px',
+                    minHeight: '500px',
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    border: '1px solid #e9ecef'
+                } })))));
+};
+exports["default"] = ESGStackedBarChart;
+
+
+/***/ }),
+
 /***/ "./src/all_data.tsx":
 /*!**************************!*\
   !*** ./src/all_data.tsx ***!
@@ -491,79 +1511,112 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const react_1 = __importStar(__webpack_require__(/*! react */ "react"));
 const highcharts_1 = __importDefault(__webpack_require__(/*! highcharts */ "./node_modules/highcharts/highcharts.js"));
-// Sample data
-const activityData = [
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Jan", value: "43" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Feb", value: "56" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Mar", value: "49" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Apr", value: "51" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "May", value: "39" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Jun", value: "45" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Jul", value: "50" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Aug", value: "47" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Sep", value: "52" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Oct", value: "48" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Nov", value: "44" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Dec", value: "53" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Jan", value: "45" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Feb", value: "76" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Mar", value: "68" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Apr", value: "55" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "May", value: "62" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Jun", value: "71" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Jul", value: "60" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Aug", value: "58" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Sep", value: "67" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Oct", value: "59" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Nov", value: "65" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Dec", value: "70" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Jan", value: "4855" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Feb", value: "4720" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Mar", value: "4985" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Apr", value: "5100" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "May", value: "5205" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Jun", value: "5350" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Jul", value: "5470" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Aug", value: "5395" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Sep", value: "5250" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Oct", value: "4950" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Nov", value: "4825" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Dec", value: "4750" }
-];
+const components_1 = __webpack_require__(/*! uxp/components */ "uxp/components");
 // Month sort helper
 const monthOrder = {
     Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6,
     Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12
 };
-const all_data = (props) => {
+// 🔧 Style helpers for legend
+const legendItemStyle = (active, color) => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 12px',
+    borderRadius: 4,
+    backgroundColor: active ? '#f0f8ff' : 'transparent',
+    cursor: 'pointer',
+    fontSize: '13px',
+    fontWeight: active ? 'bold' : 'normal',
+    border: active ? `1px solid ${color}` : '1px solid transparent',
+    transition: 'all 0.2s ease'
+});
+const legendDotStyle = (color) => ({
+    width: 12,
+    height: 12,
+    borderRadius: '50%',
+    backgroundColor: color,
+    display: 'inline-block'
+});
+const AllData = (props) => {
     const chartRef = (0, react_1.useRef)(null);
+    const chartInstance = (0, react_1.useRef)(null);
+    const toast = (0, components_1.useToast)();
+    const [loading, setLoading] = (0, react_1.useState)(false);
+    const [activityData, setActivityData] = (0, react_1.useState)([]);
+    const [activityNames, setActivityNames] = (0, react_1.useState)([]);
+    const [selectedLegend, setSelectedLegend] = (0, react_1.useState)("all");
+    const [monthFilter, setMonthFilter] = (0, react_1.useState)(null);
+    const [yearFilter, setYearFilter] = (0, react_1.useState)(new Date().getFullYear());
+    const [activityName, setActivityName] = (0, react_1.useState)("");
+    const monthOptions = [
+        { label: "Jan", value: "Jan" }, { label: "Feb", value: "Feb" },
+        { label: "Mar", value: "Mar" }, { label: "Apr", value: "Apr" },
+        { label: "May", value: "May" }, { label: "Jun", value: "Jun" },
+        { label: "Jul", value: "Jul" }, { label: "Aug", value: "Aug" },
+        { label: "Sep", value: "Sep" }, { label: "Oct", value: "Oct" },
+        { label: "Nov", value: "Nov" }, { label: "Dec", value: "Dec" },
+    ];
+    const fetchActivityData = () => __awaiter(void 0, void 0, void 0, function* () {
+        if (!props.uxpContext)
+            return;
+        setLoading(true);
+        try {
+            const result = yield props.uxpContext.executeAction("carbon_reporting_80rr", "GetAllData", { year: yearFilter, month: monthFilter, activityName: activityName }, { json: true });
+            const cleanedData = (result === null || result === void 0 ? void 0 : result.map((row) => ({
+                activity: row.activity,
+                year: row.year,
+                month: row.month,
+                value: parseFloat(row.value)
+            }))) || [];
+            setActivityData(cleanedData);
+            setActivityNames(Array.from(new Set(cleanedData.map((item) => item.activity))));
+        }
+        catch (error) {
+            console.error("Error loading data:", error);
+            toast.error("Failed to load activity data.");
+        }
+        finally {
+            setLoading(false);
+        }
+    });
     (0, react_1.useEffect)(() => {
-        if (chartRef.current) {
-            // Process data for Highcharts
-            const processedData = {};
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            // Group data by activity
-            activityData.forEach(item => {
-                if (!processedData[item.activity]) {
-                    processedData[item.activity] = [];
-                }
-            });
-            // Sort and organize data for each activity
-            Object.keys(processedData).forEach(activity => {
-                const activityItems = activityData
-                    .filter(item => item.activity === activity)
-                    .sort((a, b) => monthOrder[a.month] - monthOrder[b.month]);
-                processedData[activity] = activityItems.map(item => parseFloat(item.value));
-            });
-            // Create series for Highcharts
-            const series = Object.keys(processedData).map((activity, index) => ({
+        fetchActivityData();
+    }, [monthFilter, yearFilter]);
+    (0, react_1.useEffect)(() => {
+        if (!chartRef.current)
+            return;
+        const processedData = {};
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        activityData.forEach(item => {
+            if (!processedData[item.activity]) {
+                processedData[item.activity] = [];
+            }
+        });
+        Object.keys(processedData).forEach(activity => {
+            const activityItems = activityData
+                .filter(item => item.activity === activity)
+                .sort((a, b) => monthOrder[a.month] - monthOrder[b.month]);
+            processedData[activity] = activityItems.map(item => item.value);
+        });
+        const series = Object.keys(processedData).length > 0
+            ? Object.keys(processedData).map((activity, index) => ({
                 name: activity,
                 data: processedData[activity],
                 type: 'line',
@@ -573,113 +1626,114 @@ const all_data = (props) => {
                     enabled: true,
                     radius: 4
                 }
-            }));
-            // Highcharts configuration
-            const chartConfig = {
-                chart: {
-                    type: 'line',
-                    height: 400,
-                    backgroundColor: 'transparent'
-                },
-                title: {
-                    text: 'Monthly Activity Data - 2025',
-                    style: {
-                        fontSize: '18px',
-                        fontWeight: 'bold'
+            }))
+            : [{
+                    name: 'No Data',
+                    data: [],
+                    type: 'line'
+                }];
+        const xCategories = activityData.length > 0
+            ? Array.from(new Set(activityData.map(d => d.month))).sort((a, b) => monthOrder[a] - monthOrder[b])
+            : months;
+        const chartConfig = {
+            chart: {
+                type: 'line',
+                height: 400,
+                backgroundColor: 'transparent'
+            },
+            title: {
+                text: 'Monthly Activity Data - 2025',
+                style: { fontSize: '18px', fontWeight: 'bold' }
+            },
+            subtitle: {
+                text: 'Generator Fuel, Refrigerant Leakages, and HVAC Electricity Consumption'
+            },
+            xAxis: {
+                categories: xCategories,
+                title: { text: 'Month' },
+                gridLineWidth: 1,
+                gridLineColor: '#e6e6e6'
+            },
+            yAxis: [{
+                    title: { text: 'Generator Fuel & Refrigerant (Units)', style: { color: '#666' } },
+                    labels: { style: { color: '#666' } }
+                }, {
+                    title: { text: 'HVAC Electricity (kWh)', style: { color: '#666' } },
+                    labels: { style: { color: '#666' } },
+                    opposite: true
+                }],
+            tooltip: {
+                shared: true,
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                borderColor: '#ccc',
+                borderRadius: 5,
+                shadow: true
+            },
+            legend: { enabled: false },
+            plotOptions: {
+                line: {
+                    dataLabels: { enabled: false },
+                    enableMouseTracking: true,
+                    lineWidth: 2,
+                    marker: {
+                        symbol: 'circle',
+                        states: { hover: { radius: 6 } }
                     }
-                },
-                subtitle: {
-                    text: 'Generator Fuel, Refrigerant Leakages, and HVAC Electricity Consumption'
-                },
-                xAxis: {
-                    categories: months,
-                    title: {
-                        text: 'Month'
-                    },
-                    gridLineWidth: 1,
-                    gridLineColor: '#e6e6e6'
-                },
-                yAxis: [{
-                        title: {
-                            text: 'Generator Fuel & Refrigerant (Units)',
-                            style: { color: '#666' }
-                        },
-                        labels: {
-                            style: { color: '#666' }
-                        }
-                    }, {
-                        title: {
-                            text: 'HVAC Electricity (kWh)',
-                            style: { color: '#666' }
-                        },
-                        labels: {
-                            style: { color: '#666' }
-                        },
-                        opposite: true
-                    }],
-                tooltip: {
-                    shared: true,
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    borderColor: '#ccc',
-                    borderRadius: 5,
-                    shadow: true
-                },
-                legend: {
-                    align: 'center',
-                    verticalAlign: 'bottom',
-                    layout: 'horizontal',
-                    itemStyle: {
-                        fontSize: '12px'
-                    }
-                },
-                plotOptions: {
-                    line: {
-                        dataLabels: {
-                            enabled: false
-                        },
-                        enableMouseTracking: true,
-                        lineWidth: 2,
-                        marker: {
-                            symbol: 'circle',
-                            states: {
-                                hover: {
-                                    radius: 6
-                                }
-                            }
-                        }
-                    }
-                },
-                series: series,
-                credits: {
-                    enabled: false
-                },
-                responsive: {
-                    rules: [{
-                            condition: {
-                                maxWidth: 500
-                            },
-                            chartOptions: {
-                                legend: {
-                                    layout: 'horizontal',
-                                    align: 'center',
-                                    verticalAlign: 'bottom'
-                                }
-                            }
-                        }]
                 }
-            };
-            // Create the chart
-            highcharts_1.default.chart(chartRef.current, chartConfig);
-        }
-    }, []);
-    return (react_1.default.createElement("div", { style: { width: '100%', height: '100%', padding: '20px' } },
-        react_1.default.createElement("div", { ref: chartRef, style: {
-                width: '100%',
-                height: '400px',
-                minHeight: '400px'
-            } })));
+            },
+            series: series,
+            credits: { enabled: false },
+            responsive: {
+                rules: [{
+                        condition: { maxWidth: 500 },
+                        chartOptions: {}
+                    }]
+            }
+        };
+        chartInstance.current = highcharts_1.default.chart(chartRef.current, chartConfig);
+    }, [activityData]);
+    return (react_1.default.createElement(components_1.WidgetWrapper, null,
+        react_1.default.createElement(components_1.TitleBar, { title: "Carbon Reporting Tool" },
+            react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
+                    setMonthFilter(null);
+                    setYearFilter(new Date().getFullYear());
+                    setActivityName("");
+                } },
+                react_1.default.createElement(components_1.FormField, null,
+                    react_1.default.createElement(components_1.Label, null, "Filter by month"),
+                    react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (newMonth) => setMonthFilter(newMonth) })),
+                react_1.default.createElement(components_1.FormField, null,
+                    react_1.default.createElement(components_1.Label, null, "Filter by Year"),
+                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null), placeholder: "e.g., 2025" })))),
+        react_1.default.createElement("div", { style: { display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '12px', marginBottom: '12px', flexWrap: 'wrap' } },
+            react_1.default.createElement("div", { style: legendItemStyle(selectedLegend === "all", "#888"), onClick: () => {
+                    var _a;
+                    setSelectedLegend("all");
+                    (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.series.forEach(s => s.show());
+                } },
+                react_1.default.createElement("span", { style: legendDotStyle("#888") }),
+                "All"),
+            activityNames.map((name) => {
+                var _a, _b;
+                const rawColor = (_b = (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.series.find(s => s.name === name)) === null || _b === void 0 ? void 0 : _b.color;
+                const color = typeof rawColor === "string" ? rawColor : "#ccc";
+                return (react_1.default.createElement("div", { key: name, style: legendItemStyle(selectedLegend === name, color), onClick: () => {
+                        var _a;
+                        setSelectedLegend(name);
+                        (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.series.forEach(s => {
+                            if (s.name === name)
+                                s.show();
+                            else
+                                s.hide();
+                        });
+                    } },
+                    react_1.default.createElement("span", { style: legendDotStyle(color) }),
+                    name));
+            })),
+        react_1.default.createElement("div", { style: { width: '100%', height: '100%', padding: '20px' } },
+            react_1.default.createElement("div", { ref: chartRef, style: { width: '100%', height: '400px', minHeight: '400px' } }))));
 };
-exports["default"] = all_data;
+exports["default"] = AllData;
 
 
 /***/ }),
@@ -715,79 +1769,98 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const react_1 = __importStar(__webpack_require__(/*! react */ "react"));
 const highcharts_1 = __importDefault(__webpack_require__(/*! highcharts */ "./node_modules/highcharts/highcharts.js"));
-// Sample data
-const activityData = [
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Jan", value: "43" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Feb", value: "56" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Mar", value: "49" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Apr", value: "51" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "May", value: "39" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Jun", value: "45" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Jul", value: "50" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Aug", value: "47" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Sep", value: "52" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Oct", value: "48" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Nov", value: "44" },
-    { activity: "Generator Fuel Consumption", year: "2025", month: "Dec", value: "53" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Jan", value: "45" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Feb", value: "76" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Mar", value: "68" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Apr", value: "55" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "May", value: "62" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Jun", value: "71" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Jul", value: "60" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Aug", value: "58" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Sep", value: "67" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Oct", value: "59" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Nov", value: "65" },
-    { activity: "Refrigerant Leakages/Refilling", year: "2025", month: "Dec", value: "70" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Jan", value: "4855" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Feb", value: "4720" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Mar", value: "4985" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Apr", value: "5100" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "May", value: "5205" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Jun", value: "5350" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Jul", value: "5470" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Aug", value: "5395" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Sep", value: "5250" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Oct", value: "4950" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Nov", value: "4825" },
-    { activity: "Electricity Consumption – HVAC", year: "2025", month: "Dec", value: "4750" }
-];
-// Month sort helper
+const components_1 = __webpack_require__(/*! uxp/components */ "uxp/components");
 const monthOrder = {
     Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6,
     Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12
 };
 const BarChartComponent = (props) => {
     const chartRef = (0, react_1.useRef)(null);
+    const chartInstance = (0, react_1.useRef)(null); // 🔧 chart instance ref
+    const toast = (0, components_1.useToast)();
+    const [activityData, setActivityData] = (0, react_1.useState)([]);
+    const [monthFilter, setMonthFilter] = (0, react_1.useState)(null);
+    const [yearFilter, setYearFilter] = (0, react_1.useState)(new Date().getFullYear());
+    const [activityName, setActivityName] = (0, react_1.useState)("");
+    const [activityNames, setActivityNames] = (0, react_1.useState)([]); // 🔧 for custom legend
+    const monthOptions = Object.keys(monthOrder).map(m => ({ label: m, value: m }));
+    const [selectedLegend, setSelectedLegend] = (0, react_1.useState)("all");
+    const fetchActivityData = () => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
+        try {
+            const result = yield ((_a = props.uxpContext) === null || _a === void 0 ? void 0 : _a.executeAction("carbon_reporting_80rr", "GetAllData", { year: yearFilter, month: monthFilter, activityName }, { json: true }));
+            const cleanedData = (result === null || result === void 0 ? void 0 : result.map((row) => ({
+                activity: row.activity,
+                year: row.year,
+                month: row.month,
+                value: parseFloat(row.value)
+            }))) || [];
+            setActivityData(cleanedData);
+            // 🔧 collect distinct activity names for legend
+            const distinctActivities = Array.from(new Set(cleanedData.map((item) => item.activity)));
+            setActivityNames(Array.from(new Set(cleanedData.map((item) => item.activity))));
+        }
+        catch (error) {
+            console.error("Error fetching data:", error);
+            toast.error("Failed to load data");
+        }
+    });
+    const legendItemStyle = (active, color) => ({
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        padding: '6px 12px',
+        borderRadius: 4,
+        backgroundColor: active ? '#f0f8ff' : 'transparent',
+        cursor: 'pointer',
+        fontSize: '13px',
+        fontWeight: active ? 'bold' : 'normal',
+        border: active ? `1px solid ${color}` : '1px solid transparent',
+        transition: 'all 0.2s ease'
+    });
+    const legendDotStyle = (color) => ({
+        width: 12,
+        height: 12,
+        borderRadius: '50%',
+        backgroundColor: color,
+        display: 'inline-block'
+    });
+    (0, react_1.useEffect)(() => { fetchActivityData(); }, [monthFilter, yearFilter, activityName]);
     (0, react_1.useEffect)(() => {
-        if (chartRef.current) {
-            // Process data for Highcharts
-            const processedData = {};
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            // Group data by activity
-            activityData.forEach(item => {
-                if (!processedData[item.activity]) {
-                    processedData[item.activity] = [];
-                }
-            });
-            // Sort and organize data for each activity
-            Object.keys(processedData).forEach(activity => {
-                const activityItems = activityData
-                    .filter(item => item.activity === activity)
-                    .sort((a, b) => monthOrder[a.month] - monthOrder[b.month]);
-                processedData[activity] = activityItems.map(item => parseFloat(item.value));
-            });
-            // Create series for Highcharts bar chart
-            const series = Object.keys(processedData).map((activity, index) => ({
+        if (!chartRef.current)
+            return;
+        const processedData = {};
+        activityData.forEach(item => {
+            if (!processedData[item.activity]) {
+                processedData[item.activity] = [];
+            }
+        });
+        Object.keys(processedData).forEach(activity => {
+            const activityItems = activityData
+                .filter(item => item.activity === activity)
+                .sort((a, b) => monthOrder[a.month] - monthOrder[b.month]);
+            processedData[activity] = activityItems.map(item => item.value);
+        });
+        const categories = activityData.length > 0
+            ? Array.from(new Set(activityData.map(d => d.month))).sort((a, b) => monthOrder[a] - monthOrder[b])
+            : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const series = Object.keys(processedData).length > 0
+            ? Object.keys(processedData).map((activity, index) => ({
                 name: activity,
                 data: processedData[activity],
                 type: 'column',
@@ -795,166 +1868,153 @@ const BarChartComponent = (props) => {
                 color: index === 0 ? '#7cb5ec' : index === 1 ? '#434348' : '#90ed7d',
                 borderWidth: 0,
                 borderRadius: 2
-            }));
-            // Highcharts configuration for bar chart
-            const chartConfig = {
-                chart: {
-                    type: 'column',
-                    height: 450,
-                    backgroundColor: 'transparent',
-                    spacing: [20, 20, 20, 20]
-                },
+            }))
+            : [{
+                    name: 'No Data',
+                    data: [],
+                    type: 'column'
+                }];
+        const chartConfig = {
+            chart: {
+                type: 'column',
+                height: 450,
+                backgroundColor: 'transparent',
+                spacing: [20, 20, 20, 20]
+            },
+            title: {
+                text: 'Monthly Activity Data - Bar Chart',
+                style: {
+                    fontSize: '18px',
+                    fontWeight: 'bold',
+                    color: '#333'
+                }
+            },
+            subtitle: {
+                text: 'Comparative view of Generator Fuel, Refrigerant Leakages, and HVAC Electricity',
+                style: {
+                    fontSize: '14px',
+                    color: '#666'
+                }
+            },
+            xAxis: {
+                categories: categories,
                 title: {
-                    text: 'Monthly Activity Data - Bar Chart',
-                    style: {
-                        fontSize: '18px',
-                        fontWeight: 'bold',
-                        color: '#333'
-                    }
-                },
-                subtitle: {
-                    text: 'Comparative view of Generator Fuel, Refrigerant Leakages, and HVAC Electricity',
+                    text: 'Month',
                     style: {
                         fontSize: '14px',
-                        color: '#666'
+                        fontWeight: 'bold'
                     }
                 },
-                xAxis: {
-                    categories: months,
+                gridLineWidth: 0,
+                lineWidth: 1,
+                lineColor: '#ccc',
+                tickWidth: 1,
+                tickColor: '#ccc'
+            },
+            yAxis: [{
                     title: {
-                        text: 'Month',
-                        style: {
-                            fontSize: '14px',
-                            fontWeight: 'bold'
-                        }
+                        text: 'Generator Fuel & Refrigerant (Units)',
+                        style: { color: '#666', fontSize: '12px', fontWeight: 'bold' }
                     },
-                    gridLineWidth: 0,
-                    lineWidth: 1,
-                    lineColor: '#ccc',
-                    tickWidth: 1,
-                    tickColor: '#ccc'
-                },
-                yAxis: [{
-                        title: {
-                            text: 'Generator Fuel & Refrigerant (Units)',
-                            style: {
-                                color: '#666',
-                                fontSize: '12px',
-                                fontWeight: 'bold'
-                            }
-                        },
-                        labels: {
-                            style: {
-                                color: '#666',
-                                fontSize: '11px'
-                            }
-                        },
-                        gridLineWidth: 1,
-                        gridLineColor: '#e6e6e6'
-                    }, {
-                        title: {
-                            text: 'HVAC Electricity (kWh)',
-                            style: {
-                                color: '#666',
-                                fontSize: '12px',
-                                fontWeight: 'bold'
-                            }
-                        },
-                        labels: {
-                            style: {
-                                color: '#666',
-                                fontSize: '11px'
-                            }
-                        },
-                        opposite: true,
-                        gridLineWidth: 0
-                    }],
-                tooltip: {
-                    shared: true,
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    borderColor: '#ccc',
-                    borderRadius: 8,
-                    shadow: true,
-                    headerFormat: '<b>{point.x}</b><br/>',
-                    pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
-                    style: {
-                        fontSize: '12px'
-                    }
-                },
-                legend: {
-                    align: 'center',
-                    verticalAlign: 'bottom',
-                    layout: 'horizontal',
-                    itemStyle: {
-                        fontSize: '12px',
-                        fontWeight: 'normal'
+                    labels: { style: { color: '#666', fontSize: '11px' } },
+                    gridLineWidth: 1,
+                    gridLineColor: '#e6e6e6'
+                }, {
+                    title: {
+                        text: 'HVAC Electricity (kWh)',
+                        style: { color: '#666', fontSize: '12px', fontWeight: 'bold' }
                     },
-                    itemHoverStyle: {
-                        color: '#000'
-                    },
-                    margin: 20
-                },
-                plotOptions: {
-                    column: {
-                        dataLabels: {
-                            enabled: false
-                        },
-                        enableMouseTracking: true,
-                        borderWidth: 0,
-                        groupPadding: 0.1,
-                        pointPadding: 0.05,
-                        states: {
-                            hover: {
-                                brightness: 0.1
-                            }
-                        },
-                        animation: {
-                            duration: 1000
-                        }
-                    }
-                },
-                series: series,
-                credits: {
-                    enabled: false
-                },
-                responsive: {
-                    rules: [{
-                            condition: {
-                                maxWidth: 600
-                            },
-                            chartOptions: {
-                                chart: {
-                                    height: 400
-                                },
-                                legend: {
-                                    layout: 'horizontal',
-                                    align: 'center',
-                                    verticalAlign: 'bottom'
-                                },
-                                plotOptions: {
-                                    column: {
-                                        dataLabels: {
-                                            enabled: false
-                                        }
-                                    }
-                                }
-                            }
-                        }]
+                    labels: { style: { color: '#666', fontSize: '11px' } },
+                    opposite: true,
+                    gridLineWidth: 0
+                }],
+            tooltip: {
+                shared: true,
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                borderColor: '#ccc',
+                borderRadius: 8,
+                shadow: true,
+                headerFormat: '<b>{point.x}</b><br/>',
+                pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
+                style: { fontSize: '12px' }
+            },
+            legend: { enabled: false },
+            plotOptions: {
+                column: {
+                    dataLabels: { enabled: false },
+                    enableMouseTracking: true,
+                    borderWidth: 0,
+                    groupPadding: 0.1,
+                    pointPadding: 0.05,
+                    states: { hover: { brightness: 0.1 } },
+                    animation: { duration: 1000 }
                 }
-            };
-            // Create the chart
-            highcharts_1.default.chart(chartRef.current, chartConfig);
-        }
-    }, []);
-    return (react_1.default.createElement("div", { style: { width: '100%', height: '100%', padding: '20px', backgroundColor: '#fafafa' } },
-        react_1.default.createElement("div", { ref: chartRef, style: {
-                width: '100%',
-                height: '450px',
-                minHeight: '450px',
-                backgroundColor: 'white',
-                borderRadius: '8px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-            } })));
+            },
+            series: series,
+            credits: { enabled: false },
+            responsive: {
+                rules: [{
+                        condition: { maxWidth: 600 },
+                        chartOptions: { chart: { height: 400 } }
+                    }]
+            }
+        };
+        chartInstance.current = highcharts_1.default.chart(chartRef.current, chartConfig); // 🔧 save chart instance
+    }, [activityData]);
+    // 🔧 Legend toggle helpers
+    const showAllSeries = () => {
+        var _a;
+        (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.series.forEach(s => s.show());
+    };
+    const showOnlySeries = (name) => {
+        var _a;
+        (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.series.forEach(s => {
+            if (s.name === name)
+                s.show();
+            else
+                s.hide();
+        });
+    };
+    return (react_1.default.createElement(components_1.WidgetWrapper, null,
+        react_1.default.createElement(components_1.TitleBar, { title: "Carbon Reporting Tool" },
+            react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
+                    setMonthFilter(null);
+                    setYearFilter(new Date().getFullYear());
+                    setActivityName("");
+                } },
+                react_1.default.createElement(components_1.FormField, null,
+                    react_1.default.createElement(components_1.Label, null, "Month"),
+                    react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (val) => setMonthFilter(val) })),
+                react_1.default.createElement(components_1.FormField, null,
+                    react_1.default.createElement(components_1.Label, null, "Year"),
+                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) })))),
+        react_1.default.createElement("div", { style: { display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' } },
+            react_1.default.createElement("div", { style: legendItemStyle(selectedLegend === "all", "#888"), onClick: () => {
+                    setSelectedLegend("all");
+                    showAllSeries();
+                } },
+                react_1.default.createElement("span", { style: legendDotStyle("#888") }),
+                "All"),
+            activityNames.map((name, idx) => {
+                var _a, _b;
+                const rawColor = (_b = (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.series.find(s => s.name === name)) === null || _b === void 0 ? void 0 : _b.color;
+                const color = typeof rawColor === 'string' ? rawColor : "#ccc";
+                return (react_1.default.createElement("div", { key: name, style: legendItemStyle(selectedLegend === name, color), onClick: () => {
+                        setSelectedLegend(name);
+                        showOnlySeries(name);
+                    } },
+                    react_1.default.createElement("span", { style: legendDotStyle(color) }),
+                    name));
+            })),
+        react_1.default.createElement("div", { style: { width: '100%', height: '100%', padding: '20px', backgroundColor: '#fafafa' } },
+            react_1.default.createElement("div", { ref: chartRef, style: {
+                    width: '100%',
+                    height: '450px',
+                    minHeight: '450px',
+                    backgroundColor: 'white',
+                    borderRadius: '8px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                } }))));
 };
 exports["default"] = BarChartComponent;
 
@@ -992,51 +2052,130 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const react_1 = __importStar(__webpack_require__(/*! react */ "react"));
 const highcharts_1 = __importDefault(__webpack_require__(/*! highcharts */ "./node_modules/highcharts/highcharts.js"));
-// ESG Carbon Emissions data (calculated from monthly data)
-const carbonEmissionsData = [
-    // Scope 1 Emissions (Direct emissions from owned/controlled sources)
-    {
-        category: "Scope 1",
-        source: "Generator Fuel Consumption",
-        totalCO2e: 577,
-        color: "#FF6B6B",
-        scope: 1
-    },
-    {
-        category: "Scope 1",
-        source: "Refrigerant Leakages/Refilling",
-        totalCO2e: 1326,
-        color: "#FF8E8E",
-        scope: 1
-    },
-    // Scope 2 Emissions (Indirect emissions from purchased energy)
-    {
-        category: "Scope 2",
-        source: "Electricity Consumption – HVAC",
-        totalCO2e: 2438,
-        color: "#4ECDC4",
-        scope: 2
-    }
-];
-// Calculate totals for each scope
-const scope1Total = carbonEmissionsData
-    .filter(item => item.scope === 1)
-    .reduce((sum, item) => sum + item.totalCO2e, 0);
-const scope2Total = carbonEmissionsData
-    .filter(item => item.scope === 2)
-    .reduce((sum, item) => sum + item.totalCO2e, 0);
-const totalEmissions = scope1Total + scope2Total;
+const components_1 = __webpack_require__(/*! uxp/components */ "uxp/components");
+// Emission factors for calculations
+const emissionFactors = {
+    "Generator Fuel Consumption": 3.761,
+    "Refrigerant Leakages/Refilling": 1.000,
+    "Electricity Consumption – HVAC": 0.412 // tCO₂e per kWh
+};
 const ESGDonutChart = (props) => {
     const chartRef = (0, react_1.useRef)(null);
+    const toast = (0, components_1.useToast)();
+    const [loading, setLoading] = (0, react_1.useState)(false);
+    const [activityData, setActivityData] = (0, react_1.useState)([]);
+    const [monthFilter, setMonthFilter] = (0, react_1.useState)(null);
+    const [yearFilter, setYearFilter] = (0, react_1.useState)(new Date().getFullYear()); // Current year as default
+    const [activityName, setActivityName] = (0, react_1.useState)("");
+    const monthOptions = [
+        { label: "Jan", value: "Jan" }, { label: "Feb", value: "Feb" },
+        { label: "Mar", value: "Mar" }, { label: "Apr", value: "Apr" },
+        { label: "May", value: "May" }, { label: "Jun", value: "Jun" },
+        { label: "Jul", value: "Jul" }, { label: "Aug", value: "Aug" },
+        { label: "Sep", value: "Sep" }, { label: "Oct", value: "Oct" },
+        { label: "Nov", value: "Nov" }, { label: "Dec", value: "Dec" },
+    ];
+    const fetchActivityData = () => __awaiter(void 0, void 0, void 0, function* () {
+        if (!props.uxpContext)
+            return;
+        setLoading(true);
+        try {
+            const result = yield props.uxpContext.executeAction("carbon_reporting_80rr", "GetAllData", { year: yearFilter, month: monthFilter, activityName: activityName }, { json: true });
+            console.log("Fetched emission data:", result);
+            const cleanedData = (result === null || result === void 0 ? void 0 : result.map((row) => ({
+                activity: row.activity,
+                year: row.year,
+                month: row.month,
+                value: parseFloat(row.value)
+            }))) || [];
+            setActivityData(cleanedData);
+        }
+        catch (error) {
+            console.error("Error loading emission data:", error);
+            toast.error("Failed to load activity data.");
+        }
+        finally {
+            setLoading(false);
+        }
+    });
+    // Calculate emissions dynamically from API data
+    const calculateEmissions = () => {
+        if (activityData.length === 0) {
+            return {
+                dynamicEmissionData: [],
+                scope1Total: 0,
+                scope2Total: 0,
+                totalEmissions: 0
+            };
+        }
+        const emissionsByActivity = {};
+        // Group and sum values by activity from real API data
+        activityData.forEach(item => {
+            if (!emissionsByActivity[item.activity]) {
+                emissionsByActivity[item.activity] = 0;
+            }
+            emissionsByActivity[item.activity] += item.value;
+        });
+        // Apply emission factors to calculate real CO2e emissions
+        const dynamicEmissionData = Object.keys(emissionsByActivity).map(activity => {
+            const totalActivityValue = emissionsByActivity[activity];
+            const emissionFactor = emissionFactors[activity] || 0;
+            const calculatedCO2e = totalActivityValue * emissionFactor;
+            const isScope1 = activity.includes("Generator") || activity.includes("Refrigerant");
+            return {
+                source: activity,
+                totalCO2e: calculatedCO2e,
+                scope: isScope1 ? 1 : 2,
+                category: isScope1 ? "Scope 1" : "Scope 2"
+            };
+        });
+        // Calculate scope totals from dynamic data
+        const scope1Total = dynamicEmissionData
+            .filter(item => item.scope === 1)
+            .reduce((sum, item) => sum + item.totalCO2e, 0);
+        const scope2Total = dynamicEmissionData
+            .filter(item => item.scope === 2)
+            .reduce((sum, item) => sum + item.totalCO2e, 0);
+        const totalEmissions = scope1Total + scope2Total;
+        return { dynamicEmissionData, scope1Total, scope2Total, totalEmissions };
+    };
+    // Generate dynamic title based on selected filters
+    const generateTitle = () => {
+        let titleParts = ['Carbon Emissions by Scope'];
+        if (yearFilter) {
+            titleParts.push(yearFilter.toString());
+        }
+        if (monthFilter) {
+            titleParts.push(monthFilter);
+        }
+        if (activityName) {
+            titleParts.push(`(${activityName})`);
+        }
+        return titleParts.join(' - ');
+    };
+    // Get calculated emissions (recalculates when activityData changes)
+    const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions } = calculateEmissions();
     (0, react_1.useEffect)(() => {
-        if (chartRef.current) {
-            // Prepare data for donut chart
+        fetchActivityData();
+    }, [monthFilter, yearFilter, activityName]);
+    (0, react_1.useEffect)(() => {
+        if (chartRef.current && dynamicEmissionData.length > 0) {
+            // Prepare scope data for outer donut ring
             const scopeData = [
                 {
                     name: 'Scope 1 Emissions',
@@ -1050,23 +2189,25 @@ const ESGDonutChart = (props) => {
                     color: '#4ECDC4',
                     description: 'Indirect emissions from purchased energy'
                 }
-            ];
-            // Detailed breakdown data for inner ring
-            const detailedData = carbonEmissionsData.map(item => ({
+            ].filter(item => item.y > 0); // Only show scopes with actual data
+            // Prepare detailed data for inner donut ring with distinct colors
+            const detailedData = dynamicEmissionData.map((item, index) => ({
                 name: item.source,
                 y: item.totalCO2e,
-                color: item.color
+                color: item.scope === 1
+                    ? (index === 0 ? '#E74C3C' : '#C0392B') // Different reds for Scope 1 activities
+                    : '#17A2B8' // Different teal for Scope 2 activities
             }));
-            // Highcharts configuration for ESG donut chart
+            // Highcharts configuration for dynamic ESG donut chart
             const chartConfig = {
                 chart: {
                     type: 'pie',
-                    height: 500,
+                    height: 450,
                     backgroundColor: 'transparent',
                     spacing: [20, 20, 20, 20]
                 },
                 title: {
-                    text: 'Annual Carbon Emissions by Scope',
+                    text: generateTitle(),
                     style: {
                         fontSize: '20px',
                         fontWeight: 'bold',
@@ -1074,7 +2215,7 @@ const ESGDonutChart = (props) => {
                     }
                 },
                 subtitle: {
-                    text: `Total: ${totalEmissions.toLocaleString()} tCO₂e | ESG Reporting Dashboard`,
+                    text: `Total: ${totalEmissions.toFixed(1)} tCO₂e | ESG Reporting Dashboard`,
                     style: {
                         fontSize: '14px',
                         color: '#7f8c8d',
@@ -1092,7 +2233,7 @@ const ESGDonutChart = (props) => {
                         return `
               <div style="padding: 8px;">
                 <b style="color: ${this.color};">${this.key}</b><br/>
-                <strong>${this.y.toLocaleString()} tCO₂e</strong><br/>
+                <strong>${this.y.toFixed(1)} tCO₂e</strong><br/>
                 <span style="color: #7f8c8d;">${percentage}% of total emissions</span>
               </div>
             `;
@@ -1130,7 +2271,7 @@ const ESGDonutChart = (props) => {
                             },
                             formatter: function () {
                                 const percentage = ((this.y / totalEmissions) * 100).toFixed(1);
-                                return `<b>${this.key}</b><br/>${percentage}%<br/>${this.y.toLocaleString()} tCO₂e`;
+                                return `<b>${this.key}</b><br/>${percentage}%<br/>${this.y.toFixed(1)} tCO₂e`;
                             }
                         },
                         showInLegend: true,
@@ -1172,9 +2313,22 @@ const ESGDonutChart = (props) => {
                         size: '40%',
                         innerSize: '20%',
                         dataLabels: {
-                            enabled: false
+                            enabled: true,
+                            distance: -30,
+                            style: {
+                                fontSize: '10px',
+                                fontWeight: 'bold',
+                                color: 'white',
+                                textOutline: '1px black'
+                            },
+                            formatter: function () {
+                                const percentage = ((this.y / totalEmissions) * 100).toFixed(0);
+                                return `${percentage}%`;
+                            }
                         },
-                        showInLegend: false
+                        showInLegend: false,
+                        borderWidth: 1,
+                        borderColor: '#ffffff'
                     }],
                 credits: {
                     enabled: false
@@ -1205,116 +2359,164 @@ const ESGDonutChart = (props) => {
                         }]
                 }
             };
-            // Create the chart
+            // Create the dynamic chart
             highcharts_1.default.chart(chartRef.current, chartConfig);
         }
-    }, []);
-    return (react_1.default.createElement("div", { style: {
-            width: '100%',
-            height: '100%',
-            padding: '20px',
-            backgroundColor: '#f8f9fa',
-            fontFamily: 'Arial, sans-serif'
-        } },
-        react_1.default.createElement("div", { ref: chartRef, style: {
-                width: '100%',
-                height: '500px',
-                minHeight: '500px',
-                backgroundColor: 'white',
-                borderRadius: '12px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                border: '1px solid #e9ecef'
-            } }),
+    }, [activityData, dynamicEmissionData, scope1Total, scope2Total, totalEmissions]);
+    return (react_1.default.createElement(components_1.WidgetWrapper, null,
+        react_1.default.createElement(components_1.TitleBar, { title: "Carbon Reporting Tool - ESG Dashboard" },
+            react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
+                    setMonthFilter(null);
+                    setYearFilter(new Date().getFullYear());
+                    setActivityName("");
+                } },
+                react_1.default.createElement(components_1.FormField, null,
+                    react_1.default.createElement(components_1.Label, null, "Filter by Month"),
+                    react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (newMonth) => setMonthFilter(newMonth) })),
+                react_1.default.createElement(components_1.FormField, null,
+                    react_1.default.createElement(components_1.Label, null, "Filter by Year"),
+                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null), placeholder: "e.g., 2025" })),
+                react_1.default.createElement(components_1.FormField, null,
+                    react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
+                    react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" })))),
         react_1.default.createElement("div", { style: {
-                display: 'flex',
-                gap: '15px',
-                marginTop: '20px',
-                flexWrap: 'wrap'
+                width: '100%',
+                height: '100%',
+                padding: '20px',
+                backgroundColor: '#f8f9fa',
+                fontFamily: 'Arial, sans-serif'
             } },
             react_1.default.createElement("div", { style: {
-                    flex: 1,
-                    minWidth: '200px',
-                    backgroundColor: '#fff5f5',
-                    border: '2px solid #FF6B6B',
-                    borderRadius: '8px',
-                    padding: '15px',
-                    textAlign: 'center'
+                    display: 'flex',
+                    gap: '15px',
+                    marginBottom: '20px',
+                    flexWrap: 'wrap'
                 } },
-                react_1.default.createElement("h4", { style: {
-                        margin: '0 0 8px 0',
-                        color: '#FF6B6B',
-                        fontSize: '16px',
-                        fontWeight: 'bold'
-                    } }, "Scope 1 Emissions"),
-                react_1.default.createElement("p", { style: {
-                        fontSize: '24px',
-                        fontWeight: 'bold',
-                        margin: '0 0 5px 0',
-                        color: '#2c3e50'
+                react_1.default.createElement("div", { style: {
+                        flex: 1,
+                        minWidth: '200px',
+                        backgroundColor: '#fff5f5',
+                        border: '2px solid #FF6B6B',
+                        borderRadius: '8px',
+                        padding: '15px',
+                        textAlign: 'center'
                     } },
-                    scope1Total.toLocaleString(),
-                    " tCO\u2082e"),
-                react_1.default.createElement("p", { style: {
-                        fontSize: '12px',
-                        color: '#7f8c8d',
-                        margin: 0
-                    } }, "Direct emissions from fuel & refrigerants")),
-            react_1.default.createElement("div", { style: {
-                    flex: 1,
-                    minWidth: '200px',
-                    backgroundColor: '#f0fdfc',
-                    border: '2px solid #4ECDC4',
-                    borderRadius: '8px',
-                    padding: '15px',
-                    textAlign: 'center'
-                } },
-                react_1.default.createElement("h4", { style: {
-                        margin: '0 0 8px 0',
-                        color: '#4ECDC4',
-                        fontSize: '16px',
-                        fontWeight: 'bold'
-                    } }, "Scope 2 Emissions"),
-                react_1.default.createElement("p", { style: {
-                        fontSize: '24px',
-                        fontWeight: 'bold',
-                        margin: '0 0 5px 0',
-                        color: '#2c3e50'
+                    react_1.default.createElement("h4", { style: {
+                            margin: '0 0 8px 0',
+                            color: '#FF6B6B',
+                            fontSize: '16px',
+                            fontWeight: 'bold'
+                        } }, "Scope 1 Emissions"),
+                    react_1.default.createElement("p", { style: {
+                            fontSize: '24px',
+                            fontWeight: 'bold',
+                            margin: '0 0 5px 0',
+                            color: '#2c3e50'
+                        } },
+                        scope1Total.toFixed(1),
+                        " tCO\u2082e"),
+                    react_1.default.createElement("p", { style: {
+                            fontSize: '12px',
+                            color: '#7f8c8d',
+                            margin: 0
+                        } }, "Direct emissions from fuel & refrigerants")),
+                react_1.default.createElement("div", { style: {
+                        flex: 1,
+                        minWidth: '200px',
+                        backgroundColor: '#f0fdfc',
+                        border: '2px solid #4ECDC4',
+                        borderRadius: '8px',
+                        padding: '15px',
+                        textAlign: 'center'
                     } },
-                    scope2Total.toLocaleString(),
-                    " tCO\u2082e"),
-                react_1.default.createElement("p", { style: {
-                        fontSize: '12px',
-                        color: '#7f8c8d',
-                        margin: 0
-                    } }, "Indirect emissions from electricity")),
-            react_1.default.createElement("div", { style: {
-                    flex: 1,
-                    minWidth: '200px',
-                    backgroundColor: '#f8f9fa',
-                    border: '2px solid #6c757d',
-                    borderRadius: '8px',
-                    padding: '15px',
-                    textAlign: 'center'
-                } },
-                react_1.default.createElement("h4", { style: {
-                        margin: '0 0 8px 0',
-                        color: '#6c757d',
-                        fontSize: '16px',
-                        fontWeight: 'bold'
-                    } }, "Total Emissions"),
-                react_1.default.createElement("p", { style: {
-                        fontSize: '24px',
-                        fontWeight: 'bold',
-                        margin: '0 0 5px 0',
-                        color: '#2c3e50'
+                    react_1.default.createElement("h4", { style: {
+                            margin: '0 0 8px 0',
+                            color: '#4ECDC4',
+                            fontSize: '16px',
+                            fontWeight: 'bold'
+                        } }, "Scope 2 Emissions"),
+                    react_1.default.createElement("p", { style: {
+                            fontSize: '24px',
+                            fontWeight: 'bold',
+                            margin: '0 0 5px 0',
+                            color: '#2c3e50'
+                        } },
+                        scope2Total.toFixed(1),
+                        " KgCo2e"),
+                    react_1.default.createElement("p", { style: {
+                            fontSize: '12px',
+                            color: '#7f8c8d',
+                            margin: 0
+                        } }, "Indirect emissions from electricity")),
+                react_1.default.createElement("div", { style: {
+                        flex: 1,
+                        minWidth: '200px',
+                        backgroundColor: '#f8f9fa',
+                        border: '2px solid #6c757d',
+                        borderRadius: '8px',
+                        padding: '15px',
+                        textAlign: 'center'
                     } },
-                    totalEmissions.toLocaleString(),
-                    " tCO\u2082e"),
-                react_1.default.createElement("p", { style: {
-                        fontSize: '12px',
-                        color: '#7f8c8d',
-                        margin: 0
-                    } }, "Combined carbon footprint")))));
+                    react_1.default.createElement("h4", { style: {
+                            margin: '0 0 8px 0',
+                            color: '#6c757d',
+                            fontSize: '16px',
+                            fontWeight: 'bold'
+                        } }, "Total Emissions"),
+                    react_1.default.createElement("p", { style: {
+                            fontSize: '24px',
+                            fontWeight: 'bold',
+                            margin: '0 0 5px 0',
+                            color: '#2c3e50'
+                        } },
+                        totalEmissions.toFixed(1),
+                        " KgCo2e"),
+                    react_1.default.createElement("p", { style: {
+                            fontSize: '12px',
+                            color: '#7f8c8d',
+                            margin: 0
+                        } }, "Combined carbon footprint")))),
+        react_1.default.createElement("div", { style: {
+                width: '100%',
+                height: '100%',
+                padding: '20px',
+                backgroundColor: '#f8f9fa',
+                fontFamily: 'Arial, sans-serif'
+            } },
+            react_1.default.createElement("div", { ref: chartRef, style: {
+                    width: '100%',
+                    height: '500px',
+                    minHeight: '500px',
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    border: '1px solid #e9ecef'
+                } }),
+            loading && (react_1.default.createElement("div", { style: {
+                    textAlign: 'center',
+                    padding: '40px',
+                    color: '#7f8c8d',
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                } }, "Loading emissions data...")),
+            !loading && activityData.length === 0 && (react_1.default.createElement("div", { style: {
+                    textAlign: 'center',
+                    padding: '40px',
+                    color: '#7f8c8d',
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                } }, "No emission data found for the selected filters.")),
+            !loading && activityData.length > 0 && (react_1.default.createElement("div", { ref: chartRef, style: {
+                    width: '100%',
+                    height: '450px',
+                    minHeight: '450px',
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    border: '1px solid #e9ecef'
+                } })))));
 };
 exports["default"] = ESGDonutChart;
 
@@ -1352,15 +2554,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -1373,24 +2566,35 @@ __webpack_require__(/*! ./styles.scss */ "./src/styles.scss");
 const all_data_1 = __importDefault(__webpack_require__(/*! ./all_data */ "./src/all_data.tsx"));
 const bar_cahrt_1 = __importDefault(__webpack_require__(/*! ./bar_cahrt */ "./src/bar_cahrt.tsx"));
 const carbon_emissions_1 = __importDefault(__webpack_require__(/*! ./carbon_emissions */ "./src/carbon_emissions.tsx"));
-const LucyPackage = "carbon_reporting_80rr";
-const carbon_reporting_80rr = (props) => {
+const ESGEmissionFactorsTable_1 = __importDefault(__webpack_require__(/*! ./ESGEmissionFactorsTable */ "./src/ESGEmissionFactorsTable.tsx"));
+const ESGStackedBarChart_1 = __importDefault(__webpack_require__(/*! ./ESGStackedBarChart */ "./src/ESGStackedBarChart.tsx"));
+const ESGAreaChart_1 = __importDefault(__webpack_require__(/*! ./ESGAreaChart */ "./src/ESGAreaChart.tsx"));
+const CarbonReportingTool = (props) => {
     const fileInputRef = React.useRef(null);
     const [parsedData, setParsedData] = React.useState(null);
     const [loading, setLoading] = React.useState(false);
     const [fileName, setFileName] = React.useState(null);
     const toast = (0, components_1.useToast)();
-    const handleFileChange = (e) => {
-        var _a;
-        const file = (_a = e.target.files) === null || _a === void 0 ? void 0 : _a[0];
-        if (!file)
-            return;
+    const resetState = () => {
+        setParsedData(null);
+        setFileName(null);
+        setLoading(false);
+    };
+    const parseCSVFile = (file) => {
         papaparse_1.default.parse(file, {
             header: true,
             skipEmptyLines: true,
             complete: (results) => {
-                const jsonData = results.data;
-                console.log("Parsed JSON Data:", jsonData);
+                const jsonData = results.data.map((row) => {
+                    var _a;
+                    const cleanedRow = {};
+                    for (const key in row) {
+                        cleanedRow[key] = (_a = row[key]) !== null && _a !== void 0 ? _a : "";
+                    }
+                    return cleanedRow;
+                });
+                console.log("parsed data", jsonData);
+                console.log("parse data type", typeof (jsonData));
                 setParsedData(jsonData);
                 setFileName(file.name);
             },
@@ -1399,55 +2603,71 @@ const carbon_reporting_80rr = (props) => {
                 toast.error("Failed to parse CSV file");
             }
         });
-        // Reset file input so user can re-select the same file again if needed
-        e.target.value = '';
     };
-    const uploadToLucy = () => __awaiter(void 0, void 0, void 0, function* () {
-        if (!props.uxpContext || !parsedData)
+    const uploadToLucy = () => {
+        // if (!props.uxpContext || !parsedData) return;
+        if (!parsedData || !Array.isArray(parsedData)) {
+            toast.error("Parsed data is empty or invalid.");
             return;
+        }
         setLoading(true);
+        debugger;
         try {
-            const result = yield props.uxpContext.executeAction(LucyPackage, "InsertCarbonReport", { CarbonInputData: parsedData }, { json: true });
-            console.log("Upload result:", result);
+            const result = props.uxpContext.executeAction("carbon_reporting_80rr", // Backend model name remains
+            "InsertCarbonReport", { CarbonInputData: JSON.stringify(parsedData) });
             toast.success("Data uploaded successfully!");
             resetState();
         }
         catch (error) {
-            console.error("Upload error:", error);
             toast.error(`Upload failed: ${error.message || "Unknown error"}`);
         }
         finally {
             setLoading(false);
         }
-    });
-    const resetState = () => {
-        setParsedData(null);
-        setFileName(null);
-        setLoading(false);
     };
     return (React.createElement(components_1.WidgetWrapper, null,
         React.createElement(components_1.TitleBar, { title: "Carbon Reporting Tool" },
             React.createElement(components_1.FilterPanel, null)),
-        !parsedData && (React.createElement(components_1.Button, { title: loading ? "Uploading..." : "Select CSV", disabled: loading, onClick: () => { var _a; return (_a = fileInputRef.current) === null || _a === void 0 ? void 0 : _a.click(); } })),
+        React.createElement("div", { className: `dropzone ${loading ? "disabled" : ""}`, onDragOver: (e) => {
+                e.preventDefault();
+                e.currentTarget.classList.add("dragover");
+            }, onDragLeave: (e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove("dragover");
+            }, onDrop: (e) => {
+                var _a;
+                e.preventDefault();
+                e.currentTarget.classList.remove("dragover");
+                const file = (_a = e.dataTransfer.files) === null || _a === void 0 ? void 0 : _a[0];
+                if (file)
+                    parseCSVFile(file);
+            }, onClick: () => { var _a; return (_a = fileInputRef.current) === null || _a === void 0 ? void 0 : _a.click(); } }, fileName ? (React.createElement("div", { className: "file-tag" },
+            React.createElement("span", null, fileName),
+            React.createElement("button", { onClick: (e) => {
+                    e.stopPropagation();
+                    resetState();
+                }, title: "Remove file" }, "\u2716"))) : (React.createElement("p", null, "Drag & drop CSV file here, or click to select"))),
+        React.createElement("input", { type: "file", accept: ".csv", style: { display: "none" }, ref: fileInputRef, onChange: (e) => {
+                var _a;
+                const file = (_a = e.target.files) === null || _a === void 0 ? void 0 : _a[0];
+                if (file)
+                    parseCSVFile(file);
+                e.target.value = ""; // reset input
+            } }),
         parsedData && (React.createElement("div", { style: { marginTop: "1rem" } },
-            React.createElement("p", null,
-                React.createElement("strong", null, "File:"),
-                " ",
-                fileName),
             React.createElement("p", null,
                 parsedData.length,
                 " rows parsed. Proceed to upload?"),
             React.createElement("div", { style: { display: "flex", gap: "10px" } },
                 React.createElement(components_1.Button, { title: loading ? "Uploading..." : "Upload", onClick: uploadToLucy, disabled: loading }),
-                React.createElement(components_1.Button, { title: "Cancel", onClick: resetState, disabled: loading })))),
-        React.createElement("input", { type: "file", accept: ".csv", style: { display: 'none' }, ref: fileInputRef, onChange: handleFileChange })));
+                React.createElement(components_1.Button, { title: "Cancel", onClick: resetState, disabled: loading }))))));
 };
 /**
  * Register as a Widget
  */
 (0, uxp_1.registerWidget)({
-    id: "carbon_reporting_80rr",
-    widget: carbon_reporting_80rr,
+    id: "CarbonReportingTool",
+    widget: CarbonReportingTool,
     configs: {
         layout: {
         // w: 12,
@@ -1484,6 +2704,42 @@ const carbon_reporting_80rr = (props) => {
 (0, uxp_1.registerWidget)({
     id: "ESG_Donut_Chart",
     widget: carbon_emissions_1.default,
+    configs: {
+        layout: {
+        // w: 12,
+        // h: 12,
+        // minH: 12,
+        // minW: 12
+        }
+    }
+});
+(0, uxp_1.registerWidget)({
+    id: "ESGEmissionFactorsTable",
+    widget: ESGEmissionFactorsTable_1.default,
+    configs: {
+        layout: {
+        // w: 12,
+        // h: 12,
+        // minH: 12,
+        // minW: 12
+        }
+    }
+});
+(0, uxp_1.registerWidget)({
+    id: "ESGStackedBarChart",
+    widget: ESGStackedBarChart_1.default,
+    configs: {
+        layout: {
+        // w: 12,
+        // h: 12,
+        // minH: 12,
+        // minW: 12
+        }
+    }
+});
+(0, uxp_1.registerWidget)({
+    id: "ESGAreaChart",
+    widget: ESGAreaChart_1.default,
     configs: {
         layout: {
         // w: 12,

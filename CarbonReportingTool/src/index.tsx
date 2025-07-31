@@ -13,6 +13,9 @@ import "./styles.scss";
 import all_data from "./all_data";
 import BarChartComponent from "./bar_cahrt";
 import ESGDonutChart from "./carbon_emissions";
+import ESGEmissionFactorsTable from "./ESGEmissionFactorsTable";
+import ESGStackedBarChart from "./ESGStackedBarChart";
+import ESGAreaChart from "./ESGAreaChart";
 
 export interface IWidgetProps {
   uxpContext?: IContextProvider;
@@ -47,7 +50,7 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
         });
         console.log("parsed data",jsonData)
         console.log("parse data type",typeof(jsonData))
-        setParsedData(jsonData);
+        setParsedData(   jsonData);
         setFileName(file.name);
       },
       error: (err) => {
@@ -65,20 +68,22 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
         return;
       }
     setLoading(true);
-
-       props.uxpContext.executeAction(
+    debugger;
+    try {
+      const result = props.uxpContext.executeAction(
         "carbon_reporting_80rr", // Backend model name remains
         "InsertCarbonReport",
-         {CarbonInputData: parsedData } ,
-        { json: true }
-      ).then((res)=>{
-        toast.success("Data uploaded successfully!");
-        resetState();
-      })
-      .catch((err)=>{
-        toast.error(`Upload failed: ${err|| "Unknown error"}`);
-      })
-    
+        { CarbonInputData: JSON.stringify(parsedData)   },
+       
+      );
+
+      toast.success("Data uploaded successfully!");
+      resetState();
+    } catch (error: any) {
+      toast.error(`Upload failed: ${error.message || "Unknown error"}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -204,6 +209,45 @@ registerWidget({
 registerWidget({
     id: "ESG_Donut_Chart",
     widget: ESGDonutChart,
+    configs: {
+        layout: {
+            // w: 12,
+            // h: 12,
+            // minH: 12,
+            // minW: 12
+        }
+    }
+});
+
+registerWidget({
+    id: "ESGEmissionFactorsTable",
+    widget: ESGEmissionFactorsTable,
+    configs: {
+        layout: {
+            // w: 12,
+            // h: 12,
+            // minH: 12,
+            // minW: 12
+        }
+    }
+});
+
+registerWidget({
+    id: "ESGStackedBarChart",
+    widget: ESGStackedBarChart,
+    configs: {
+        layout: {
+            // w: 12,
+            // h: 12,
+            // minH: 12,
+            // minW: 12
+        }
+    }
+});
+
+registerWidget({
+    id: "ESGAreaChart",
+    widget: ESGAreaChart,
     configs: {
         layout: {
             // w: 12,

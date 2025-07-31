@@ -37,6 +37,33 @@
             "tags":[],
             "category":"",
             "isTemplate": false
+        },
+        {
+            "id": "ESGEmissionFactorsTable",
+            "name": "ESGEmissionFactorsTable",
+            "description": "ESGEmissionFactorsTable",
+            "icon": "",
+            "tags":[],
+            "category":"",
+            "isTemplate": false
+        },
+        {
+            "id": "ESGStackedBarChart",
+            "name": "ESGStackedBarChart",
+            "description": "ESGStackedBarChart",
+            "icon": "",
+            "tags":[],
+            "category":"",
+            "isTemplate": false
+        },
+        {
+            "id": "ESGAreaChart",
+            "name": "ESGAreaChart",
+            "description": "ESGAreaChart",
+            "icon": "",
+            "tags":[],
+            "category":"",
+            "isTemplate": false
         }
     ],
     "sidebarLinks": [
