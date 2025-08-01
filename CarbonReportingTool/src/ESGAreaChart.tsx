@@ -11,9 +11,9 @@ export interface IWidgetProps {
 
 // Emission factors for calculations
 const emissionFactors: { [key: string]: number } = {
-  "Generator Fuel Consumption": 3.761, // tCO₂e per litre
-  "Refrigerant Leakages/Refilling": 1.000, // tCO₂e per litre
-  "Electricity Consumption – HVAC": 0.412 // tCO₂e per kWh
+  "Generator Fuel Consumption": 3.761, // kgCO₂e per litre
+  "Refrigerant Leakages/Refilling": 1.000, // kgCO₂e per litre
+  "Electricity Consumption – HVAC": 0.412 // kgCO₂e per kWh
 };
 
 // Month sort helper
@@ -256,7 +256,7 @@ const [activityNames, setActivityNames] = useState<string[]>([]);
         yAxis: {
           min: 0,
           title: {
-            text: 'Carbon Emissions (tCO₂e)',
+            text: 'Carbon Emissions (kgCO₂e)',
             style: {
               fontSize: '14px',
               fontWeight: 'bold',
@@ -279,7 +279,7 @@ const [activityNames, setActivityNames] = useState<string[]>([]);
           borderRadius: 8,
           shadow: true,
           headerFormat: '<b>{point.x}</b><br/>',
-          pointFormat: '<span style="color:{series.color}">●</span> {series.name}: <b>{point.y:.1f} tCO₂e</b><br/>',
+          pointFormat: '<span style="color:{series.color}">●</span> {series.name}: <b>{point.y:.1f} kgCO₂e</b><br/>',
           footerFormat: '<span style="font-size: 10px">Click and drag to zoom</span>',
           style: {
             fontSize: '12px'

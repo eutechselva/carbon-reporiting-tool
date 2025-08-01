@@ -145,7 +145,7 @@ const ESGEmissionFactorsTable: React.FunctionComponent<IWidgetProps> = (props) =
               }}>
                 Emission Factor<br/>
                 <span style={{ fontSize: '11px', fontWeight: 'normal', textTransform: 'none' }}>
-                  (tCO₂e per unit)
+                  (kgCO₂e per unit)
                 </span>
               </th>
               <th style={{
@@ -292,7 +292,7 @@ const ESGEmissionFactorsTable: React.FunctionComponent<IWidgetProps> = (props) =
         }}>
           <li><strong>Scope 1:</strong> Direct GHG emissions from sources owned or controlled by the organization</li>
           <li><strong>Scope 2:</strong> Indirect GHG emissions from consumption of purchased electricity, heat, or steam</li>
-          <li><strong>tCO₂e:</strong> Tonnes of carbon dioxide equivalent - standardized unit for all greenhouse gases</li>
+          <li><strong>kgCO₂e:</strong> Tonnes of carbon dioxide equivalent - standardized unit for all greenhouse gases</li>
           <li><strong>Data Sources:</strong> All emission factors are from recognized ESG reporting standards and local regulatory bodies</li>
         </ul>
       </div>
