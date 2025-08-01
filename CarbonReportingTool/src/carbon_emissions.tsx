@@ -11,9 +11,9 @@ export interface IWidgetProps {
 
 // Emission factors for calculations
 const emissionFactors: { [key: string]: number } = {
-  "Generator Fuel Consumption": 3.761, // tCO₂e per litre
-  "Refrigerant Leakages/Refilling": 1.000, // tCO₂e per litre
-  "Electricity Consumption – HVAC": 0.412 // tCO₂e per kWh
+  "Generator Fuel Consumption": 3.761, // kgCO₂e per litre
+  "Refrigerant Leakages/Refilling": 1.000, // kgCO₂e per litre
+  "Electricity Consumption – HVAC": 0.412 // kgCO₂e per kWh
 };
 
 const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
@@ -427,7 +427,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
               color: '#7f8c8d',
               margin: 0
             }}>
-              Indirect emissions from electricity
+             Indirect Emissions from Electricity Consumption - HVAC
             </p>
           </div>
 
