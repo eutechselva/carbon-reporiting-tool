@@ -179,7 +179,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
             return `
               <div style="padding: 8px;">
                 <b style="color: ${this.color};">${this.key}</b><br/>
-                <strong>${this.y!.toFixed(1)} tCO₂e</strong><br/>
+                <strong>${this.y!.toFixed(1)} kgCO₂e</strong><br/>
                 <span style="color: #7f8c8d;">${percentage}% of total emissions</span>
               </div>
             `;
@@ -217,7 +217,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
               },
               formatter: function() {
                 const percentage = ((this.y! / totalEmissions) * 100).toFixed(1);
-                return `<b>${this.key}</b><br/>${percentage}%<br/>${this.y!.toFixed(1)} tCO₂e`;
+                return `<b>${this.key}</b><br/>${percentage}%<br/>${this.y!.toFixed(1)} kgCO₂e`;
               }
             },
             showInLegend: true,
@@ -386,7 +386,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
               margin: '0 0 5px 0',
               color: '#2c3e50'
             }}>
-              {scope1Total.toFixed(1)} tCO₂e
+              {scope1Total.toFixed(1)} kgCO₂e
             </p>
             <p style={{ 
               fontSize: '12px', 
@@ -420,7 +420,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
               margin: '0 0 5px 0',
               color: '#2c3e50'
             }}>
-              {scope2Total.toFixed(1)} tCO₂e
+              {scope2Total.toFixed(1)} kgCO₂e
             </p>
             <p style={{ 
               fontSize: '12px', 
@@ -453,7 +453,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
               margin: '0 0 5px 0',
               color: '#2c3e50'
             }}>
-              {totalEmissions.toFixed(1)} tCO₂e
+              {totalEmissions.toFixed(1)} kgCO₂e
             </p>
             <p style={{ 
               fontSize: '12px', 
