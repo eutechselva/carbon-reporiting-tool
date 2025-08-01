@@ -116,24 +116,6 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
     return { dynamicEmissionData, scope1Total, scope2Total, totalEmissions };
   };
 
-  // Generate dynamic title based on selected filters
-  const generateTitle = () => {
-    let titleParts = ['Carbon Emissions by Scope'];
-    
-    if (yearFilter) {
-      titleParts.push(yearFilter.toString());
-    }
-    
-    if (monthFilter) {
-      titleParts.push(monthFilter);
-    }
-    
-    if (activityName) {
-      titleParts.push(`(${activityName})`);
-    }
-    
-    return titleParts.join(' - ');
-  };
 
   // Get calculated emissions (recalculates when activityData changes)
   const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions } = calculateEmissions();
@@ -178,21 +160,14 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
           spacing: [20, 20, 20, 20]
         },
         title: {
-          text: generateTitle(),
+          text: 'Carbon Emissions by Scope',
           style: {
             fontSize: '20px',
             fontWeight: 'bold',
             color: '#2c3e50'
           }
         },
-        subtitle: {
-          text: `Total: ${totalEmissions.toFixed(1)} tCO₂e | ESG Reporting Dashboard`,
-          style: {
-            fontSize: '14px',
-            color: '#7f8c8d',
-            fontWeight: 'normal'
-          }
-        },
+
         tooltip: {
           backgroundColor: 'rgba(255, 255, 255, 0.95)',
           borderColor: '#bdc3c7',
@@ -338,7 +313,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
 
   return (
     <WidgetWrapper>
-      <TitleBar title="Carbon Reporting Tool - ESG Dashboard">
+      <TitleBar title="">
         <FilterPanel
           onClear={() => {
             setMonthFilter(null);
@@ -361,7 +336,6 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
               type="number"
               value={yearFilter}
               onChange={(val) => setYearFilter(parseInt(val) || null)}
-              placeholder="e.g., 2025"
             />
           </FormField>
 
@@ -380,7 +354,6 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
         width: '100%', 
         height: '100%', 
         padding: '20px', 
-        backgroundColor: '#f8f9fa',
         fontFamily: 'Arial, sans-serif'
       }}>
         {/* Dynamic ESG Summary Cards - AT THE TOP */}
@@ -447,7 +420,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
               margin: '0 0 5px 0',
               color: '#2c3e50'
             }}>
-              {scope2Total.toFixed(1)} KgCo2e
+              {scope2Total.toFixed(1)} tCO₂e
             </p>
             <p style={{ 
               fontSize: '12px', 
@@ -461,7 +434,6 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
           <div style={{
             flex: 1,
             minWidth: '200px',
-            backgroundColor: '#f8f9fa',
             border: '2px solid #6c757d',
             borderRadius: '8px',
             padding: '15px',
@@ -481,7 +453,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
               margin: '0 0 5px 0',
               color: '#2c3e50'
             }}>
-              {totalEmissions.toFixed(1)} KgCo2e
+              {totalEmissions.toFixed(1)} tCO₂e
             </p>
             <p style={{ 
               fontSize: '12px', 
@@ -497,7 +469,6 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
       width: '100%', 
       height: '100%', 
       padding: '20px', 
-      backgroundColor: '#f8f9fa',
       fontFamily: 'Arial, sans-serif'
     }}>
       <div 
@@ -508,7 +479,6 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
           minHeight: '500px',
           backgroundColor: 'white',
           borderRadius: '12px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
           border: '1px solid #e9ecef'
         }}
       />
@@ -543,21 +513,6 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
           </div>
         )}
 
-        {/* Dynamic Donut Chart */}
-        {!loading && activityData.length > 0 && (
-          <div 
-            ref={chartRef} 
-            style={{ 
-              width: '100%', 
-              height: '450px',
-              minHeight: '450px',
-              backgroundColor: 'white',
-              borderRadius: '12px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              border: '1px solid #e9ecef'
-            }}
-          />
-        )}
       </div>
     </WidgetWrapper>
   );

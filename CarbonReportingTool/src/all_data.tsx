@@ -161,12 +161,10 @@ const AllData: React.FunctionComponent<IWidgetProps> = (props) => {
         backgroundColor: 'transparent'
       },
       title: {
-        text: 'Monthly Activity Data - 2025',
+        text: 'Monthly Activity Data',
         style: { fontSize: '18px', fontWeight: 'bold' }
       },
-      subtitle: {
-        text: 'Generator Fuel, Refrigerant Leakages, and HVAC Electricity Consumption'
-      },
+
       xAxis: {
         categories: xCategories,
         title: { text: 'Month' },
@@ -215,7 +213,7 @@ const AllData: React.FunctionComponent<IWidgetProps> = (props) => {
 
   return (
     <WidgetWrapper>
-      <TitleBar title="Carbon Reporting Tool">
+      <TitleBar title="">
         <FilterPanel
           onClear={() => {
             setMonthFilter(null);
@@ -234,7 +232,6 @@ const AllData: React.FunctionComponent<IWidgetProps> = (props) => {
               type="number"
               value={yearFilter}
               onChange={(val) => setYearFilter(parseInt(val) || null)}
-              placeholder="e.g., 2025"
             />
           </FormField>
         </FilterPanel>

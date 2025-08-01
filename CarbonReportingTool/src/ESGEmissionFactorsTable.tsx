@@ -1,4 +1,5 @@
 import React from "react";
+import { WidgetWrapper } from "uxp/components";
 import { IWidgetProps } from "widget-designer/components";
 
 // Emission factors data
@@ -50,11 +51,12 @@ const ESGEmissionFactorsTable: React.FunctionComponent<IWidgetProps> = (props) =
   });
 
   return (
+    <WidgetWrapper>
     <div style={{ 
       width: '100%', 
       height: '100%', 
       padding: '20px', 
-      backgroundColor: '#f8f9fa',
+
       fontFamily: 'Arial, sans-serif'
     }}>
       {/* Header */}
@@ -295,6 +297,7 @@ const ESGEmissionFactorsTable: React.FunctionComponent<IWidgetProps> = (props) =
         </ul>
       </div>
     </div>
+    </WidgetWrapper>
   );
 };
 

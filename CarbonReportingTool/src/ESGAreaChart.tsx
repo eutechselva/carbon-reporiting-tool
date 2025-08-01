@@ -25,7 +25,10 @@ const monthOrder: { [key: string]: number } = {
 const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
   const chartRef = useRef(null);
   const toast = useToast();
-  
+  const chartInstance = useRef<Highcharts.Chart | null>(null);
+const [selectedLegend, setSelectedLegend] = useState<string | null>("all");
+const [activityNames, setActivityNames] = useState<string[]>([]);
+
   const [loading, setLoading] = useState(false);
   const [activityData, setActivityData] = useState<any[]>([]);
   const [monthFilter, setMonthFilter] = useState<any>(null);
@@ -63,6 +66,12 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
       })) || [];
 
       setActivityData(cleanedData);
+
+      setActivityNames(
+        Array.from(new Set(
+          cleanedData.map((item: any) => item.activity as string)
+        ))
+      );
     } catch (error: any) {
       console.error("Error loading emission data:", error);
       toast.error("Failed to load activity data.");
@@ -134,25 +143,38 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
     return { dynamicEmissionData, scope1Total, scope2Total, totalEmissions, monthlyEmissions };
   };
 
-  // Generate dynamic title based on selected filters
-  const generateTitle = () => {
-    let titleParts = ['Carbon Emissions Trends (Area Chart)'];
-    
-    if (yearFilter) {
-      titleParts.push(yearFilter.toString());
-    }
-    
-    if (monthFilter) {
-      titleParts.push(monthFilter);
-    }
-    
-    if (activityName) {
-      titleParts.push(`(${activityName})`);
-    }
-    
-    return titleParts.join(' - ');
+  const legendItemStyle = (active: boolean, color: string): React.CSSProperties => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 12px',
+    borderRadius: 4,
+    backgroundColor: active ? '#f0f8ff' : 'transparent',
+    cursor: 'pointer',
+    fontSize: '13px',
+    fontWeight: active ? 'bold' : 'normal',
+    border: active ? `1px solid ${color}` : '1px solid transparent',
+    transition: 'all 0.2s ease'
+  });
+  
+  const legendDotStyle = (color: string): React.CSSProperties => ({
+    width: 12,
+    height: 12,
+    borderRadius: '50%',
+    backgroundColor: color,
+    display: 'inline-block'
+  });
+  const showAllSeries = () => {
+    chartInstance.current?.series.forEach(s => s.show());
   };
-
+  
+  const showOnlySeries = (name: string) => {
+    chartInstance.current?.series.forEach(s => {
+      if (s.name === name) s.show();
+      else s.hide();
+    });
+  };
+  
   const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions, monthlyEmissions } = calculateEmissions();
 
   useEffect(() => {
@@ -169,8 +191,14 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
         Object.values(monthlyEmissions).flatMap(monthData => Object.keys(monthData))
       ));
 
-      // Create series for each activity
-      const series: Highcharts.SeriesAreaOptions[] = activities.map((activity, index) => {
+// Filter based on selectedLegend
+        const filteredActivities = selectedLegend === "all"
+          ? activities
+          : activities.filter((a) => a === selectedLegend);
+
+        // Create series for each filtered activity
+        const series: Highcharts.SeriesAreaOptions[] = filteredActivities.map((activity, index) => {
+
         const isScope1 = activity.includes("Generator") || activity.includes("Refrigerant");
         const data = months.map(month => monthlyEmissions[month]?.[activity] || 0);
         
@@ -202,21 +230,14 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
           
         },
         title: {
-          text: generateTitle(),
+          text: 'Carbon Emissions (Area Chart)',
           style: {
             fontSize: '20px',
             fontWeight: 'bold',
             color: '#2c3e50'
           }
         },
-        subtitle: {
-          text: `Total: ${totalEmissions.toFixed(1)} tCO₂e | Trend Analysis`,
-          style: {
-            fontSize: '14px',
-            color: '#7f8c8d',
-            fontWeight: 'normal'
-          }
-        },
+
         xAxis: {
           categories: months,
           title: {
@@ -265,17 +286,7 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
           }
         },
         legend: {
-          align: 'center' as const,
-          verticalAlign: 'bottom' as const,
-          layout: 'horizontal' as const,
-          itemStyle: {
-            fontSize: '12px',
-            fontWeight: 'normal'
-          },
-          itemHoverStyle: {
-            color: '#000'
-          },
-          margin: 20
+          enabled:false
         },
         plotOptions: {
           area: {
@@ -323,14 +334,14 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
           }]
         }
       };
+      chartInstance.current = Highcharts.chart(chartRef.current, chartConfig); // Only once
 
-      Highcharts.chart(chartRef.current, chartConfig);
     }
   }, [activityData, monthlyEmissions, totalEmissions]);
 
   return (
     <WidgetWrapper>
-      <TitleBar title="Carbon Reporting Tool - Area Chart">
+      <TitleBar title="">
         <FilterPanel
           onClear={() => {
             setMonthFilter(null);
@@ -353,7 +364,6 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
               type="number"
               value={yearFilter}
               onChange={(val) => setYearFilter(parseInt(val) || null)}
-              placeholder="e.g., 2025"
             />
           </FormField>
 
@@ -367,12 +377,45 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
           </FormField>
         </FilterPanel>
       </TitleBar>
+      {activityData.length > 0 && (
+  <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
+    <div
+      style={legendItemStyle(selectedLegend === "all", "#888")}
+      onClick={() => {
+        setSelectedLegend("all");
+        showAllSeries();
+      }}
+    >
+      <span style={legendDotStyle("#888")}></span>
+      All
+    </div>
+
+    {activityNames.map(name => {
+      const rawColor = chartInstance.current?.series.find(s => s.name === name)?.color;
+      const color = typeof rawColor === 'string' ? rawColor : "#ccc";
+
+      return (
+        <div
+          key={name}
+          style={legendItemStyle(selectedLegend === name, color)}
+          onClick={() => {
+            setSelectedLegend(name);
+            showOnlySeries(name);
+          }}
+        >
+          <span style={legendDotStyle(color)}></span>
+          {name}
+        </div>
+      );
+    })}
+  </div>
+)}
 
       <div style={{ 
         width: '100%', 
         height: '100%', 
         padding: '20px', 
-        backgroundColor: '#f8f9fa',
+        // backgroundColor: '#f8f9fa',
         fontFamily: 'Arial, sans-serif'
       }}>
         {/* Loading State */}
@@ -383,7 +426,7 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
             color: '#7f8c8d',
             backgroundColor: 'white',
             borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            // boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
           }}>
             Loading emissions data...
           </div>
@@ -397,7 +440,7 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
             color: '#7f8c8d',
             backgroundColor: 'white',
             borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            // boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
           }}>
             No emission data found for the selected filters.
           </div>
@@ -413,8 +456,8 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
               minHeight: '500px',
               backgroundColor: 'white',
               borderRadius: '12px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              border: '1px solid #e9ecef'
+              // boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              // border: '1px solid #e9ecef'
             }}
           />
         )}

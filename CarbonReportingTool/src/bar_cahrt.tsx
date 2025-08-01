@@ -148,13 +148,7 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
           color: '#333'
         }
       },
-      subtitle: {
-        text: 'Comparative view of Generator Fuel, Refrigerant Leakages, and HVAC Electricity',
-        style: {
-          fontSize: '14px',
-          color: '#666'
-        }
-      },
+
       xAxis: {
         categories: categories,
         title: {
@@ -236,7 +230,7 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
 
   return (
     <WidgetWrapper>
-      <TitleBar title="Carbon Reporting Tool">
+      <TitleBar title="">
         <FilterPanel onClear={() => {
           setMonthFilter(null);
           setYearFilter(new Date().getFullYear());
@@ -287,16 +281,14 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
 </div>
 
 
-      <div style={{ width: '100%', height: '100%', padding: '20px', backgroundColor: '#fafafa' }}>
+      <div style={{ width: '100%', height: '100%', padding: '20px' }}>
         <div
           ref={chartRef}
           style={{
             width: '100%',
             height: '450px',
             minHeight: '450px',
-            backgroundColor: 'white',
             borderRadius: '8px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
           }}
         />
       </div>

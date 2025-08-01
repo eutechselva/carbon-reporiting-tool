@@ -88,47 +88,124 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
 
   return (
     <WidgetWrapper>
-      <TitleBar title="Carbon Reporting Tool">
-        <FilterPanel />
-      </TitleBar>
-
+      <TitleBar title="Bulk Data Upload" />
+  
       <div
         className={`dropzone ${loading ? "disabled" : ""}`}
+        style={{
+          maxWidth: '600px',
+          width: '90%',
+          margin: '5% auto',
+          border: '2px dashed #ccc',
+          borderRadius: '10px',
+          backgroundColor: '#f9f9f9',
+          textAlign: 'center',
+          padding: '2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          transition: 'border-color 0.3s ease',
+          cursor: loading ? 'not-allowed' : 'pointer',
+          position: 'relative'
+        }}
         onDragOver={(e) => {
           e.preventDefault();
-          e.currentTarget.classList.add("dragover");
+          e.currentTarget.style.borderColor = '#0078d4';
         }}
         onDragLeave={(e) => {
           e.preventDefault();
-          e.currentTarget.classList.remove("dragover");
+          e.currentTarget.style.borderColor = '#ccc';
         }}
         onDrop={(e) => {
           e.preventDefault();
-          e.currentTarget.classList.remove("dragover");
-
+          e.currentTarget.style.borderColor = '#ccc';
           const file = e.dataTransfer.files?.[0];
           if (file) parseCSVFile(file);
         }}
-        onClick={() => fileInputRef.current?.click()}
+        onClick={() => {
+          if (!loading) fileInputRef.current?.click();
+        }}
       >
         {fileName ? (
-          <div className="file-tag">
-            <span>{fileName}</span>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                resetState();
-              }}
-              title="Remove file"
-            >
-              ✖
-            </button>
-          </div>
+          <>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '10px',
+              background: '#e6f7ff',
+              padding: '6px 12px',
+              borderRadius: '6px',
+              border: '1px solid #91d5ff',
+              marginBottom: '0.5rem',
+              maxWidth: '100%',
+              flexWrap: 'wrap'
+            }}>
+              <span style={{
+                fontWeight: 500,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '200px'
+              }}>{fileName}</span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  resetState();
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  fontSize: '16px',
+                  cursor: 'pointer',
+                  color: '#ff4d4f'
+                }}
+                title="Remove file"
+              >
+                ✖
+              </button>
+            </div>
+  
+            <p style={{
+              marginBottom: '1.5rem',
+              fontSize: '14px',
+              color: '#555'
+            }}>
+              ✅ <strong>{parsedData.length}</strong> rows parsed
+            </p>
+  
+            <div style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "10px",
+              flexWrap: "wrap"
+            }}>
+              <Button
+                title={loading ? "Uploading..." : "Upload"}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  uploadToLucy();
+                }}
+                disabled={loading}
+              />
+              <Button
+                title="Cancel"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  resetState();
+                }}
+                disabled={loading}
+              />
+            </div>
+          </>
         ) : (
-          <p>Drag & drop CSV file here, or click to select</p>
+          <p style={{ color: '#888', fontSize: '14px' }}>
+            Drag & drop a CSV file here,<br />or click to select
+          </p>
         )}
       </div>
-
+  
       <input
         type="file"
         accept=".csv"
@@ -137,29 +214,13 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) parseCSVFile(file);
-          e.target.value = ""; // reset input
+          e.target.value = "";
         }}
       />
-
-      {parsedData && (
-        <div style={{ marginTop: "1rem" }}>
-          <p>{parsedData.length} rows parsed. Proceed to upload?</p>
-          <div style={{ display: "flex", gap: "10px" }}>
-            <Button
-              title={loading ? "Uploading..." : "Upload"}
-              onClick={uploadToLucy}
-              disabled={loading}
-            />
-            <Button
-              title="Cancel"
-              onClick={resetState}
-              disabled={loading}
-            />
-          </div>
-        </div>
-      )}
     </WidgetWrapper>
   );
+  
+  
 };
 
 

@@ -40,4 +40,15 @@
     cursor: pointer;
     padding: 0;
   }
+  //new
+
+  
+  .dropzone.dragover {
+    border-color: #0078d4 !important;
+    background-color: #e6f7ff;
+  }
+  .dropzone.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
   
