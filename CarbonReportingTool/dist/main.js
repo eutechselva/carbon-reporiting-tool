@@ -33,7 +33,7 @@ module.exports = {};
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.id, ".dropzone {\n  border: 2px dashed #ccc;\n  border-radius: 8px;\n  padding: 2rem;\n  text-align: center;\n  transition: all 0.3s ease-in-out;\n  background: #fafafa;\n  color: #666;\n  cursor: pointer;\n}\n\n.dropzone.dragover {\n  border-color: #2196f3;\n  background: #e3f2fd;\n  color: #1976d2;\n}\n\n.file-tag {\n  display: inline-flex;\n  align-items: center;\n  background: #e0f7fa;\n  border-radius: 16px;\n  padding: 0.5rem 1rem;\n  margin-top: 1rem;\n  font-size: 14px;\n  color: #006064;\n}\n\n.file-tag span {\n  margin-left: 0.5rem;\n  font-weight: bold;\n}\n\n.file-tag button {\n  margin-left: 10px;\n  background: none;\n  border: none;\n  color: #006064;\n  font-size: 16px;\n  cursor: pointer;\n  padding: 0;\n}", ""]);
+exports.push([module.id, ".dropzone {\n  border: 2px dashed #ccc;\n  border-radius: 8px;\n  padding: 2rem;\n  text-align: center;\n  transition: all 0.3s ease-in-out;\n  background: #fafafa;\n  color: #666;\n  cursor: pointer;\n}\n\n.dropzone.dragover {\n  border-color: #2196f3;\n  background: #e3f2fd;\n  color: #1976d2;\n}\n\n.file-tag {\n  display: inline-flex;\n  align-items: center;\n  background: #e0f7fa;\n  border-radius: 16px;\n  padding: 0.5rem 1rem;\n  margin-top: 1rem;\n  font-size: 14px;\n  color: #006064;\n}\n\n.file-tag span {\n  margin-left: 0.5rem;\n  font-weight: bold;\n}\n\n.file-tag button {\n  margin-left: 10px;\n  background: none;\n  border: none;\n  color: #006064;\n  font-size: 16px;\n  cursor: pointer;\n  padding: 0;\n}\n\n.dropzone.dragover {\n  border-color: #0078d4 !important;\n  background-color: #e6f7ff;\n}\n\n.dropzone.disabled {\n  opacity: 0.6;\n  pointer-events: none;\n}", ""]);
 // Exports
 module.exports = exports;
 
@@ -521,6 +521,9 @@ const monthOrder = {
 const ESGAreaChart = (props) => {
     const chartRef = (0, react_1.useRef)(null);
     const toast = (0, components_1.useToast)();
+    const chartInstance = (0, react_1.useRef)(null);
+    const [selectedLegend, setSelectedLegend] = (0, react_1.useState)("all");
+    const [activityNames, setActivityNames] = (0, react_1.useState)([]);
     const [loading, setLoading] = (0, react_1.useState)(false);
     const [activityData, setActivityData] = (0, react_1.useState)([]);
     const [monthFilter, setMonthFilter] = (0, react_1.useState)(null);
@@ -548,6 +551,7 @@ const ESGAreaChart = (props) => {
                 value: parseFloat(row.value)
             }))) || [];
             setActivityData(cleanedData);
+            setActivityNames(Array.from(new Set(cleanedData.map((item) => item.activity))));
         }
         catch (error) {
             console.error("Error loading emission data:", error);
@@ -609,19 +613,38 @@ const ESGAreaChart = (props) => {
         const totalEmissions = scope1Total + scope2Total;
         return { dynamicEmissionData, scope1Total, scope2Total, totalEmissions, monthlyEmissions };
     };
-    // Generate dynamic title based on selected filters
-    const generateTitle = () => {
-        let titleParts = ['Carbon Emissions Trends (Area Chart)'];
-        if (yearFilter) {
-            titleParts.push(yearFilter.toString());
-        }
-        if (monthFilter) {
-            titleParts.push(monthFilter);
-        }
-        if (activityName) {
-            titleParts.push(`(${activityName})`);
-        }
-        return titleParts.join(' - ');
+    const legendItemStyle = (active, color) => ({
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        padding: '6px 12px',
+        borderRadius: 4,
+        backgroundColor: active ? '#f0f8ff' : 'transparent',
+        cursor: 'pointer',
+        fontSize: '13px',
+        fontWeight: active ? 'bold' : 'normal',
+        border: active ? `1px solid ${color}` : '1px solid transparent',
+        transition: 'all 0.2s ease'
+    });
+    const legendDotStyle = (color) => ({
+        width: 12,
+        height: 12,
+        borderRadius: '50%',
+        backgroundColor: color,
+        display: 'inline-block'
+    });
+    const showAllSeries = () => {
+        var _a;
+        (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.series.forEach(s => s.show());
+    };
+    const showOnlySeries = (name) => {
+        var _a;
+        (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.series.forEach(s => {
+            if (s.name === name)
+                s.show();
+            else
+                s.hide();
+        });
     };
     const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions, monthlyEmissions } = calculateEmissions();
     (0, react_1.useEffect)(() => {
@@ -633,8 +656,12 @@ const ESGAreaChart = (props) => {
             const months = Object.keys(monthlyEmissions).sort((a, b) => monthOrder[a] - monthOrder[b]);
             // Get all activities
             const activities = Array.from(new Set(Object.values(monthlyEmissions).flatMap(monthData => Object.keys(monthData))));
-            // Create series for each activity
-            const series = activities.map((activity, index) => {
+            // Filter based on selectedLegend
+            const filteredActivities = selectedLegend === "all"
+                ? activities
+                : activities.filter((a) => a === selectedLegend);
+            // Create series for each filtered activity
+            const series = filteredActivities.map((activity, index) => {
                 const isScope1 = activity.includes("Generator") || activity.includes("Refrigerant");
                 const data = months.map(month => { var _a; return ((_a = monthlyEmissions[month]) === null || _a === void 0 ? void 0 : _a[activity]) || 0; });
                 return {
@@ -663,19 +690,11 @@ const ESGAreaChart = (props) => {
                     spacing: [20, 20, 20, 20],
                 },
                 title: {
-                    text: generateTitle(),
+                    text: 'Carbon Emissions (Area Chart)',
                     style: {
                         fontSize: '20px',
                         fontWeight: 'bold',
                         color: '#2c3e50'
-                    }
-                },
-                subtitle: {
-                    text: `Total: ${totalEmissions.toFixed(1)} tCO₂e | Trend Analysis`,
-                    style: {
-                        fontSize: '14px',
-                        color: '#7f8c8d',
-                        fontWeight: 'normal'
                     }
                 },
                 xAxis: {
@@ -726,17 +745,7 @@ const ESGAreaChart = (props) => {
                     }
                 },
                 legend: {
-                    align: 'center',
-                    verticalAlign: 'bottom',
-                    layout: 'horizontal',
-                    itemStyle: {
-                        fontSize: '12px',
-                        fontWeight: 'normal'
-                    },
-                    itemHoverStyle: {
-                        color: '#000'
-                    },
-                    margin: 20
+                    enabled: false
                 },
                 plotOptions: {
                     area: {
@@ -784,11 +793,11 @@ const ESGAreaChart = (props) => {
                         }]
                 }
             };
-            highcharts_1.default.chart(chartRef.current, chartConfig);
+            chartInstance.current = highcharts_1.default.chart(chartRef.current, chartConfig); // Only once
         }
     }, [activityData, monthlyEmissions, totalEmissions]);
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
-        react_1.default.createElement(components_1.TitleBar, { title: "Carbon Reporting Tool - Area Chart" },
+        react_1.default.createElement(components_1.TitleBar, { title: "" },
             react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
                     setMonthFilter(null);
                     setYearFilter(new Date().getFullYear());
@@ -799,15 +808,33 @@ const ESGAreaChart = (props) => {
                     react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (newMonth) => setMonthFilter(newMonth) })),
                 react_1.default.createElement(components_1.FormField, null,
                     react_1.default.createElement(components_1.Label, null, "Filter by Year"),
-                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null), placeholder: "e.g., 2025" })),
+                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) })),
                 react_1.default.createElement(components_1.FormField, null,
                     react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
                     react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" })))),
+        activityData.length > 0 && (react_1.default.createElement("div", { style: { display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' } },
+            react_1.default.createElement("div", { style: legendItemStyle(selectedLegend === "all", "#888"), onClick: () => {
+                    setSelectedLegend("all");
+                    showAllSeries();
+                } },
+                react_1.default.createElement("span", { style: legendDotStyle("#888") }),
+                "All"),
+            activityNames.map(name => {
+                var _a, _b;
+                const rawColor = (_b = (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.series.find(s => s.name === name)) === null || _b === void 0 ? void 0 : _b.color;
+                const color = typeof rawColor === 'string' ? rawColor : "#ccc";
+                return (react_1.default.createElement("div", { key: name, style: legendItemStyle(selectedLegend === name, color), onClick: () => {
+                        setSelectedLegend(name);
+                        showOnlySeries(name);
+                    } },
+                    react_1.default.createElement("span", { style: legendDotStyle(color) }),
+                    name));
+            }))),
         react_1.default.createElement("div", { style: {
                 width: '100%',
                 height: '100%',
                 padding: '20px',
-                backgroundColor: '#f8f9fa',
+                // backgroundColor: '#f8f9fa',
                 fontFamily: 'Arial, sans-serif'
             } },
             loading && (react_1.default.createElement("div", { style: {
@@ -816,7 +843,7 @@ const ESGAreaChart = (props) => {
                     color: '#7f8c8d',
                     backgroundColor: 'white',
                     borderRadius: '12px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                    // boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                 } }, "Loading emissions data...")),
             !loading && activityData.length === 0 && (react_1.default.createElement("div", { style: {
                     textAlign: 'center',
@@ -824,7 +851,7 @@ const ESGAreaChart = (props) => {
                     color: '#7f8c8d',
                     backgroundColor: 'white',
                     borderRadius: '12px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                    // boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                 } }, "No emission data found for the selected filters.")),
             !loading && activityData.length > 0 && (react_1.default.createElement("div", { ref: chartRef, style: {
                     width: '100%',
@@ -832,8 +859,8 @@ const ESGAreaChart = (props) => {
                     minHeight: '500px',
                     backgroundColor: 'white',
                     borderRadius: '12px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    border: '1px solid #e9ecef'
+                    // boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    // border: '1px solid #e9ecef'
                 } })))));
 };
 exports["default"] = ESGAreaChart;
@@ -854,6 +881,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const react_1 = __importDefault(__webpack_require__(/*! react */ "react"));
+const components_1 = __webpack_require__(/*! uxp/components */ "uxp/components");
 // Emission factors data
 const emissionFactorsData = [
     {
@@ -899,203 +927,203 @@ const ESGEmissionFactorsTable = (props) => {
         minWidth: '70px',
         textAlign: 'center'
     });
-    return (react_1.default.createElement("div", { style: {
-            width: '100%',
-            height: '100%',
-            padding: '20px',
-            backgroundColor: '#f8f9fa',
-            fontFamily: 'Arial, sans-serif'
-        } },
+    return (react_1.default.createElement(components_1.WidgetWrapper, null,
         react_1.default.createElement("div", { style: {
-                backgroundColor: 'white',
-                borderRadius: '12px 12px 0 0',
+                width: '100%',
+                height: '100%',
                 padding: '20px',
-                borderBottom: '1px solid #e9ecef',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-            } },
-            react_1.default.createElement("h2", { style: {
-                    margin: '0 0 8px 0',
-                    color: '#2c3e50',
-                    fontSize: '20px',
-                    fontWeight: 'bold'
-                } }, "Emission Factors Reference"),
-            react_1.default.createElement("p", { style: {
-                    margin: 0,
-                    color: '#7f8c8d',
-                    fontSize: '14px'
-                } }, "Carbon emission factors and data sources for ESG reporting compliance")),
-        react_1.default.createElement("div", { style: {
-                backgroundColor: 'white',
-                borderRadius: '0 0 12px 12px',
-                overflow: 'hidden',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-            } },
-            react_1.default.createElement("table", { style: {
-                    width: '100%',
-                    borderCollapse: 'collapse',
-                    fontSize: '14px'
-                } },
-                react_1.default.createElement("thead", null,
-                    react_1.default.createElement("tr", { style: {
-                            backgroundColor: '#f8f9fa',
-                            borderBottom: '2px solid #e9ecef'
-                        } },
-                        react_1.default.createElement("th", { style: {
-                                padding: '16px 12px',
-                                textAlign: 'left',
-                                fontWeight: 'bold',
-                                color: '#2c3e50',
-                                fontSize: '13px',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.5px'
-                            } }, "Scope"),
-                        react_1.default.createElement("th", { style: {
-                                padding: '16px 12px',
-                                textAlign: 'left',
-                                fontWeight: 'bold',
-                                color: '#2c3e50',
-                                fontSize: '13px',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.5px'
-                            } }, "Activity"),
-                        react_1.default.createElement("th", { style: {
-                                padding: '16px 12px',
-                                textAlign: 'center',
-                                fontWeight: 'bold',
-                                color: '#2c3e50',
-                                fontSize: '13px',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.5px'
-                            } }, "Unit"),
-                        react_1.default.createElement("th", { style: {
-                                padding: '16px 12px',
-                                textAlign: 'right',
-                                fontWeight: 'bold',
-                                color: '#2c3e50',
-                                fontSize: '13px',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.5px'
-                            } },
-                            "Emission Factor",
-                            react_1.default.createElement("br", null),
-                            react_1.default.createElement("span", { style: { fontSize: '11px', fontWeight: 'normal', textTransform: 'none' } }, "(tCO\u2082e per unit)")),
-                        react_1.default.createElement("th", { style: {
-                                padding: '16px 12px',
-                                textAlign: 'left',
-                                fontWeight: 'bold',
-                                color: '#2c3e50',
-                                fontSize: '13px',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.5px'
-                            } }, "Data Source"))),
-                react_1.default.createElement("tbody", null, emissionFactorsData.map((row, index) => (react_1.default.createElement("tr", { key: index, style: {
-                        borderBottom: '1px solid #f1f3f4',
-                        transition: 'background-color 0.2s ease',
-                        cursor: 'default'
-                    }, onMouseEnter: (e) => {
-                        e.currentTarget.style.backgroundColor = '#f8f9fa';
-                    }, onMouseLeave: (e) => {
-                        e.currentTarget.style.backgroundColor = 'white';
-                    } },
-                    react_1.default.createElement("td", { style: {
-                            padding: '16px 12px',
-                            verticalAlign: 'top'
-                        } },
-                        react_1.default.createElement("span", { style: getScopeBadgeStyle(row.scope) }, row.scope),
-                        react_1.default.createElement("div", { style: {
-                                fontSize: '11px',
-                                color: '#7f8c8d',
-                                marginTop: '4px',
-                                fontStyle: 'italic'
-                            } }, row.category)),
-                    react_1.default.createElement("td", { style: {
-                            padding: '16px 12px',
-                            verticalAlign: 'top'
-                        } },
-                        react_1.default.createElement("div", { style: {
-                                fontWeight: 'bold',
-                                color: '#2c3e50',
-                                marginBottom: '4px'
-                            } }, row.activity),
-                        react_1.default.createElement("div", { style: {
-                                fontSize: '12px',
-                                color: '#7f8c8d',
-                                lineHeight: '1.4'
-                            } }, row.description)),
-                    react_1.default.createElement("td", { style: {
-                            padding: '16px 12px',
-                            textAlign: 'center',
-                            verticalAlign: 'middle'
-                        } },
-                        react_1.default.createElement("span", { style: {
-                                backgroundColor: '#e9ecef',
-                                padding: '4px 8px',
-                                borderRadius: '4px',
-                                fontSize: '12px',
-                                fontWeight: 'bold',
-                                color: '#495057'
-                            } }, row.unit)),
-                    react_1.default.createElement("td", { style: {
-                            padding: '16px 12px',
-                            textAlign: 'right',
-                            verticalAlign: 'middle'
-                        } },
-                        react_1.default.createElement("span", { style: {
-                                fontSize: '16px',
-                                fontWeight: 'bold',
-                                color: getScopeColor(row.scope)
-                            } }, row.emissionFactor.toFixed(3))),
-                    react_1.default.createElement("td", { style: {
-                            padding: '16px 12px',
-                            verticalAlign: 'top'
-                        } },
-                        react_1.default.createElement("div", { style: {
-                                fontSize: '13px',
-                                color: '#2c3e50',
-                                fontWeight: '500',
-                                lineHeight: '1.4'
-                            } }, row.source)))))))),
-        react_1.default.createElement("div", { style: {
-                marginTop: '16px',
-                padding: '16px',
-                backgroundColor: '#e3f2fd',
-                borderRadius: '8px',
-                border: '1px solid #bbdefb'
+                fontFamily: 'Arial, sans-serif'
             } },
             react_1.default.createElement("div", { style: {
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    marginBottom: '8px'
+                    backgroundColor: 'white',
+                    borderRadius: '12px 12px 0 0',
+                    padding: '20px',
+                    borderBottom: '1px solid #e9ecef',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                 } },
-                react_1.default.createElement("span", { style: {
-                        fontSize: '16px'
-                    } }, "\u2139\uFE0F"),
-                react_1.default.createElement("h4", { style: {
-                        margin: 0,
-                        color: '#1565c0',
-                        fontSize: '14px',
+                react_1.default.createElement("h2", { style: {
+                        margin: '0 0 8px 0',
+                        color: '#2c3e50',
+                        fontSize: '20px',
                         fontWeight: 'bold'
-                    } }, "ESG Reporting Notes")),
-            react_1.default.createElement("ul", { style: {
-                    margin: '0',
-                    paddingLeft: '20px',
-                    color: '#1976d2',
-                    fontSize: '13px',
-                    lineHeight: '1.5'
+                    } }, "Emission Factors Reference"),
+                react_1.default.createElement("p", { style: {
+                        margin: 0,
+                        color: '#7f8c8d',
+                        fontSize: '14px'
+                    } }, "Carbon emission factors and data sources for ESG reporting compliance")),
+            react_1.default.createElement("div", { style: {
+                    backgroundColor: 'white',
+                    borderRadius: '0 0 12px 12px',
+                    overflow: 'hidden',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                 } },
-                react_1.default.createElement("li", null,
-                    react_1.default.createElement("strong", null, "Scope 1:"),
-                    " Direct GHG emissions from sources owned or controlled by the organization"),
-                react_1.default.createElement("li", null,
-                    react_1.default.createElement("strong", null, "Scope 2:"),
-                    " Indirect GHG emissions from consumption of purchased electricity, heat, or steam"),
-                react_1.default.createElement("li", null,
-                    react_1.default.createElement("strong", null, "tCO\u2082e:"),
-                    " Tonnes of carbon dioxide equivalent - standardized unit for all greenhouse gases"),
-                react_1.default.createElement("li", null,
-                    react_1.default.createElement("strong", null, "Data Sources:"),
-                    " All emission factors are from recognized ESG reporting standards and local regulatory bodies")))));
+                react_1.default.createElement("table", { style: {
+                        width: '100%',
+                        borderCollapse: 'collapse',
+                        fontSize: '14px'
+                    } },
+                    react_1.default.createElement("thead", null,
+                        react_1.default.createElement("tr", { style: {
+                                backgroundColor: '#f8f9fa',
+                                borderBottom: '2px solid #e9ecef'
+                            } },
+                            react_1.default.createElement("th", { style: {
+                                    padding: '16px 12px',
+                                    textAlign: 'left',
+                                    fontWeight: 'bold',
+                                    color: '#2c3e50',
+                                    fontSize: '13px',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px'
+                                } }, "Scope"),
+                            react_1.default.createElement("th", { style: {
+                                    padding: '16px 12px',
+                                    textAlign: 'left',
+                                    fontWeight: 'bold',
+                                    color: '#2c3e50',
+                                    fontSize: '13px',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px'
+                                } }, "Activity"),
+                            react_1.default.createElement("th", { style: {
+                                    padding: '16px 12px',
+                                    textAlign: 'center',
+                                    fontWeight: 'bold',
+                                    color: '#2c3e50',
+                                    fontSize: '13px',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px'
+                                } }, "Unit"),
+                            react_1.default.createElement("th", { style: {
+                                    padding: '16px 12px',
+                                    textAlign: 'right',
+                                    fontWeight: 'bold',
+                                    color: '#2c3e50',
+                                    fontSize: '13px',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px'
+                                } },
+                                "Emission Factor",
+                                react_1.default.createElement("br", null),
+                                react_1.default.createElement("span", { style: { fontSize: '11px', fontWeight: 'normal', textTransform: 'none' } }, "(tCO\u2082e per unit)")),
+                            react_1.default.createElement("th", { style: {
+                                    padding: '16px 12px',
+                                    textAlign: 'left',
+                                    fontWeight: 'bold',
+                                    color: '#2c3e50',
+                                    fontSize: '13px',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px'
+                                } }, "Data Source"))),
+                    react_1.default.createElement("tbody", null, emissionFactorsData.map((row, index) => (react_1.default.createElement("tr", { key: index, style: {
+                            borderBottom: '1px solid #f1f3f4',
+                            transition: 'background-color 0.2s ease',
+                            cursor: 'default'
+                        }, onMouseEnter: (e) => {
+                            e.currentTarget.style.backgroundColor = '#f8f9fa';
+                        }, onMouseLeave: (e) => {
+                            e.currentTarget.style.backgroundColor = 'white';
+                        } },
+                        react_1.default.createElement("td", { style: {
+                                padding: '16px 12px',
+                                verticalAlign: 'top'
+                            } },
+                            react_1.default.createElement("span", { style: getScopeBadgeStyle(row.scope) }, row.scope),
+                            react_1.default.createElement("div", { style: {
+                                    fontSize: '11px',
+                                    color: '#7f8c8d',
+                                    marginTop: '4px',
+                                    fontStyle: 'italic'
+                                } }, row.category)),
+                        react_1.default.createElement("td", { style: {
+                                padding: '16px 12px',
+                                verticalAlign: 'top'
+                            } },
+                            react_1.default.createElement("div", { style: {
+                                    fontWeight: 'bold',
+                                    color: '#2c3e50',
+                                    marginBottom: '4px'
+                                } }, row.activity),
+                            react_1.default.createElement("div", { style: {
+                                    fontSize: '12px',
+                                    color: '#7f8c8d',
+                                    lineHeight: '1.4'
+                                } }, row.description)),
+                        react_1.default.createElement("td", { style: {
+                                padding: '16px 12px',
+                                textAlign: 'center',
+                                verticalAlign: 'middle'
+                            } },
+                            react_1.default.createElement("span", { style: {
+                                    backgroundColor: '#e9ecef',
+                                    padding: '4px 8px',
+                                    borderRadius: '4px',
+                                    fontSize: '12px',
+                                    fontWeight: 'bold',
+                                    color: '#495057'
+                                } }, row.unit)),
+                        react_1.default.createElement("td", { style: {
+                                padding: '16px 12px',
+                                textAlign: 'right',
+                                verticalAlign: 'middle'
+                            } },
+                            react_1.default.createElement("span", { style: {
+                                    fontSize: '16px',
+                                    fontWeight: 'bold',
+                                    color: getScopeColor(row.scope)
+                                } }, row.emissionFactor.toFixed(3))),
+                        react_1.default.createElement("td", { style: {
+                                padding: '16px 12px',
+                                verticalAlign: 'top'
+                            } },
+                            react_1.default.createElement("div", { style: {
+                                    fontSize: '13px',
+                                    color: '#2c3e50',
+                                    fontWeight: '500',
+                                    lineHeight: '1.4'
+                                } }, row.source)))))))),
+            react_1.default.createElement("div", { style: {
+                    marginTop: '16px',
+                    padding: '16px',
+                    backgroundColor: '#e3f2fd',
+                    borderRadius: '8px',
+                    border: '1px solid #bbdefb'
+                } },
+                react_1.default.createElement("div", { style: {
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        marginBottom: '8px'
+                    } },
+                    react_1.default.createElement("span", { style: {
+                            fontSize: '16px'
+                        } }, "\u2139\uFE0F"),
+                    react_1.default.createElement("h4", { style: {
+                            margin: 0,
+                            color: '#1565c0',
+                            fontSize: '14px',
+                            fontWeight: 'bold'
+                        } }, "ESG Reporting Notes")),
+                react_1.default.createElement("ul", { style: {
+                        margin: '0',
+                        paddingLeft: '20px',
+                        color: '#1976d2',
+                        fontSize: '13px',
+                        lineHeight: '1.5'
+                    } },
+                    react_1.default.createElement("li", null,
+                        react_1.default.createElement("strong", null, "Scope 1:"),
+                        " Direct GHG emissions from sources owned or controlled by the organization"),
+                    react_1.default.createElement("li", null,
+                        react_1.default.createElement("strong", null, "Scope 2:"),
+                        " Indirect GHG emissions from consumption of purchased electricity, heat, or steam"),
+                    react_1.default.createElement("li", null,
+                        react_1.default.createElement("strong", null, "tCO\u2082e:"),
+                        " Tonnes of carbon dioxide equivalent - standardized unit for all greenhouse gases"),
+                    react_1.default.createElement("li", null,
+                        react_1.default.createElement("strong", null, "Data Sources:"),
+                        " All emission factors are from recognized ESG reporting standards and local regulatory bodies"))))));
 };
 exports["default"] = ESGEmissionFactorsTable;
 
@@ -1163,6 +1191,9 @@ const monthOrder = {
 const ESGStackedBarChart = (props) => {
     const chartRef = (0, react_1.useRef)(null);
     const toast = (0, components_1.useToast)();
+    const chartInstance = (0, react_1.useRef)(null);
+    const [selectedLegend, setSelectedLegend] = (0, react_1.useState)("all");
+    const [activityNames, setActivityNames] = (0, react_1.useState)([]);
     const [loading, setLoading] = (0, react_1.useState)(false);
     const [activityData, setActivityData] = (0, react_1.useState)([]);
     const [monthFilter, setMonthFilter] = (0, react_1.useState)(null);
@@ -1190,6 +1221,7 @@ const ESGStackedBarChart = (props) => {
                 value: parseFloat(row.value)
             }))) || [];
             setActivityData(cleanedData);
+            setActivityNames(Array.from(new Set(cleanedData.map((item) => item.activity))));
         }
         catch (error) {
             console.error("Error loading emission data:", error);
@@ -1251,19 +1283,38 @@ const ESGStackedBarChart = (props) => {
         const totalEmissions = scope1Total + scope2Total;
         return { dynamicEmissionData, scope1Total, scope2Total, totalEmissions, monthlyEmissions };
     };
-    // Generate dynamic title based on selected filters
-    const generateTitle = () => {
-        let titleParts = ['Monthly Carbon Emissions (Stacked)'];
-        if (yearFilter) {
-            titleParts.push(yearFilter.toString());
-        }
-        if (monthFilter) {
-            titleParts.push(monthFilter);
-        }
-        if (activityName) {
-            titleParts.push(`(${activityName})`);
-        }
-        return titleParts.join(' - ');
+    const legendItemStyle = (active, color) => ({
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        padding: '6px 12px',
+        borderRadius: 4,
+        backgroundColor: active ? '#f0f8ff' : 'transparent',
+        cursor: 'pointer',
+        fontSize: '13px',
+        fontWeight: active ? 'bold' : 'normal',
+        border: active ? `1px solid ${color}` : '1px solid transparent',
+        transition: 'all 0.2s ease'
+    });
+    const legendDotStyle = (color) => ({
+        width: 12,
+        height: 12,
+        borderRadius: '50%',
+        backgroundColor: color,
+        display: 'inline-block'
+    });
+    const showAllSeries = () => {
+        var _a;
+        (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.series.forEach(s => s.show());
+    };
+    const showOnlySeries = (name) => {
+        var _a;
+        (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.series.forEach(s => {
+            if (s.name === name)
+                s.show();
+            else
+                s.hide();
+        });
     };
     const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions, monthlyEmissions } = calculateEmissions();
     (0, react_1.useEffect)(() => {
@@ -1275,8 +1326,12 @@ const ESGStackedBarChart = (props) => {
             const months = Object.keys(monthlyEmissions).sort((a, b) => monthOrder[a] - monthOrder[b]);
             // Get all activities
             const activities = Array.from(new Set(Object.values(monthlyEmissions).flatMap(monthData => Object.keys(monthData))));
-            // Create series for each activity
-            const series = activities.map((activity, index) => {
+            // Filter based on selectedLegend
+            const filteredActivities = selectedLegend === "all"
+                ? activities
+                : activities.filter((a) => a === selectedLegend);
+            // Create series for each filtered activity
+            const series = filteredActivities.map((activity, index) => {
                 const isScope1 = activity.includes("Generator") || activity.includes("Refrigerant");
                 const data = months.map(month => { var _a; return ((_a = monthlyEmissions[month]) === null || _a === void 0 ? void 0 : _a[activity]) || 0; });
                 return {
@@ -1300,19 +1355,11 @@ const ESGStackedBarChart = (props) => {
                     spacing: [20, 20, 20, 20]
                 },
                 title: {
-                    text: generateTitle(),
+                    text: 'Monthly Carbon Emissions (Stacked)',
                     style: {
                         fontSize: '20px',
                         fontWeight: 'bold',
                         color: '#2c3e50'
-                    }
-                },
-                subtitle: {
-                    text: `Total: ${totalEmissions.toFixed(1)} tCO₂e | Stacked by Scope`,
-                    style: {
-                        fontSize: '14px',
-                        color: '#7f8c8d',
-                        fontWeight: 'normal'
                     }
                 },
                 xAxis: {
@@ -1370,17 +1417,7 @@ const ESGStackedBarChart = (props) => {
                     shadow: true
                 },
                 legend: {
-                    align: 'center',
-                    verticalAlign: 'bottom',
-                    layout: 'horizontal',
-                    itemStyle: {
-                        fontSize: '12px',
-                        fontWeight: 'normal'
-                    },
-                    itemHoverStyle: {
-                        color: '#000'
-                    },
-                    margin: 20
+                    enabled: false // Disable the default legend
                 },
                 plotOptions: {
                     column: {
@@ -1413,21 +1450,16 @@ const ESGStackedBarChart = (props) => {
                             chartOptions: {
                                 chart: {
                                     height: 400
-                                },
-                                legend: {
-                                    layout: 'horizontal',
-                                    align: 'center',
-                                    verticalAlign: 'bottom'
                                 }
                             }
                         }]
                 }
             };
-            highcharts_1.default.chart(chartRef.current, chartConfig);
+            chartInstance.current = highcharts_1.default.chart(chartRef.current, chartConfig);
         }
-    }, [activityData, monthlyEmissions, totalEmissions]);
+    }, [activityData, monthlyEmissions, totalEmissions, selectedLegend]);
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
-        react_1.default.createElement(components_1.TitleBar, { title: "Carbon Reporting Tool - Stacked Bar Chart" },
+        react_1.default.createElement(components_1.TitleBar, { title: "" },
             react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
                     setMonthFilter(null);
                     setYearFilter(new Date().getFullYear());
@@ -1438,15 +1470,32 @@ const ESGStackedBarChart = (props) => {
                     react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (newMonth) => setMonthFilter(newMonth) })),
                 react_1.default.createElement(components_1.FormField, null,
                     react_1.default.createElement(components_1.Label, null, "Filter by Year"),
-                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null), placeholder: "e.g., 2025" })),
+                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) })),
                 react_1.default.createElement(components_1.FormField, null,
                     react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
                     react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" })))),
+        activityData.length > 0 && (react_1.default.createElement("div", { style: { display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' } },
+            react_1.default.createElement("div", { style: legendItemStyle(selectedLegend === "all", "#888"), onClick: () => {
+                    setSelectedLegend("all");
+                    showAllSeries();
+                } },
+                react_1.default.createElement("span", { style: legendDotStyle("#888") }),
+                "All"),
+            activityNames.map(name => {
+                var _a, _b;
+                const rawColor = (_b = (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.series.find(s => s.name === name)) === null || _b === void 0 ? void 0 : _b.color;
+                const color = typeof rawColor === 'string' ? rawColor : "#ccc";
+                return (react_1.default.createElement("div", { key: name, style: legendItemStyle(selectedLegend === name, color), onClick: () => {
+                        setSelectedLegend(name);
+                        showOnlySeries(name);
+                    } },
+                    react_1.default.createElement("span", { style: legendDotStyle(color) }),
+                    name));
+            }))),
         react_1.default.createElement("div", { style: {
                 width: '100%',
                 height: '100%',
                 padding: '20px',
-                backgroundColor: '#f8f9fa',
                 fontFamily: 'Arial, sans-serif'
             } },
             loading && (react_1.default.createElement("div", { style: {
@@ -1455,7 +1504,6 @@ const ESGStackedBarChart = (props) => {
                     color: '#7f8c8d',
                     backgroundColor: 'white',
                     borderRadius: '12px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                 } }, "Loading emissions data...")),
             !loading && activityData.length === 0 && (react_1.default.createElement("div", { style: {
                     textAlign: 'center',
@@ -1463,7 +1511,6 @@ const ESGStackedBarChart = (props) => {
                     color: '#7f8c8d',
                     backgroundColor: 'white',
                     borderRadius: '12px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                 } }, "No emission data found for the selected filters.")),
             !loading && activityData.length > 0 && (react_1.default.createElement("div", { ref: chartRef, style: {
                     width: '100%',
@@ -1471,8 +1518,6 @@ const ESGStackedBarChart = (props) => {
                     minHeight: '500px',
                     backgroundColor: 'white',
                     borderRadius: '12px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    border: '1px solid #e9ecef'
                 } })))));
 };
 exports["default"] = ESGStackedBarChart;
@@ -1642,11 +1687,8 @@ const AllData = (props) => {
                 backgroundColor: 'transparent'
             },
             title: {
-                text: 'Monthly Activity Data - 2025',
+                text: 'Monthly Activity Data',
                 style: { fontSize: '18px', fontWeight: 'bold' }
-            },
-            subtitle: {
-                text: 'Generator Fuel, Refrigerant Leakages, and HVAC Electricity Consumption'
             },
             xAxis: {
                 categories: xCategories,
@@ -1693,7 +1735,7 @@ const AllData = (props) => {
         chartInstance.current = highcharts_1.default.chart(chartRef.current, chartConfig);
     }, [activityData]);
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
-        react_1.default.createElement(components_1.TitleBar, { title: "Carbon Reporting Tool" },
+        react_1.default.createElement(components_1.TitleBar, { title: "" },
             react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
                     setMonthFilter(null);
                     setYearFilter(new Date().getFullYear());
@@ -1704,7 +1746,7 @@ const AllData = (props) => {
                     react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (newMonth) => setMonthFilter(newMonth) })),
                 react_1.default.createElement(components_1.FormField, null,
                     react_1.default.createElement(components_1.Label, null, "Filter by Year"),
-                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null), placeholder: "e.g., 2025" })))),
+                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) })))),
         react_1.default.createElement("div", { style: { display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '12px', marginBottom: '12px', flexWrap: 'wrap' } },
             react_1.default.createElement("div", { style: legendItemStyle(selectedLegend === "all", "#888"), onClick: () => {
                     var _a;
@@ -1889,13 +1931,6 @@ const BarChartComponent = (props) => {
                     color: '#333'
                 }
             },
-            subtitle: {
-                text: 'Comparative view of Generator Fuel, Refrigerant Leakages, and HVAC Electricity',
-                style: {
-                    fontSize: '14px',
-                    color: '#666'
-                }
-            },
             xAxis: {
                 categories: categories,
                 title: {
@@ -1976,7 +2011,7 @@ const BarChartComponent = (props) => {
         });
     };
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
-        react_1.default.createElement(components_1.TitleBar, { title: "Carbon Reporting Tool" },
+        react_1.default.createElement(components_1.TitleBar, { title: "" },
             react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
                     setMonthFilter(null);
                     setYearFilter(new Date().getFullYear());
@@ -2006,14 +2041,12 @@ const BarChartComponent = (props) => {
                     react_1.default.createElement("span", { style: legendDotStyle(color) }),
                     name));
             })),
-        react_1.default.createElement("div", { style: { width: '100%', height: '100%', padding: '20px', backgroundColor: '#fafafa' } },
+        react_1.default.createElement("div", { style: { width: '100%', height: '100%', padding: '20px' } },
             react_1.default.createElement("div", { ref: chartRef, style: {
                     width: '100%',
                     height: '450px',
                     minHeight: '450px',
-                    backgroundColor: 'white',
                     borderRadius: '8px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                 } }))));
 };
 exports["default"] = BarChartComponent;
@@ -2154,20 +2187,6 @@ const ESGDonutChart = (props) => {
         const totalEmissions = scope1Total + scope2Total;
         return { dynamicEmissionData, scope1Total, scope2Total, totalEmissions };
     };
-    // Generate dynamic title based on selected filters
-    const generateTitle = () => {
-        let titleParts = ['Carbon Emissions by Scope'];
-        if (yearFilter) {
-            titleParts.push(yearFilter.toString());
-        }
-        if (monthFilter) {
-            titleParts.push(monthFilter);
-        }
-        if (activityName) {
-            titleParts.push(`(${activityName})`);
-        }
-        return titleParts.join(' - ');
-    };
     // Get calculated emissions (recalculates when activityData changes)
     const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions } = calculateEmissions();
     (0, react_1.useEffect)(() => {
@@ -2207,19 +2226,11 @@ const ESGDonutChart = (props) => {
                     spacing: [20, 20, 20, 20]
                 },
                 title: {
-                    text: generateTitle(),
+                    text: 'Carbon Emissions by Scope',
                     style: {
                         fontSize: '20px',
                         fontWeight: 'bold',
                         color: '#2c3e50'
-                    }
-                },
-                subtitle: {
-                    text: `Total: ${totalEmissions.toFixed(1)} tCO₂e | ESG Reporting Dashboard`,
-                    style: {
-                        fontSize: '14px',
-                        color: '#7f8c8d',
-                        fontWeight: 'normal'
                     }
                 },
                 tooltip: {
@@ -2233,7 +2244,7 @@ const ESGDonutChart = (props) => {
                         return `
               <div style="padding: 8px;">
                 <b style="color: ${this.color};">${this.key}</b><br/>
-                <strong>${this.y.toFixed(1)} tCO₂e</strong><br/>
+                <strong>${this.y.toFixed(1)} kgCO₂e</strong><br/>
                 <span style="color: #7f8c8d;">${percentage}% of total emissions</span>
               </div>
             `;
@@ -2271,7 +2282,7 @@ const ESGDonutChart = (props) => {
                             },
                             formatter: function () {
                                 const percentage = ((this.y / totalEmissions) * 100).toFixed(1);
-                                return `<b>${this.key}</b><br/>${percentage}%<br/>${this.y.toFixed(1)} tCO₂e`;
+                                return `<b>${this.key}</b><br/>${percentage}%<br/>${this.y.toFixed(1)} kgCO₂e`;
                             }
                         },
                         showInLegend: true,
@@ -2364,7 +2375,7 @@ const ESGDonutChart = (props) => {
         }
     }, [activityData, dynamicEmissionData, scope1Total, scope2Total, totalEmissions]);
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
-        react_1.default.createElement(components_1.TitleBar, { title: "Carbon Reporting Tool - ESG Dashboard" },
+        react_1.default.createElement(components_1.TitleBar, { title: "" },
             react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
                     setMonthFilter(null);
                     setYearFilter(new Date().getFullYear());
@@ -2375,7 +2386,7 @@ const ESGDonutChart = (props) => {
                     react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (newMonth) => setMonthFilter(newMonth) })),
                 react_1.default.createElement(components_1.FormField, null,
                     react_1.default.createElement(components_1.Label, null, "Filter by Year"),
-                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null), placeholder: "e.g., 2025" })),
+                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) })),
                 react_1.default.createElement(components_1.FormField, null,
                     react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
                     react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" })))),
@@ -2383,7 +2394,6 @@ const ESGDonutChart = (props) => {
                 width: '100%',
                 height: '100%',
                 padding: '20px',
-                backgroundColor: '#f8f9fa',
                 fontFamily: 'Arial, sans-serif'
             } },
             react_1.default.createElement("div", { style: {
@@ -2414,7 +2424,7 @@ const ESGDonutChart = (props) => {
                             color: '#2c3e50'
                         } },
                         scope1Total.toFixed(1),
-                        " tCO\u2082e"),
+                        " kgCO\u2082e"),
                     react_1.default.createElement("p", { style: {
                             fontSize: '12px',
                             color: '#7f8c8d',
@@ -2442,7 +2452,7 @@ const ESGDonutChart = (props) => {
                             color: '#2c3e50'
                         } },
                         scope2Total.toFixed(1),
-                        " KgCo2e"),
+                        " kgCO\u2082e"),
                     react_1.default.createElement("p", { style: {
                             fontSize: '12px',
                             color: '#7f8c8d',
@@ -2451,7 +2461,6 @@ const ESGDonutChart = (props) => {
                 react_1.default.createElement("div", { style: {
                         flex: 1,
                         minWidth: '200px',
-                        backgroundColor: '#f8f9fa',
                         border: '2px solid #6c757d',
                         borderRadius: '8px',
                         padding: '15px',
@@ -2470,7 +2479,7 @@ const ESGDonutChart = (props) => {
                             color: '#2c3e50'
                         } },
                         totalEmissions.toFixed(1),
-                        " KgCo2e"),
+                        " kgCO\u2082e"),
                     react_1.default.createElement("p", { style: {
                             fontSize: '12px',
                             color: '#7f8c8d',
@@ -2480,7 +2489,6 @@ const ESGDonutChart = (props) => {
                 width: '100%',
                 height: '100%',
                 padding: '20px',
-                backgroundColor: '#f8f9fa',
                 fontFamily: 'Arial, sans-serif'
             } },
             react_1.default.createElement("div", { ref: chartRef, style: {
@@ -2489,7 +2497,6 @@ const ESGDonutChart = (props) => {
                     minHeight: '500px',
                     backgroundColor: 'white',
                     borderRadius: '12px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                     border: '1px solid #e9ecef'
                 } }),
             loading && (react_1.default.createElement("div", { style: {
@@ -2507,16 +2514,7 @@ const ESGDonutChart = (props) => {
                     backgroundColor: 'white',
                     borderRadius: '12px',
                     boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                } }, "No emission data found for the selected filters.")),
-            !loading && activityData.length > 0 && (react_1.default.createElement("div", { ref: chartRef, style: {
-                    width: '100%',
-                    height: '450px',
-                    minHeight: '450px',
-                    backgroundColor: 'white',
-                    borderRadius: '12px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    border: '1px solid #e9ecef'
-                } })))));
+                } }, "No emission data found for the selected filters.")))));
 };
 exports["default"] = ESGDonutChart;
 
@@ -2626,41 +2624,103 @@ const CarbonReportingTool = (props) => {
         }
     };
     return (React.createElement(components_1.WidgetWrapper, null,
-        React.createElement(components_1.TitleBar, { title: "Carbon Reporting Tool" },
-            React.createElement(components_1.FilterPanel, null)),
-        React.createElement("div", { className: `dropzone ${loading ? "disabled" : ""}`, onDragOver: (e) => {
+        React.createElement(components_1.TitleBar, { title: "Bulk Data Upload" }),
+        React.createElement("div", { className: `dropzone ${loading ? "disabled" : ""}`, style: {
+                maxWidth: '600px',
+                width: '90%',
+                margin: '5% auto',
+                border: '2px dashed #ccc',
+                borderRadius: '10px',
+                backgroundColor: '#f9f9f9',
+                textAlign: 'center',
+                padding: '2rem',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                transition: 'border-color 0.3s ease',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                position: 'relative'
+            }, onDragOver: (e) => {
                 e.preventDefault();
-                e.currentTarget.classList.add("dragover");
+                e.currentTarget.style.borderColor = '#0078d4';
             }, onDragLeave: (e) => {
                 e.preventDefault();
-                e.currentTarget.classList.remove("dragover");
+                e.currentTarget.style.borderColor = '#ccc';
             }, onDrop: (e) => {
                 var _a;
                 e.preventDefault();
-                e.currentTarget.classList.remove("dragover");
+                e.currentTarget.style.borderColor = '#ccc';
                 const file = (_a = e.dataTransfer.files) === null || _a === void 0 ? void 0 : _a[0];
                 if (file)
                     parseCSVFile(file);
-            }, onClick: () => { var _a; return (_a = fileInputRef.current) === null || _a === void 0 ? void 0 : _a.click(); } }, fileName ? (React.createElement("div", { className: "file-tag" },
-            React.createElement("span", null, fileName),
-            React.createElement("button", { onClick: (e) => {
-                    e.stopPropagation();
-                    resetState();
-                }, title: "Remove file" }, "\u2716"))) : (React.createElement("p", null, "Drag & drop CSV file here, or click to select"))),
+            }, onClick: () => {
+                var _a;
+                if (!loading)
+                    (_a = fileInputRef.current) === null || _a === void 0 ? void 0 : _a.click();
+            } }, fileName ? (React.createElement(React.Fragment, null,
+            React.createElement("div", { style: {
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '10px',
+                    background: '#e6f7ff',
+                    padding: '6px 12px',
+                    borderRadius: '6px',
+                    border: '1px solid #91d5ff',
+                    marginBottom: '0.5rem',
+                    maxWidth: '100%',
+                    flexWrap: 'wrap'
+                } },
+                React.createElement("span", { style: {
+                        fontWeight: 500,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        maxWidth: '200px'
+                    } }, fileName),
+                React.createElement("button", { onClick: (e) => {
+                        e.stopPropagation();
+                        resetState();
+                    }, style: {
+                        background: 'transparent',
+                        border: 'none',
+                        fontSize: '16px',
+                        cursor: 'pointer',
+                        color: '#ff4d4f'
+                    }, title: "Remove file" }, "\u2716")),
+            React.createElement("p", { style: {
+                    marginBottom: '1.5rem',
+                    fontSize: '14px',
+                    color: '#555'
+                } },
+                "\u2705 ",
+                React.createElement("strong", null, parsedData.length),
+                " rows parsed"),
+            React.createElement("div", { style: {
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "10px",
+                    flexWrap: "wrap"
+                } },
+                React.createElement(components_1.Button, { title: loading ? "Uploading..." : "Upload", onClick: (e) => {
+                        e.stopPropagation();
+                        uploadToLucy();
+                    }, disabled: loading }),
+                React.createElement(components_1.Button, { title: "Cancel", onClick: (e) => {
+                        e.stopPropagation();
+                        resetState();
+                    }, disabled: loading })))) : (React.createElement("p", { style: { color: '#888', fontSize: '14px' } },
+            "Drag & drop a CSV file here,",
+            React.createElement("br", null),
+            "or click to select"))),
         React.createElement("input", { type: "file", accept: ".csv", style: { display: "none" }, ref: fileInputRef, onChange: (e) => {
                 var _a;
                 const file = (_a = e.target.files) === null || _a === void 0 ? void 0 : _a[0];
                 if (file)
                     parseCSVFile(file);
-                e.target.value = ""; // reset input
-            } }),
-        parsedData && (React.createElement("div", { style: { marginTop: "1rem" } },
-            React.createElement("p", null,
-                parsedData.length,
-                " rows parsed. Proceed to upload?"),
-            React.createElement("div", { style: { display: "flex", gap: "10px" } },
-                React.createElement(components_1.Button, { title: loading ? "Uploading..." : "Upload", onClick: uploadToLucy, disabled: loading }),
-                React.createElement(components_1.Button, { title: "Cancel", onClick: resetState, disabled: loading }))))));
+                e.target.value = "";
+            } })));
 };
 /**
  * Register as a Widget
