@@ -511,7 +511,7 @@ const components_1 = __webpack_require__(/*! uxp/components */ "uxp/components")
 const emissionFactors = {
     "Generator Fuel Consumption": 3.761,
     "Refrigerant Leakages/Refilling": 1.000,
-    "Electricity Consumption – HVAC": 0.412 // tCO₂e per kWh
+    "Electricity Consumption – HVAC": 0.412 // kgCO₂e per kWh
 };
 // Month sort helper
 const monthOrder = {
@@ -715,7 +715,7 @@ const ESGAreaChart = (props) => {
                 yAxis: {
                     min: 0,
                     title: {
-                        text: 'Carbon Emissions (tCO₂e)',
+                        text: 'Carbon Emissions (kgCO₂e)',
                         style: {
                             fontSize: '14px',
                             fontWeight: 'bold',
@@ -738,7 +738,7 @@ const ESGAreaChart = (props) => {
                     borderRadius: 8,
                     shadow: true,
                     headerFormat: '<b>{point.x}</b><br/>',
-                    pointFormat: '<span style="color:{series.color}">●</span> {series.name}: <b>{point.y:.1f} tCO₂e</b><br/>',
+                    pointFormat: '<span style="color:{series.color}">●</span> {series.name}: <b>{point.y:.1f} kgCO₂e</b><br/>',
                     footerFormat: '<span style="font-size: 10px">Click and drag to zoom</span>',
                     style: {
                         fontSize: '12px'
@@ -1006,7 +1006,7 @@ const ESGEmissionFactorsTable = (props) => {
                                 } },
                                 "Emission Factor",
                                 react_1.default.createElement("br", null),
-                                react_1.default.createElement("span", { style: { fontSize: '11px', fontWeight: 'normal', textTransform: 'none' } }, "(tCO\u2082e per unit)")),
+                                react_1.default.createElement("span", { style: { fontSize: '11px', fontWeight: 'normal', textTransform: 'none' } }, "(kgCO\u2082e per unit)")),
                             react_1.default.createElement("th", { style: {
                                     padding: '16px 12px',
                                     textAlign: 'left',
@@ -1119,7 +1119,7 @@ const ESGEmissionFactorsTable = (props) => {
                         react_1.default.createElement("strong", null, "Scope 2:"),
                         " Indirect GHG emissions from consumption of purchased electricity, heat, or steam"),
                     react_1.default.createElement("li", null,
-                        react_1.default.createElement("strong", null, "tCO\u2082e:"),
+                        react_1.default.createElement("strong", null, "kgCO\u2082e:"),
                         " Tonnes of carbon dioxide equivalent - standardized unit for all greenhouse gases"),
                     react_1.default.createElement("li", null,
                         react_1.default.createElement("strong", null, "Data Sources:"),
@@ -1181,7 +1181,7 @@ const components_1 = __webpack_require__(/*! uxp/components */ "uxp/components")
 const emissionFactors = {
     "Generator Fuel Consumption": 3.761,
     "Refrigerant Leakages/Refilling": 1.000,
-    "Electricity Consumption – HVAC": 0.412 // tCO₂e per kWh
+    "Electricity Consumption – HVAC": 0.412 // kgCO₂e per kWh
 };
 // Month sort helper
 const monthOrder = {
@@ -1355,7 +1355,7 @@ const ESGStackedBarChart = (props) => {
                     spacing: [20, 20, 20, 20]
                 },
                 title: {
-                    text: 'Monthly Carbon Emissions (Stacked)',
+                    text: 'Carbon Emissions (Stacked)',
                     style: {
                         fontSize: '20px',
                         fontWeight: 'bold',
@@ -1378,7 +1378,7 @@ const ESGStackedBarChart = (props) => {
                 yAxis: {
                     min: 0,
                     title: {
-                        text: 'Carbon Emissions (tCO₂e)',
+                        text: 'Carbon Emissions (kgCO₂e)',
                         style: {
                             fontSize: '14px',
                             fontWeight: 'bold',
@@ -1402,14 +1402,14 @@ const ESGStackedBarChart = (props) => {
                         },
                         formatter: function () {
                             var _a;
-                            return ((_a = this.total) === null || _a === void 0 ? void 0 : _a.toFixed(1)) + ' tCO₂e';
+                            return ((_a = this.total) === null || _a === void 0 ? void 0 : _a.toFixed(1)) + 'kgCO₂e';
                         }
                     }
                 },
                 tooltip: {
                     headerFormat: '<b>{point.x}</b><br/>',
-                    pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y:.1f} tCO₂e</b> ({series.options.stack})<br/>',
-                    footerFormat: 'Total: <b>{point.total:.1f} tCO₂e</b>',
+                    pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y:.1f} kgCO₂e</b> ({series.options.stack})<br/>',
+                    footerFormat: 'Total: <b>{point.total:.1f} kgCO₂e</b>',
                     shared: false,
                     backgroundColor: 'rgba(255, 255, 255, 0.95)',
                     borderColor: '#ccc',
@@ -2105,7 +2105,7 @@ const components_1 = __webpack_require__(/*! uxp/components */ "uxp/components")
 const emissionFactors = {
     "Generator Fuel Consumption": 3.761,
     "Refrigerant Leakages/Refilling": 1.000,
-    "Electricity Consumption – HVAC": 0.412 // tCO₂e per kWh
+    "Electricity Consumption – HVAC": 0.412 // kgCO₂e per kWh
 };
 const ESGDonutChart = (props) => {
     const chartRef = (0, react_1.useRef)(null);
@@ -2457,7 +2457,7 @@ const ESGDonutChart = (props) => {
                             fontSize: '12px',
                             color: '#7f8c8d',
                             margin: 0
-                        } }, "Indirect emissions from electricity")),
+                        } }, "Indirect Emissions from Electricity Consumption - HVAC")),
                 react_1.default.createElement("div", { style: {
                         flex: 1,
                         minWidth: '200px',
@@ -2552,6 +2552,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -2572,11 +2581,23 @@ const CarbonReportingTool = (props) => {
     const [parsedData, setParsedData] = React.useState(null);
     const [loading, setLoading] = React.useState(false);
     const [fileName, setFileName] = React.useState(null);
+    const [showReviewModal, setShowReviewModal] = React.useState(false);
     const toast = (0, components_1.useToast)();
     const resetState = () => {
         setParsedData(null);
         setFileName(null);
         setLoading(false);
+    };
+    const downloadEmptySheet = () => {
+        const headers = ["activity", "year", "month", "value"];
+        const csvContent = headers.join(",") + "\n";
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute("download", "Empty_Carbon_Report.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
     const parseCSVFile = (file) => {
         papaparse_1.default.parse(file, {
@@ -2625,6 +2646,8 @@ const CarbonReportingTool = (props) => {
     };
     return (React.createElement(components_1.WidgetWrapper, null,
         React.createElement(components_1.TitleBar, { title: "Bulk Data Upload" }),
+        React.createElement("div", { style: { textAlign: 'center', marginTop: '20px' } },
+            React.createElement(components_1.Button, { title: "Download Empty Sheet", onClick: downloadEmptySheet })),
         React.createElement("div", { className: `dropzone ${loading ? "disabled" : ""}`, style: {
                 maxWidth: '600px',
                 width: '90%',
@@ -2703,9 +2726,9 @@ const CarbonReportingTool = (props) => {
                     gap: "10px",
                     flexWrap: "wrap"
                 } },
-                React.createElement(components_1.Button, { title: loading ? "Uploading..." : "Upload", onClick: (e) => {
+                React.createElement(components_1.Button, { title: "Review", onClick: (e) => {
                         e.stopPropagation();
-                        uploadToLucy();
+                        setShowReviewModal(true);
                     }, disabled: loading }),
                 React.createElement(components_1.Button, { title: "Cancel", onClick: (e) => {
                         e.stopPropagation();
@@ -2714,6 +2737,57 @@ const CarbonReportingTool = (props) => {
             "Drag & drop a CSV file here,",
             React.createElement("br", null),
             "or click to select"))),
+        React.createElement(components_1.Modal, { show: showReviewModal, onClose: () => setShowReviewModal(false), title: "Review and Edit CSV Data" },
+            React.createElement("div", { className: "p-4" },
+                parsedData && (React.createElement(components_1.CRUDComponent, { list: {
+                        title: "Uploaded Data",
+                        data: { getData: parsedData },
+                        columns: Object.keys(parsedData[0] || {}).map(key => ({
+                            id: key,
+                            label: key
+                        })),
+                        defaultPageSize: 10,
+                    }, edit: {
+                        title: "Edit Record",
+                        formStructure: [
+                            {
+                                columns: 1,
+                                fields: Object.keys(parsedData[0] || {}).map(key => ({
+                                    name: key,
+                                    label: key,
+                                    type: "text",
+                                }))
+                            }
+                        ],
+                        onSubmit: (newData, oldData) => __awaiter(void 0, void 0, void 0, function* () {
+                            setParsedData((prev) => prev.map(item => item === oldData ? newData : item));
+                            return { status: "done", message: "Record updated" };
+                        }),
+                        afterSave: () => { }
+                    }, add: {
+                        title: "Add New Record",
+                        formStructure: [
+                            {
+                                columns: 1,
+                                fields: Object.keys(parsedData[0] || {}).map(key => ({
+                                    name: key,
+                                    label: key,
+                                    type: "text",
+                                }))
+                            }
+                        ],
+                        onSubmit: (data) => __awaiter(void 0, void 0, void 0, function* () {
+                            setParsedData((prev) => [...prev, data]);
+                            return { status: "done", message: "Record added" };
+                        }),
+                        afterSave: () => { }
+                    } })),
+                React.createElement("div", { className: "mt-4 flex justify-end", style: { display: 'flex', justifyContent: 'flex-end', gap: '10px' } },
+                    React.createElement(components_1.Button, { title: "Upload", onClick: () => {
+                            uploadToLucy();
+                            setShowReviewModal(false);
+                        } }),
+                    React.createElement(components_1.Button, { title: "Cancel", onClick: () => setShowReviewModal(false) })))),
         React.createElement("input", { type: "file", accept: ".csv", style: { display: "none" }, ref: fileInputRef, onChange: (e) => {
                 var _a;
                 const file = (_a = e.target.files) === null || _a === void 0 ? void 0 : _a[0];
