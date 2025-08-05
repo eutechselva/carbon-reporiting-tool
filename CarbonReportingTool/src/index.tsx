@@ -2,7 +2,6 @@ import * as React from "react";
 import {
   WidgetWrapper,
   TitleBar,
-  FilterPanel,
   Button,
   useToast,
   Modal,
@@ -11,8 +10,8 @@ import {
 } from "uxp/components";
 import { registerWidget, IContextProvider } from "./uxp";
 import Papa from "papaparse";
-
 import "./styles.scss";
+
 import all_data from "./all_data";
 import BarChartComponent from "./bar_cahrt";
 import ESGDonutChart from "./carbon_emissions";
@@ -40,7 +39,8 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
     setFileName(null);
     setLoading(false);
   };
-  const downloadEmptySheet = () => {  
+
+  const downloadEmptySheet = () => {
     const headers = ["activity", "year", "month", "value"];
     const csvContent = headers.join(",") + "\n";
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -51,7 +51,7 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
     link.click();
     document.body.removeChild(link);
   };
-  
+
   const parseCSVFile = (file: File) => {
     Papa.parse(file, {
       header: true,
@@ -64,9 +64,7 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
           }
           return cleanedRow;
         });
-        console.log("parsed data",jsonData)
-        console.log("parse data type",typeof(jsonData))
-        setParsedData(   jsonData);
+        setParsedData(jsonData);
         setFileName(file.name);
       },
       error: (err) => {
@@ -76,23 +74,18 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
     });
   };
 
-  const uploadToLucy =  () => {
-
-    // if (!props.uxpContext || !parsedData) return;
+  const uploadToLucy = () => {
     if (!parsedData || !Array.isArray(parsedData)) {
-        toast.error("Parsed data is empty or invalid.");
-        return;
-      }
+      toast.error("Parsed data is empty or invalid.");
+      return;
+    }
     setLoading(true);
-    debugger;
     try {
-      const result = props.uxpContext.executeAction(
-        "carbon_reporting_80rr", // Backend model name remains
+      props.uxpContext?.executeAction(
+        "carbon_reporting_80rr",
         "InsertCarbonReport",
-        { CarbonInputData: JSON.stringify(parsedData)   },
-       
+        { CarbonInputData: JSON.stringify(parsedData) }
       );
-
       toast.success("Data uploaded successfully!");
       resetState();
     } catch (error: any) {
@@ -105,40 +98,24 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
   return (
     <WidgetWrapper>
       <TitleBar title="Bulk Data Upload" />
-      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+
+      <div className="upload-controls">
         <Button title="Download Empty Sheet" onClick={downloadEmptySheet} />
       </div>
 
       <div
         className={`dropzone ${loading ? "disabled" : ""}`}
-        style={{
-          maxWidth: '600px',
-          width: '90%',
-          margin: '5% auto',
-          border: '2px dashed #ccc',
-          borderRadius: '10px',
-          backgroundColor: '#f9f9f9',
-          textAlign: 'center',
-          padding: '2rem',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          transition: 'border-color 0.3s ease',
-          cursor: loading ? 'not-allowed' : 'pointer',
-          position: 'relative'
-        }}
         onDragOver={(e) => {
           e.preventDefault();
-          e.currentTarget.style.borderColor = '#0078d4';
+          e.currentTarget.classList.add("highlight");
         }}
         onDragLeave={(e) => {
           e.preventDefault();
-          e.currentTarget.style.borderColor = '#ccc';
+          e.currentTarget.classList.remove("highlight");
         }}
         onDrop={(e) => {
           e.preventDefault();
-          e.currentTarget.style.borderColor = '#ccc';
+          e.currentTarget.classList.remove("highlight");
           const file = e.dataTransfer.files?.[0];
           if (file) parseCSVFile(file);
         }}
@@ -148,74 +125,17 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
       >
         {fileName ? (
           <>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: '10px',
-              background: '#e6f7ff',
-              padding: '6px 12px',
-              borderRadius: '6px',
-              border: '1px solid #91d5ff',
-              marginBottom: '0.5rem',
-              maxWidth: '100%',
-              flexWrap: 'wrap'
-            }}>
-              <span style={{
-                fontWeight: 500,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                maxWidth: '200px'
-              }}>{fileName}</span>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  resetState();
-                }}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  fontSize: '16px',
-                  cursor: 'pointer',
-                  color: '#ff4d4f'
-                }}
-                title="Remove file"
-              >
-                ✖
-              </button>
+            <div className="filename-box">
+              <span className="filename">{fileName}</span>
+              <button className="remove-file" onClick={(e) => {
+                e.stopPropagation();
+                resetState();
+              }}>✖</button>
             </div>
-  
-            <p style={{
-              marginBottom: '1.5rem',
-              fontSize: '14px',
-              color: '#555'
-            }}>
+            <p className="parsed-info">
               ✅ <strong>{parsedData.length}</strong> rows parsed
             </p>
-  
-            <div style={{
-              display: "flex",
-              justifyContent: "center",
-              gap: "10px",
-              flexWrap: "wrap"
-            }}>
-              {/* <Button
-                title={loading ? "Uploading..." : "Upload"}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  uploadToLucy();
-                }}
-                disabled={loading}
-              />
-              <Button
-                title="Cancel"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  resetState();
-                }}
-                disabled={loading}
-              /> */}
+            <div className="action-buttons">
               <Button
                 title="Review"
                 onClick={(e) => {
@@ -235,17 +155,18 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
             </div>
           </>
         ) : (
-          <p style={{ color: '#888', fontSize: '14px' }}>
+          <p className="placeholder-text">
             Drag & drop a CSV file here,<br />or click to select
           </p>
         )}
       </div>
+
       <Modal
         show={showReviewModal}
         onClose={() => setShowReviewModal(false)}
         title="Review and Edit CSV Data"
       >
-        <div className="p-4">
+        <div className="modal-body">
           {parsedData && (
             <CRUDComponent
               list={{
@@ -295,7 +216,7 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
               }}
             />
           )}
-          <div className="mt-4 flex justify-end" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+          <div className="modal-actions">
             <Button
               title="Upload"
               onClick={() => {
@@ -324,105 +245,16 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
       />
     </WidgetWrapper>
   );
-  
-  
 };
 
+registerWidget({ id: "CarbonReportingTool", widget: CarbonReportingTool });
+registerWidget({ id: "all_data", widget: all_data });
+registerWidget({ id: "bar_chart", widget: BarChartComponent });
+registerWidget({ id: "ESG_Donut_Chart", widget: ESGDonutChart });
+registerWidget({ id: "ESGEmissionFactorsTable", widget: ESGEmissionFactorsTable });
+registerWidget({ id: "ESGStackedBarChart", widget: ESGStackedBarChart });
+registerWidget({ id: "ESGAreaChart", widget: ESGAreaChart });
 
-
-/**
- * Register as a Widget
- */
-registerWidget({
-    id: "CarbonReportingTool",
-    widget: CarbonReportingTool,
-    configs: {
-        layout: {
-            // w: 12,
-            // h: 12,
-            // minH: 12,
-            // minW: 12
-        }
-    }
-});
-
-registerWidget({
-    id: "all_data",
-    widget: all_data,
-    configs: {
-        layout: {
-            // w: 12,
-            // h: 12,
-            // minH: 12,
-            // minW: 12
-        }
-    }
-});
-
-registerWidget({
-    id: "bar_chart",
-    widget: BarChartComponent,
-    configs: {
-        layout: {
-            // w: 12,
-            // h: 12,
-            // minH: 12,
-            // minW: 12
-        }
-    }
-});
-
-registerWidget({
-    id: "ESG_Donut_Chart",
-    widget: ESGDonutChart,
-    configs: {
-        layout: {
-            // w: 12,
-            // h: 12,
-            // minH: 12,
-            // minW: 12
-        }
-    }
-});
-
-registerWidget({
-    id: "ESGEmissionFactorsTable",
-    widget: ESGEmissionFactorsTable,
-    configs: {
-        layout: {
-            // w: 12,
-            // h: 12,
-            // minH: 12,
-            // minW: 12
-        }
-    }
-});
-
-registerWidget({
-    id: "ESGStackedBarChart",
-    widget: ESGStackedBarChart,
-    configs: {
-        layout: {
-            // w: 12,
-            // h: 12,
-            // minH: 12,
-            // minW: 12
-        }
-    }
-});
-
-registerWidget({
-    id: "ESGAreaChart",
-    widget: ESGAreaChart,
-    configs: {
-        layout: {
-            // w: 12,
-            // h: 12,
-            // minH: 12,
-            // minW: 12
-        }
-    }
-});
 
 /**
  * Register as a Sidebar Link
