@@ -187,7 +187,7 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
         borderColor: '#ccc',
         borderRadius: 8,
         shadow: true,
-        headerFormat: '<b>{point.x}</b><br/>',
+        headerFormat: '<b>{point.key}</b><br/>',
         pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
         style: { fontSize: '12px' }
       },

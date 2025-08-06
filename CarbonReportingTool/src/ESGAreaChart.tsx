@@ -278,9 +278,8 @@ const [activityNames, setActivityNames] = useState<string[]>([]);
           borderColor: '#ccc',
           borderRadius: 8,
           shadow: true,
-          headerFormat: '<b>{point.x}</b><br/>',
+          headerFormat: '<b>{point.key}</b><br/>',
           pointFormat: '<span style="color:{series.color}">●</span> {series.name}: <b>{point.y:.1f} kgCO₂e</b><br/>',
-          footerFormat: '<span style="font-size: 10px">Click and drag to zoom</span>',
           style: {
             fontSize: '12px'
           }
