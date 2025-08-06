@@ -271,17 +271,6 @@ const ESGEmissionFactorsTable: React.FunctionComponent<IWidgetProps> = (props) =
           gap: '8px',
           marginBottom: '8px'
         }}>
-          <span style={{
-            fontSize: '16px'
-          }}>ℹ️</span>
-          <h4 style={{
-            margin: 0,
-            color: '#1565c0',
-            fontSize: '14px',
-            fontWeight: 'bold'
-          }}>
-            ESG Reporting Notes
-          </h4>
         </div>
         <ul style={{
           margin: '0',
@@ -292,8 +281,7 @@ const ESGEmissionFactorsTable: React.FunctionComponent<IWidgetProps> = (props) =
         }}>
           <li><strong>Scope 1:</strong> Direct GHG emissions from sources owned or controlled by the organization</li>
           <li><strong>Scope 2:</strong> Indirect GHG emissions from consumption of purchased electricity, heat, or steam</li>
-          <li><strong>kgCO₂e:</strong> Tonnes of carbon dioxide equivalent - standardized unit for all greenhouse gases</li>
-          <li><strong>Data Sources:</strong> All emission factors are from recognized ESG reporting standards and local regulatory bodies</li>
+          <li><strong>kgCO₂e:</strong> Kg of carbon dioxide equivalent - standardized unit for all greenhouse gases</li>
         </ul>
       </div>
     </div>

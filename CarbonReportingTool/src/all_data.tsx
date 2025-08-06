@@ -161,21 +161,21 @@ const AllData: React.FunctionComponent<IWidgetProps> = (props) => {
         backgroundColor: 'transparent'
       },
       title: {
-        text: 'Monthly Activity Data',
-        style: { fontSize: '18px', fontWeight: 'bold' }
+        text: 'Activity Data (Line Chart)',
+        style: { fontSize: '18px', fontWeight: 'bold' , color: '#333'}
       },
 
       xAxis: {
         categories: xCategories,
-        title: { text: 'Month' },
+        title: { text: 'Month' ,style: { color: '#666', fontSize: '14px', fontWeight: 'bold' }},
         gridLineWidth: 1,
         gridLineColor: '#e6e6e6'
       },
       yAxis: [{
-        title: { text: 'Generator Fuel & Refrigerant (Units)', style: { color: '#666' } },
+        title: { text: 'Generator Fuel & Refrigerant (Units)', style: { color: '#666', fontSize: '12px', fontWeight: 'bold' } },
         labels: { style: { color: '#666' } }
       }, {
-        title: { text: 'HVAC Electricity (kWh)', style: { color: '#666' } },
+        title: { text: 'HVAC Electricity (kWh)', style: { color: '#666', fontSize: '12px', fontWeight: 'bold' } },
         labels: { style: { color: '#666' } },
         opposite: true
       }],

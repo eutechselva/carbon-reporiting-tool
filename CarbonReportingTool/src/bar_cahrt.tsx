@@ -141,7 +141,7 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
         spacing: [20, 20, 20, 20]
       },
       title: {
-        text: 'Monthly Activity Data - Bar Chart',
+        text: 'Activity Data (Bar Chart)',
         style: {
           fontSize: '18px',
           fontWeight: 'bold',
