@@ -57,6 +57,15 @@
             "isTemplate": false
         },
         {
+            "id": "AnnualCarbonEmissionChart",
+            "name": "AnnualCarbonEmissionChart",
+            "description": "AnnualCarbonEmissionChart",
+            "icon": "",
+            "tags":[],
+            "category":"",
+            "isTemplate": false
+        },
+        {
             "id": "ESGAreaChart",
             "name": "ESGAreaChart",
             "description": "ESGAreaChart",

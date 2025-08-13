@@ -276,7 +276,7 @@ const ESGStackedBarChart: React.FunctionComponent<IWidgetProps> = (props) => {
           }
         },
         tooltip: {
-          headerFormat: '<b>{point.x}</b><br/>',
+          headerFormat: '<b>{point.key}</b><br/>',
           pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y:.1f} kgCO₂e</b> ({series.options.stack})<br/>',
           footerFormat: 'Total: <b>{point.total:.1f} kgCO₂e</b>',
           shared: false,
