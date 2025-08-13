@@ -22,7 +22,7 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
   const toast = useToast();
   const chartInstance = useRef<Highcharts.Chart | null>(null);
   const [selectedLegend, setSelectedLegend] = useState<string | null>("all");
-  
+
   const [loading, setLoading] = useState(false);
   const [activityData, setActivityData] = useState<any[]>([]);
   const [yearFilter, setYearFilter] = useState<any>(null);
@@ -41,7 +41,7 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
       );
 
       console.log("Fetched annual emission data:", result);
-      
+
       const cleanedData = result?.map((row: any) => ({
         activity: row.activity,
         year: row.year,
@@ -61,7 +61,7 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
   // Calculate annual emissions aggregated by scope
   const calculateAnnualEmissions = () => {
     if (activityData.length === 0) {
-      return { 
+      return {
         annualData: [],
         totalScope1: 0,
         totalScope2: 0,
@@ -71,19 +71,19 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
 
     // Group by year and calculate scope totals
     const yearlyEmissions: { [key: string]: { scope1: number, scope2: number } } = {};
-    
+
     activityData.forEach(item => {
       const year = item.year.toString();
       if (!yearlyEmissions[year]) {
         yearlyEmissions[year] = { scope1: 0, scope2: 0 };
       }
-      
+
       const emissionFactor = emissionFactors[item.activity] || 0;
       const calculatedEmission = item.value * emissionFactor;
-      
+
       // Determine scope based on activity type
       const isScope1 = item.activity.includes("Generator") || item.activity.includes("Refrigerant");
-      
+
       if (isScope1) {
         yearlyEmissions[year].scope1 += calculatedEmission;
       } else {
@@ -113,7 +113,7 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
   const showAllSeries = () => {
     chartInstance.current?.series.forEach(s => s.show());
   };
-  
+
   const showOnlySeries = (name: string) => {
     chartInstance.current?.series.forEach(s => {
       if (s.name === name) s.show();
@@ -182,7 +182,7 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
               color: '#666',
               fontSize: '11px'
             },
-            formatter: function() {
+            formatter: function () {
               return (this.value as number).toLocaleString();
             }
           },
@@ -195,20 +195,36 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
               color: '#2c3e50',
               fontSize: '11px'
             },
-            formatter: function() {
-              return (this.total as number).toLocaleString() + ' kgCO₂e';
+            formatter: function () {
+              // Add null check for this.total
+              const total = this.total as number;
+              return total != null ? total.toLocaleString() + ' kgCOâ‚‚e' : '';
             }
           }
         },
         tooltip: {
           headerFormat: '<b>Year {point.key}</b><br/>',
-          pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y:,.1f} kgCO₂e</b><br/>',
-          footerFormat: 'Total: <b>{point.total:,.1f} kgCO₂e</b>',
+          pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y:,.1f} kgCOâ‚‚e</b><br/>',
+          footerFormat: 'Total: <b>{point.total:,.1f} kgCOâ‚‚e</b>',
           shared: true,
           backgroundColor: 'rgba(255, 255, 255, 0.95)',
           borderColor: '#ccc',
           borderRadius: 8,
-          shadow: true
+          shadow: true,
+          formatter: function () {
+            let tooltip = `<b>Year ${this.x}</b><br/>`;
+
+            this.points?.forEach(point => {
+              tooltip += `<span style="color:${point.series.color}">${point.series.name}</span>: <b>${point.y?.toLocaleString() || '0'} kgCOâ‚‚e</b><br/>`;
+            });
+
+            const total = this.points?.reduce((sum, point) => sum + (point.y || 0), 0);
+            if (total != null) {
+              tooltip += `Total: <b>${total.toLocaleString()} kgCOâ‚‚e</b>`;
+            }
+
+            return tooltip;
+          }
         },
         legend: {
           enabled: false // Disable the default legend
@@ -224,7 +240,7 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
                 color: '#fff',
                 textOutline: '1px contrast'
               },
-              formatter: function() {
+              formatter: function () {
                 const value = this.y as number;
                 return value > 0 ? value.toLocaleString() : '';
               }
@@ -377,8 +393,8 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
 
         {/* Annual Stacked Bar Chart */}
         {!loading && annualData.length > 0 && (
-          <div 
-            ref={chartRef} 
+          <div
+            ref={chartRef}
             className="annual-carbon-chart__chart"
           />
         )}
