@@ -2517,46 +2517,11 @@ exports["default"] = ESGDonutChart;
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const React = __importStar(__webpack_require__(/*! react */ "react"));
-const components_1 = __webpack_require__(/*! uxp/components */ "uxp/components");
 const uxp_1 = __webpack_require__(/*! ./uxp */ "./src/uxp.ts");
-const papaparse_1 = __importDefault(__webpack_require__(/*! papaparse */ "./node_modules/papaparse/papaparse.min.js"));
 __webpack_require__(/*! ./styles.scss */ "./src/styles.scss");
 const all_data_1 = __importDefault(__webpack_require__(/*! ./all_data */ "./src/all_data.tsx"));
 const bar_cahrt_1 = __importDefault(__webpack_require__(/*! ./bar_cahrt */ "./src/bar_cahrt.tsx"));
@@ -2564,174 +2529,8 @@ const carbon_emissions_1 = __importDefault(__webpack_require__(/*! ./carbon_emis
 const ESGEmissionFactorsTable_1 = __importDefault(__webpack_require__(/*! ./ESGEmissionFactorsTable */ "./src/ESGEmissionFactorsTable.tsx"));
 const ESGStackedBarChart_1 = __importDefault(__webpack_require__(/*! ./ESGStackedBarChart */ "./src/ESGStackedBarChart.tsx"));
 const ESGAreaChart_1 = __importDefault(__webpack_require__(/*! ./ESGAreaChart */ "./src/ESGAreaChart.tsx"));
-const CarbonReportingTool = (props) => {
-    const fileInputRef = React.useRef(null);
-    const [parsedData, setParsedData] = React.useState(null);
-    const [loading, setLoading] = React.useState(false);
-    const [fileName, setFileName] = React.useState(null);
-    const [showReviewModal, setShowReviewModal] = React.useState(false);
-    const toast = (0, components_1.useToast)();
-    const resetState = () => {
-        setParsedData(null);
-        setFileName(null);
-        setLoading(false);
-    };
-    const downloadEmptySheet = () => {
-        const headers = ["activity", "year", "month", "value"];
-        const csvContent = headers.join(",") + "\n";
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.setAttribute("download", "Empty_Carbon_Report.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-    const parseCSVFile = (file) => {
-        papaparse_1.default.parse(file, {
-            header: true,
-            skipEmptyLines: true,
-            complete: (results) => {
-                const jsonData = results.data.map((row) => {
-                    var _a;
-                    const cleanedRow = {};
-                    for (const key in row) {
-                        cleanedRow[key] = (_a = row[key]) !== null && _a !== void 0 ? _a : "";
-                    }
-                    return cleanedRow;
-                });
-                setParsedData(jsonData);
-                setFileName(file.name);
-            },
-            error: (err) => {
-                console.error("CSV parsing error:", err);
-                toast.error("Failed to parse CSV file");
-            }
-        });
-    };
-    const uploadToLucy = () => {
-        var _a;
-        if (!parsedData || !Array.isArray(parsedData)) {
-            toast.error("Parsed data is empty or invalid.");
-            return;
-        }
-        setLoading(true);
-        try {
-            (_a = props.uxpContext) === null || _a === void 0 ? void 0 : _a.executeAction("carbon_reporting_80rr", "InsertCarbonReport", { CarbonInputData: JSON.stringify(parsedData) });
-            toast.success("Data uploaded successfully!");
-            resetState();
-        }
-        catch (error) {
-            toast.error(`Upload failed: ${error.message || "Unknown error"}`);
-        }
-        finally {
-            setLoading(false);
-        }
-    };
-    return (React.createElement(components_1.WidgetWrapper, null,
-        React.createElement(components_1.TitleBar, { title: "Bulk Data Upload" }),
-        React.createElement("div", { className: "upload-controls" },
-            React.createElement(components_1.Button, { title: "Download Empty Sheet", onClick: downloadEmptySheet })),
-        React.createElement("div", { className: `dropzone ${loading ? "disabled" : ""}`, onDragOver: (e) => {
-                e.preventDefault();
-                e.currentTarget.classList.add("highlight");
-            }, onDragLeave: (e) => {
-                e.preventDefault();
-                e.currentTarget.classList.remove("highlight");
-            }, onDrop: (e) => {
-                var _a;
-                e.preventDefault();
-                e.currentTarget.classList.remove("highlight");
-                const file = (_a = e.dataTransfer.files) === null || _a === void 0 ? void 0 : _a[0];
-                if (file)
-                    parseCSVFile(file);
-            }, onClick: () => {
-                var _a;
-                if (!loading)
-                    (_a = fileInputRef.current) === null || _a === void 0 ? void 0 : _a.click();
-            } }, fileName ? (React.createElement(React.Fragment, null,
-            React.createElement("div", { className: "filename-box" },
-                React.createElement("span", { className: "filename" }, fileName),
-                React.createElement("button", { className: "remove-file", onClick: (e) => {
-                        e.stopPropagation();
-                        resetState();
-                    } }, "\u2716")),
-            React.createElement("p", { className: "parsed-info" },
-                "\u2705 ",
-                React.createElement("strong", null, parsedData.length),
-                " rows parsed"),
-            React.createElement("div", { className: "action-buttons" },
-                React.createElement(components_1.Button, { title: "Review", onClick: (e) => {
-                        e.stopPropagation();
-                        setShowReviewModal(true);
-                    }, disabled: loading }),
-                React.createElement(components_1.Button, { title: "Cancel", onClick: (e) => {
-                        e.stopPropagation();
-                        resetState();
-                    }, disabled: loading })))) : (React.createElement("p", { className: "placeholder-text" },
-            "Drag & drop a CSV file here,",
-            React.createElement("br", null),
-            "or click to select"))),
-        React.createElement(components_1.Modal, { show: showReviewModal, onClose: () => setShowReviewModal(false), title: "Review and Edit CSV Data" },
-            React.createElement("div", { className: "modal-body" },
-                parsedData && (React.createElement(components_1.CRUDComponent, { list: {
-                        title: "Uploaded Data",
-                        data: { getData: parsedData },
-                        columns: Object.keys(parsedData[0] || {}).map(key => ({
-                            id: key,
-                            label: key
-                        })),
-                        defaultPageSize: 10,
-                    }, edit: {
-                        title: "Edit Record",
-                        formStructure: [
-                            {
-                                columns: 1,
-                                fields: Object.keys(parsedData[0] || {}).map(key => ({
-                                    name: key,
-                                    label: key,
-                                    type: "text",
-                                }))
-                            }
-                        ],
-                        onSubmit: (newData, oldData) => __awaiter(void 0, void 0, void 0, function* () {
-                            setParsedData((prev) => prev.map(item => item === oldData ? newData : item));
-                            return { status: "done", message: "Record updated" };
-                        }),
-                        afterSave: () => { }
-                    }, add: {
-                        title: "Add New Record",
-                        formStructure: [
-                            {
-                                columns: 1,
-                                fields: Object.keys(parsedData[0] || {}).map(key => ({
-                                    name: key,
-                                    label: key,
-                                    type: "text",
-                                }))
-                            }
-                        ],
-                        onSubmit: (data) => __awaiter(void 0, void 0, void 0, function* () {
-                            setParsedData((prev) => [...prev, data]);
-                            return { status: "done", message: "Record added" };
-                        }),
-                        afterSave: () => { }
-                    } })),
-                React.createElement("div", { className: "modal-actions" },
-                    React.createElement(components_1.Button, { title: "Upload", onClick: () => {
-                            uploadToLucy();
-                            setShowReviewModal(false);
-                        } }),
-                    React.createElement(components_1.Button, { title: "Cancel", onClick: () => setShowReviewModal(false) })))),
-        React.createElement("input", { type: "file", accept: ".csv", style: { display: "none" }, ref: fileInputRef, onChange: (e) => {
-                var _a;
-                const file = (_a = e.target.files) === null || _a === void 0 ? void 0 : _a[0];
-                if (file)
-                    parseCSVFile(file);
-                e.target.value = "";
-            } })));
-};
-(0, uxp_1.registerWidget)({ id: "CarbonReportingTool", widget: CarbonReportingTool });
+const upload_1 = __importDefault(__webpack_require__(/*! ./upload */ "./src/upload.tsx"));
+(0, uxp_1.registerWidget)({ id: "CarbonReportingTool", widget: upload_1.default });
 (0, uxp_1.registerWidget)({ id: "all_data", widget: all_data_1.default });
 (0, uxp_1.registerWidget)({ id: "bar_chart", widget: bar_cahrt_1.default });
 (0, uxp_1.registerWidget)({ id: "ESG_Donut_Chart", widget: carbon_emissions_1.default });
@@ -2864,6 +2663,373 @@ var update = api(content, options);
 
 
 module.exports = content.locals || {};
+
+/***/ }),
+
+/***/ "./src/upload.tsx":
+/*!************************!*\
+  !*** ./src/upload.tsx ***!
+  \************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const React = __importStar(__webpack_require__(/*! react */ "react"));
+const components_1 = __webpack_require__(/*! uxp/components */ "uxp/components");
+const react_1 = __webpack_require__(/*! react */ "react");
+const papaparse_1 = __importDefault(__webpack_require__(/*! papaparse */ "./node_modules/papaparse/papaparse.min.js"));
+// Custom Table Component
+const DataTable = ({ data, onEdit, onDelete, onAdd }) => {
+    const [editingIndex, setEditingIndex] = (0, react_1.useState)(null);
+    const [editData, setEditData] = (0, react_1.useState)({});
+    const [showAddForm, setShowAddForm] = (0, react_1.useState)(false);
+    const [newData, setNewData] = (0, react_1.useState)({});
+    const [currentPage, setCurrentPage] = (0, react_1.useState)(1);
+    const itemsPerPage = 10;
+    const columns = data.length > 0 ? Object.keys(data[0]) : [];
+    const totalPages = Math.ceil(data.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
+    const handleEdit = (index) => {
+        const actualIndex = startIndex + index;
+        setEditingIndex(actualIndex);
+        setEditData(Object.assign({}, data[actualIndex]));
+    };
+    const saveEdit = () => {
+        if (editingIndex !== null) {
+            onEdit(editingIndex, editData);
+            setEditingIndex(null);
+            setEditData({});
+        }
+    };
+    const cancelEdit = () => {
+        setEditingIndex(null);
+        setEditData({});
+    };
+    const handleAdd = () => {
+        const newRecord = columns.reduce((acc, col) => (Object.assign(Object.assign({}, acc), { [col]: "" })), {});
+        setNewData(newRecord);
+        setShowAddForm(true);
+    };
+    const saveAdd = () => {
+        onAdd(newData);
+        setShowAddForm(false);
+        setNewData({});
+    };
+    const cancelAdd = () => {
+        setShowAddForm(false);
+        setNewData({});
+    };
+    return (React.createElement("div", { style: { padding: '16px' } },
+        React.createElement("div", { style: {
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '16px'
+            } },
+            React.createElement("h3", null,
+                "Uploaded Data (",
+                data.length,
+                " records)"),
+            React.createElement(components_1.Button, { title: "Add Record", onClick: handleAdd })),
+        showAddForm && (React.createElement("div", { style: {
+                background: '#f5f5f5',
+                padding: '16px',
+                borderRadius: '8px',
+                marginBottom: '16px'
+            } },
+            React.createElement("h4", null, "Add New Record"),
+            React.createElement("div", { style: {
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gap: '12px',
+                    margin: '16px 0'
+                } }, columns.map((col) => (React.createElement("div", { key: col },
+                React.createElement("label", { style: { display: 'block', marginBottom: '4px', fontWeight: 'bold' } }, col),
+                React.createElement("input", { type: "text", value: newData[col] || "", onChange: (e) => setNewData(Object.assign(Object.assign({}, newData), { [col]: e.target.value })), style: {
+                        width: '100%',
+                        padding: '8px',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px'
+                    } }))))),
+            React.createElement("div", { style: { display: 'flex', gap: '8px' } },
+                React.createElement(components_1.Button, { title: "Save", onClick: saveAdd }),
+                React.createElement(components_1.Button, { title: "Cancel", onClick: cancelAdd })))),
+        React.createElement("div", { style: {
+                overflowX: 'auto',
+                border: '1px solid #ddd',
+                borderRadius: '8px'
+            } },
+            React.createElement("table", { style: { width: '100%', borderCollapse: 'collapse' } },
+                React.createElement("thead", null,
+                    React.createElement("tr", null,
+                        columns.map((col) => (React.createElement("th", { key: col, style: {
+                                padding: '12px',
+                                textAlign: 'left',
+                                borderBottom: '1px solid #eee',
+                                background: '#f8f9fa',
+                                fontWeight: 'bold'
+                            } }, col))),
+                        React.createElement("th", { style: {
+                                padding: '12px',
+                                textAlign: 'left',
+                                borderBottom: '1px solid #eee',
+                                background: '#f8f9fa',
+                                fontWeight: 'bold'
+                            } }, "Actions"))),
+                React.createElement("tbody", null, paginatedData.map((row, index) => {
+                    const actualIndex = startIndex + index;
+                    const isEditing = editingIndex === actualIndex;
+                    return (React.createElement("tr", { key: actualIndex, style: { background: isEditing ? '#fff3cd' : 'transparent' }, onMouseEnter: (e) => !isEditing && (e.currentTarget.style.background = '#f8f9fa'), onMouseLeave: (e) => !isEditing && (e.currentTarget.style.background = 'transparent') },
+                        columns.map((col) => (React.createElement("td", { key: col, style: {
+                                padding: '12px',
+                                textAlign: 'left',
+                                borderBottom: '1px solid #eee'
+                            } }, isEditing ? (React.createElement("input", { type: "text", value: editData[col] || "", onChange: (e) => setEditData(Object.assign(Object.assign({}, editData), { [col]: e.target.value })), style: {
+                                width: '100%',
+                                padding: '4px',
+                                border: '1px solid #ddd',
+                                borderRadius: '4px'
+                            } })) : (row[col])))),
+                        React.createElement("td", { style: {
+                                padding: '12px',
+                                textAlign: 'left',
+                                borderBottom: '1px solid #eee'
+                            } }, isEditing ? (React.createElement("div", { style: { display: 'flex', gap: '8px' } },
+                            React.createElement("button", { onClick: saveEdit, style: {
+                                    padding: '4px 8px',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    fontSize: '12px',
+                                    background: '#28a745',
+                                    color: 'white'
+                                } }, "Save"),
+                            React.createElement("button", { onClick: cancelEdit, style: {
+                                    padding: '4px 8px',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    fontSize: '12px',
+                                    background: '#6c757d',
+                                    color: 'white'
+                                } }, "Cancel"))) : (React.createElement("div", { style: { display: 'flex', gap: '8px' } },
+                            React.createElement("button", { onClick: () => handleEdit(index), style: {
+                                    padding: '4px 8px',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    fontSize: '12px',
+                                    background: '#007bff',
+                                    color: 'white'
+                                } }, "Edit"),
+                            React.createElement("button", { onClick: () => onDelete(actualIndex), style: {
+                                    padding: '4px 8px',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    fontSize: '12px',
+                                    background: '#dc3545',
+                                    color: 'white'
+                                } }, "Delete"))))));
+                })))),
+        totalPages > 1 && (React.createElement("div", { style: {
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '16px',
+                marginTop: '16px'
+            } },
+            React.createElement("button", { onClick: () => setCurrentPage(Math.max(1, currentPage - 1)), disabled: currentPage === 1, style: {
+                    padding: '8px 12px',
+                    border: '1px solid #ddd',
+                    background: 'white',
+                    borderRadius: '4px',
+                    cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                    opacity: currentPage === 1 ? 0.5 : 1
+                } }, "Previous"),
+            React.createElement("span", null,
+                "Page ",
+                currentPage,
+                " of ",
+                totalPages),
+            React.createElement("button", { onClick: () => setCurrentPage(Math.min(totalPages, currentPage + 1)), disabled: currentPage === totalPages, style: {
+                    padding: '8px 12px',
+                    border: '1px solid #ddd',
+                    background: 'white',
+                    borderRadius: '4px',
+                    cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                    opacity: currentPage === totalPages ? 0.5 : 1
+                } }, "Next")))));
+};
+const CarbonReportingTool = (props) => {
+    const fileInputRef = React.useRef(null);
+    const [parsedData, setParsedData] = React.useState(null);
+    const [loading, setLoading] = React.useState(false);
+    const [fileName, setFileName] = React.useState(null);
+    const [showReviewModal, setShowReviewModal] = React.useState(false);
+    const toast = (0, components_1.useToast)();
+    const resetState = () => {
+        setParsedData(null);
+        setFileName(null);
+        setLoading(false);
+    };
+    const downloadEmptySheet = () => {
+        const headers = ["activity", "year", "month", "value"];
+        const csvContent = headers.join(",") + "\n";
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute("download", "Empty_Carbon_Report.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+    const parseCSVFile = (file) => {
+        papaparse_1.default.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            complete: (results) => {
+                const jsonData = results.data.map((row) => {
+                    var _a;
+                    const cleanedRow = {};
+                    for (const key in row) {
+                        cleanedRow[key] = (_a = row[key]) !== null && _a !== void 0 ? _a : "";
+                    }
+                    return cleanedRow;
+                });
+                setParsedData(jsonData);
+                setFileName(file.name);
+            },
+            error: (err) => {
+                console.error("CSV parsing error:", err);
+                toast.error("Failed to parse CSV file");
+            }
+        });
+    };
+    const uploadToLucy = () => {
+        var _a;
+        if (!parsedData || !Array.isArray(parsedData)) {
+            toast.error("Parsed data is empty or invalid.");
+            return;
+        }
+        setLoading(true);
+        try {
+            (_a = props.uxpContext) === null || _a === void 0 ? void 0 : _a.executeAction("carbon_reporting_80rr", "InsertCarbonReport", { CarbonInputData: JSON.stringify(parsedData) });
+            toast.success("Data uploaded successfully!");
+            resetState();
+        }
+        catch (error) {
+            toast.error(`Upload failed: ${error.message || "Unknown error"}`);
+        }
+        finally {
+            setLoading(false);
+        }
+    };
+    // Table event handlers
+    const handleEdit = (index, newData) => {
+        setParsedData((prev) => {
+            const updated = [...prev];
+            updated[index] = newData;
+            return updated;
+        });
+    };
+    const handleDelete = (index) => {
+        setParsedData((prev) => prev.filter((_, i) => i !== index));
+    };
+    const handleAdd = (newData) => {
+        setParsedData((prev) => [...prev, newData]);
+    };
+    return (React.createElement(components_1.WidgetWrapper, null,
+        React.createElement(components_1.TitleBar, { title: "Bulk Data Upload" }),
+        React.createElement("div", { className: "upload-controls" },
+            React.createElement(components_1.Button, { title: "Download Empty Sheet", onClick: downloadEmptySheet })),
+        React.createElement("div", { className: `dropzone ${loading ? "disabled" : ""}`, onDragOver: (e) => {
+                e.preventDefault();
+                e.currentTarget.classList.add("highlight");
+            }, onDragLeave: (e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove("highlight");
+            }, onDrop: (e) => {
+                var _a;
+                e.preventDefault();
+                e.currentTarget.classList.remove("highlight");
+                const file = (_a = e.dataTransfer.files) === null || _a === void 0 ? void 0 : _a[0];
+                if (file)
+                    parseCSVFile(file);
+            }, onClick: () => {
+                var _a;
+                if (!loading)
+                    (_a = fileInputRef.current) === null || _a === void 0 ? void 0 : _a.click();
+            } }, fileName ? (React.createElement(React.Fragment, null,
+            React.createElement("div", { className: "filename-box" },
+                React.createElement("span", { className: "filename" }, fileName),
+                React.createElement("button", { className: "remove-file", onClick: (e) => {
+                        e.stopPropagation();
+                        resetState();
+                    } }, "\u2716")),
+            React.createElement("p", { className: "parsed-info" },
+                "\u2705 ",
+                React.createElement("strong", null, parsedData.length),
+                " rows parsed"),
+            React.createElement("div", { className: "action-buttons" },
+                React.createElement(components_1.Button, { title: "Review", onClick: (e) => {
+                        e.stopPropagation();
+                        setShowReviewModal(true);
+                    }, disabled: loading }),
+                React.createElement(components_1.Button, { title: "Cancel", onClick: (e) => {
+                        e.stopPropagation();
+                        resetState();
+                    }, disabled: loading })))) : (React.createElement("p", { className: "placeholder-text" },
+            "Drag & drop a CSV file here,",
+            React.createElement("br", null),
+            "or click to select"))),
+        React.createElement(components_1.Modal, { show: showReviewModal, onClose: () => setShowReviewModal(false), title: "Review and Edit CSV Data" },
+            React.createElement("div", { className: "modal-body" },
+                parsedData && (React.createElement(DataTable, { data: parsedData, onEdit: handleEdit, onDelete: handleDelete, onAdd: handleAdd })),
+                React.createElement("div", { className: "modal-actions" },
+                    React.createElement(components_1.Button, { title: "Upload", onClick: () => {
+                            uploadToLucy();
+                            setShowReviewModal(false);
+                        } }),
+                    React.createElement(components_1.Button, { title: "Cancel", onClick: () => setShowReviewModal(false) })))),
+        React.createElement("input", { type: "file", accept: ".csv", style: { display: "none" }, ref: fileInputRef, onChange: (e) => {
+                var _a;
+                const file = (_a = e.target.files) === null || _a === void 0 ? void 0 : _a[0];
+                if (file)
+                    parseCSVFile(file);
+                e.target.value = "";
+            } })));
+};
+exports["default"] = CarbonReportingTool;
+
 
 /***/ }),
 
