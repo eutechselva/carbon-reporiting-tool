@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Highcharts from 'highcharts';
-import { WidgetWrapper, TitleBar, FilterPanel, FormField, Select, Input, Label, useToast } from "uxp/components";
+import { WidgetWrapper, TitleBar, FilterPanel, FormField, Select, Input, Label, useToast, Button } from "uxp/components";
 import { IContextProvider } from "./uxp";
 
 export interface IWidgetProps {
@@ -175,7 +175,35 @@ const ESGStackedBarChart: React.FunctionComponent<IWidgetProps> = (props) => {
       else s.hide();
     });
   };
-
+  const exportToCSV = () => {
+    if (!activityData.length) {
+      toast.error("No data to export");
+      return;
+    }
+  
+    const months = Object.keys(monthlyEmissions).sort((a, b) => monthOrder[a] - monthOrder[b]);
+    const activities = Array.from(new Set(
+      Object.values(monthlyEmissions).flatMap(monthData => Object.keys(monthData))
+    ));
+  
+    const headers = ["Month", ...activities];
+    const rows = months.map(month => {
+      return [month, ...activities.map(act => (monthlyEmissions[month]?.[act] || 0).toFixed(2))];
+    });
+  
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers, ...rows].map(e => e.join(",")).join("\n");
+  
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "stacked_bar_chart_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
   const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions, monthlyEmissions } = calculateEmissions();
 
   useEffect(() => {
@@ -331,7 +359,8 @@ const ESGStackedBarChart: React.FunctionComponent<IWidgetProps> = (props) => {
 
   return (
     <WidgetWrapper>
-      <TitleBar title="">
+    <TitleBar title="">
+      <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" }}>
         <FilterPanel
           onClear={() => {
             setMonthFilter(null);
@@ -366,7 +395,11 @@ const ESGStackedBarChart: React.FunctionComponent<IWidgetProps> = (props) => {
             />
           </FormField>
         </FilterPanel>
-      </TitleBar>
+
+        <Button title="Export to CSV" onClick={exportToCSV} />
+      </div>
+    </TitleBar>
+
 
       {/* Custom Interactive Legend */}
       {activityData.length > 0 && (

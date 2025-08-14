@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Highcharts from 'highcharts';
-import { WidgetWrapper, TitleBar, FilterPanel, FormField, Select, Input, Label, useToast } from "uxp/components";
+import { WidgetWrapper, TitleBar, FilterPanel, FormField, Select, Input, Label, useToast, Button } from "uxp/components";
 import { IContextProvider } from "./uxp";
 import './AnnualCarbonChart.scss';
 
@@ -107,7 +107,34 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
 
     return { annualData, totalScope1, totalScope2, totalEmissions };
   };
+  const exportToCSV = () => {
+    const { annualData } = calculateAnnualEmissions();
 
+    if (!annualData.length) {
+      toast.error("No data to export");
+      return;
+    }
+
+    const headers = ["Year", "Scope 1 (kgCO₂e)", "Scope 2 (kgCO₂e)", "Total (kgCO₂e)"];
+    const rows = annualData.map(row => [
+      row.year,
+      row.scope1.toFixed(2),
+      row.scope2.toFixed(2),
+      row.total.toFixed(2)
+    ]);
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers, ...rows].map(e => e.join(",")).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "annual_carbon_emissions.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   const { annualData, totalScope1, totalScope2, totalEmissions } = calculateAnnualEmissions();
 
   const showAllSeries = () => {
@@ -147,13 +174,7 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
             color: '#2c3e50'
           }
         },
-        subtitle: {
-          text: `Total Emissions: ${totalEmissions.toFixed(1)} kgCO₂e`,
-          style: {
-            fontSize: '14px',
-            color: '#7f8c8d'
-          }
-        },
+
         xAxis: {
           categories: years,
           title: {
@@ -198,14 +219,14 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
             formatter: function () {
               // Add null check for this.total
               const total = this.total as number;
-              return total != null ? total.toLocaleString() + ' kgCOâ‚‚e' : '';
+              return total != null ? total.toLocaleString() + ' kgCO₂e' : '';
             }
           }
         },
         tooltip: {
           headerFormat: '<b>Year {point.key}</b><br/>',
-          pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y:,.1f} kgCOâ‚‚e</b><br/>',
-          footerFormat: 'Total: <b>{point.total:,.1f} kgCOâ‚‚e</b>',
+          pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y:,.1f} kgCO₂e</b><br/>',
+          footerFormat: 'Total: <b>{point.total:,.1f} kgCO₂e</b>',
           shared: true,
           backgroundColor: 'rgba(255, 255, 255, 0.95)',
           borderColor: '#ccc',
@@ -215,12 +236,12 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
             let tooltip = `<b>Year ${this.x}</b><br/>`;
 
             this.points?.forEach(point => {
-              tooltip += `<span style="color:${point.series.color}">${point.series.name}</span>: <b>${point.y?.toLocaleString() || '0'} kgCOâ‚‚e</b><br/>`;
+              tooltip += `<span style="color:${point.series.color}">${point.series.name}</span>: <b>${point.y?.toLocaleString() || '0'} kgCO₂e</b><br/>`;
             });
 
             const total = this.points?.reduce((sum, point) => sum + (point.y || 0), 0);
             if (total != null) {
-              tooltip += `Total: <b>${total.toLocaleString()} kgCOâ‚‚e</b>`;
+              tooltip += `Total: <b>${total.toLocaleString()} kgCO₂e</b>`;
             }
 
             return tooltip;
@@ -304,7 +325,9 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
 
   return (
     <WidgetWrapper>
+
       <TitleBar title="">
+      <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" }}>
         <FilterPanel
           onClear={() => {
             setYearFilter(null);
@@ -330,6 +353,8 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
             />
           </FormField>
         </FilterPanel>
+        <Button title="Export to CSV" onClick={exportToCSV} />
+        </div>
       </TitleBar>
 
       {/* Custom Interactive Legend */}

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Highcharts from 'highcharts';
-import { WidgetWrapper, TitleBar, FilterPanel, FormField, Select, Input, Label, useToast } from "uxp/components";
+import { WidgetWrapper, TitleBar, FilterPanel, FormField, Select, Input, Label, useToast, Button } from "uxp/components";
 import { IContextProvider } from "./uxp";
 
 export interface IWidgetProps {
@@ -116,6 +116,39 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
     return { dynamicEmissionData, scope1Total, scope2Total, totalEmissions };
   };
 
+  const exportToCSV = () => {
+    const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions } = calculateEmissions();
+
+    if (!dynamicEmissionData.length) {
+      toast.error("No data to export");
+      return;
+    }
+
+    const headers = ["Source", "Scope", "Total CO₂e (kg)", "Scope 1 Total", "Scope 2 Total", "Total Emissions"];
+    const rows = dynamicEmissionData.map(row => [
+      row.source,
+      row.category,
+      row.totalCO2e.toFixed(2),
+      "",
+      "",
+      ""
+    ]);
+
+    // Add summary row at the bottom
+    rows.push(["", "", "", scope1Total.toFixed(2), scope2Total.toFixed(2), totalEmissions.toFixed(2)]);
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers, ...rows].map(e => e.join(",")).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "carbon_emissions.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Get calculated emissions (recalculates when activityData changes)
   const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions } = calculateEmissions();
@@ -314,6 +347,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
   return (
     <WidgetWrapper>
       <TitleBar title="">
+      <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" }}>
         <FilterPanel
           onClear={() => {
             setMonthFilter(null);
@@ -348,6 +382,8 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
             />
           </FormField>
         </FilterPanel>
+        <Button title="Export to CSV" onClick={exportToCSV} />
+        </div>
       </TitleBar>
 
       <div style={{ 

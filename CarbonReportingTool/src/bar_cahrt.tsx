@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Highcharts, { SeriesColumnOptions, Chart } from 'highcharts';
 import {
+  Button,
   FilterPanel, FormField, Input, Label, Select, TitleBar, WidgetWrapper, useToast
 } from "uxp/components";
 import { IContextProvider } from "./uxp";
@@ -68,6 +69,32 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
       console.error("Error fetching data:", error);
       toast.error("Failed to load data");
     }
+  };
+  const exportToCSV = () => {
+    if (!activityData.length) {
+      toast.error("No data to export");
+      return;
+    }
+
+    const headers = ["Activity", "Year", "Month", "Value"];
+    const rows = activityData.map(row => [
+      row.activity,
+      row.year,
+      row.month,
+      row.value
+    ]);
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers, ...rows].map(e => e.join(",")).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "activity_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
   const legendItemStyle = (active: boolean, color: string): React.CSSProperties => ({
     display: 'flex',
@@ -231,6 +258,7 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
   return (
     <WidgetWrapper>
       <TitleBar title="">
+      <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" }}>
         <FilterPanel onClear={() => {
           setMonthFilter(null);
           setYearFilter(new Date().getFullYear());
@@ -245,6 +273,8 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
             <Input type="number" value={yearFilter} onChange={(val) => setYearFilter(parseInt(val) || null)} />
           </FormField>
         </FilterPanel>
+        <Button title="Export to CSV" onClick={exportToCSV} />
+        </div>
       </TitleBar>
 
       {/* 🔧 Custom Legend */}

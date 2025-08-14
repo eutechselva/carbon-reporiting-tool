@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Highcharts from 'highcharts';
-import { WidgetWrapper, TitleBar, FilterPanel, FormField, Select, Input, Label, useToast } from "uxp/components";
+import { WidgetWrapper, TitleBar, FilterPanel, FormField, Select, Input, Label, useToast, Button } from "uxp/components";
 import { IContextProvider } from "./uxp";
 
 export interface IWidgetProps {
@@ -174,6 +174,31 @@ const [activityNames, setActivityNames] = useState<string[]>([]);
       else s.hide();
     });
   };
+  const exportToCSV = () => {
+    if (!activityData.length) {
+      toast.error("No data to export");
+      return;
+    }
+  
+    const headers = ["Activity", "Year", "Month", "Value (raw)", "Value (kgCO₂e)"];
+    const rows = activityData.map(row => {
+      const emissionFactor = emissionFactors[row.activity] || 0;
+      const co2eValue = row.value * emissionFactor;
+      return [row.activity, row.year, row.month, row.value, co2eValue.toFixed(2)];
+    });
+  
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers, ...rows].map(e => e.join(",")).join("\n");
+  
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "esg_area_chart_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   
   const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions, monthlyEmissions } = calculateEmissions();
 
@@ -340,42 +365,47 @@ const [activityNames, setActivityNames] = useState<string[]>([]);
 
   return (
     <WidgetWrapper>
-      <TitleBar title="">
-        <FilterPanel
-          onClear={() => {
-            setMonthFilter(null);
-            setYearFilter(new Date().getFullYear());
-            setActivityName("");
-          }}
-        >
-          <FormField>
-            <Label>Filter by Month</Label>
-            <Select
-              options={monthOptions}
-              selected={monthFilter}
-              onChange={(newMonth) => setMonthFilter(newMonth)}
-            />
-          </FormField>
+<TitleBar title="">
+  <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" }}>
+    <FilterPanel
+      onClear={() => {
+        setMonthFilter(null);
+        setYearFilter(new Date().getFullYear());
+        setActivityName("");
+      }}
+    >
+      <FormField>
+        <Label>Filter by Month</Label>
+        <Select
+          options={monthOptions}
+          selected={monthFilter}
+          onChange={(newMonth) => setMonthFilter(newMonth)}
+        />
+      </FormField>
 
-          <FormField>
-            <Label>Filter by Year</Label>
-            <Input
-              type="number"
-              value={yearFilter}
-              onChange={(val) => setYearFilter(parseInt(val) || null)}
-            />
-          </FormField>
+      <FormField>
+        <Label>Filter by Year</Label>
+        <Input
+          type="number"
+          value={yearFilter}
+          onChange={(val) => setYearFilter(parseInt(val) || null)}
+        />
+      </FormField>
 
-          <FormField>
-            <Label>Filter by Activity</Label>
-            <Input
-              value={activityName}
-              onChange={(val) => setActivityName(val)}
-              placeholder="Enter activity name"
-            />
-          </FormField>
-        </FilterPanel>
-      </TitleBar>
+      <FormField>
+        <Label>Filter by Activity</Label>
+        <Input
+          value={activityName}
+          onChange={(val) => setActivityName(val)}
+          placeholder="Enter activity name"
+        />
+      </FormField>
+    </FilterPanel>
+
+    <Button title="Export to CSV" onClick={exportToCSV} />
+  </div>
+</TitleBar>
+
       {activityData.length > 0 && (
   <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
     <div
