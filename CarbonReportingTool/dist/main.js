@@ -633,6 +633,29 @@ const AnnualCarbonEmissionChart = (props) => {
         const totalEmissions = totalScope1 + totalScope2;
         return { annualData, totalScope1, totalScope2, totalEmissions };
     };
+    const exportToCSV = () => {
+        const { annualData } = calculateAnnualEmissions();
+        if (!annualData.length) {
+            toast.error("No data to export");
+            return;
+        }
+        const headers = ["Year", "Scope 1 (kgCO₂e)", "Scope 2 (kgCO₂e)", "Total (kgCO₂e)"];
+        const rows = annualData.map(row => [
+            row.year,
+            row.scope1.toFixed(2),
+            row.scope2.toFixed(2),
+            row.total.toFixed(2)
+        ]);
+        const csvContent = "data:text/csv;charset=utf-8," +
+            [headers, ...rows].map(e => e.join(",")).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "annual_carbon_emissions.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
     const { annualData, totalScope1, totalScope2, totalEmissions } = calculateAnnualEmissions();
     const showAllSeries = () => {
         var _a;
@@ -669,13 +692,6 @@ const AnnualCarbonEmissionChart = (props) => {
                         fontSize: '22px',
                         fontWeight: 'bold',
                         color: '#2c3e50'
-                    }
-                },
-                subtitle: {
-                    text: `Total Emissions: ${totalEmissions.toFixed(1)} kgCO₂e`,
-                    style: {
-                        fontSize: '14px',
-                        color: '#7f8c8d'
                     }
                 },
                 xAxis: {
@@ -722,14 +738,14 @@ const AnnualCarbonEmissionChart = (props) => {
                         formatter: function () {
                             // Add null check for this.total
                             const total = this.total;
-                            return total != null ? total.toLocaleString() + ' kgCOâ‚‚e' : '';
+                            return total != null ? total.toLocaleString() + ' kgCO₂e' : '';
                         }
                     }
                 },
                 tooltip: {
                     headerFormat: '<b>Year {point.key}</b><br/>',
-                    pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y:,.1f} kgCOâ‚‚e</b><br/>',
-                    footerFormat: 'Total: <b>{point.total:,.1f} kgCOâ‚‚e</b>',
+                    pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y:,.1f} kgCO₂e</b><br/>',
+                    footerFormat: 'Total: <b>{point.total:,.1f} kgCO₂e</b>',
                     shared: true,
                     backgroundColor: 'rgba(255, 255, 255, 0.95)',
                     borderColor: '#ccc',
@@ -740,11 +756,11 @@ const AnnualCarbonEmissionChart = (props) => {
                         let tooltip = `<b>Year ${this.x}</b><br/>`;
                         (_a = this.points) === null || _a === void 0 ? void 0 : _a.forEach(point => {
                             var _a;
-                            tooltip += `<span style="color:${point.series.color}">${point.series.name}</span>: <b>${((_a = point.y) === null || _a === void 0 ? void 0 : _a.toLocaleString()) || '0'} kgCOâ‚‚e</b><br/>`;
+                            tooltip += `<span style="color:${point.series.color}">${point.series.name}</span>: <b>${((_a = point.y) === null || _a === void 0 ? void 0 : _a.toLocaleString()) || '0'} kgCO₂e</b><br/>`;
                         });
                         const total = (_b = this.points) === null || _b === void 0 ? void 0 : _b.reduce((sum, point) => sum + (point.y || 0), 0);
                         if (total != null) {
-                            tooltip += `Total: <b>${total.toLocaleString()} kgCOâ‚‚e</b>`;
+                            tooltip += `Total: <b>${total.toLocaleString()} kgCO₂e</b>`;
                         }
                         return tooltip;
                     }
@@ -825,16 +841,18 @@ const AnnualCarbonEmissionChart = (props) => {
     }, [annualData, totalEmissions, selectedLegend]);
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
         react_1.default.createElement(components_1.TitleBar, { title: "" },
-            react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
-                    setYearFilter(null);
-                    setActivityName("");
-                } },
-                react_1.default.createElement(components_1.FormField, null,
-                    react_1.default.createElement(components_1.Label, null, "Filter by Year"),
-                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter || "", onChange: (val) => setYearFilter(val ? parseInt(val) : null), placeholder: "Enter year" })),
-                react_1.default.createElement(components_1.FormField, null,
-                    react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
-                    react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" })))),
+            react_1.default.createElement("div", { style: { display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" } },
+                react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
+                        setYearFilter(null);
+                        setActivityName("");
+                    } },
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Filter by Year"),
+                        react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter || "", onChange: (val) => setYearFilter(val ? parseInt(val) : null), placeholder: "Enter year" })),
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
+                        react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" }))),
+                react_1.default.createElement(components_1.Button, { title: "Export to CSV", onClick: exportToCSV }))),
         annualData.length > 0 && (react_1.default.createElement("div", { className: "annual-carbon-chart__legend" },
             react_1.default.createElement("div", { className: `annual-carbon-chart__legend-item ${selectedLegend === "all" ? 'annual-carbon-chart__legend-item--active scope-all' : ''}`, onClick: () => {
                     setSelectedLegend("all");
@@ -1055,6 +1073,27 @@ const ESGAreaChart = (props) => {
                 s.hide();
         });
     };
+    const exportToCSV = () => {
+        if (!activityData.length) {
+            toast.error("No data to export");
+            return;
+        }
+        const headers = ["Activity", "Year", "Month", "Value (raw)", "Value (kgCO₂e)"];
+        const rows = activityData.map(row => {
+            const emissionFactor = emissionFactors[row.activity] || 0;
+            const co2eValue = row.value * emissionFactor;
+            return [row.activity, row.year, row.month, row.value, co2eValue.toFixed(2)];
+        });
+        const csvContent = "data:text/csv;charset=utf-8," +
+            [headers, ...rows].map(e => e.join(",")).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "esg_area_chart_data.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
     const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions, monthlyEmissions } = calculateEmissions();
     (0, react_1.useEffect)(() => {
         fetchActivityData();
@@ -1206,20 +1245,22 @@ const ESGAreaChart = (props) => {
     }, [activityData, monthlyEmissions, totalEmissions]);
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
         react_1.default.createElement(components_1.TitleBar, { title: "" },
-            react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
-                    setMonthFilter(null);
-                    setYearFilter(new Date().getFullYear());
-                    setActivityName("");
-                } },
-                react_1.default.createElement(components_1.FormField, null,
-                    react_1.default.createElement(components_1.Label, null, "Filter by Month"),
-                    react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (newMonth) => setMonthFilter(newMonth) })),
-                react_1.default.createElement(components_1.FormField, null,
-                    react_1.default.createElement(components_1.Label, null, "Filter by Year"),
-                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) })),
-                react_1.default.createElement(components_1.FormField, null,
-                    react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
-                    react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" })))),
+            react_1.default.createElement("div", { style: { display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" } },
+                react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
+                        setMonthFilter(null);
+                        setYearFilter(new Date().getFullYear());
+                        setActivityName("");
+                    } },
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Filter by Month"),
+                        react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (newMonth) => setMonthFilter(newMonth) })),
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Filter by Year"),
+                        react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) })),
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
+                        react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" }))),
+                react_1.default.createElement(components_1.Button, { title: "Export to CSV", onClick: exportToCSV }))),
         activityData.length > 0 && (react_1.default.createElement("div", { style: { display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' } },
             react_1.default.createElement("div", { style: legendItemStyle(selectedLegend === "all", "#888"), onClick: () => {
                     setSelectedLegend("all");
@@ -1712,6 +1753,27 @@ const ESGStackedBarChart = (props) => {
                 s.hide();
         });
     };
+    const exportToCSV = () => {
+        if (!activityData.length) {
+            toast.error("No data to export");
+            return;
+        }
+        const months = Object.keys(monthlyEmissions).sort((a, b) => monthOrder[a] - monthOrder[b]);
+        const activities = Array.from(new Set(Object.values(monthlyEmissions).flatMap(monthData => Object.keys(monthData))));
+        const headers = ["Month", ...activities];
+        const rows = months.map(month => {
+            return [month, ...activities.map(act => { var _a; return (((_a = monthlyEmissions[month]) === null || _a === void 0 ? void 0 : _a[act]) || 0).toFixed(2); })];
+        });
+        const csvContent = "data:text/csv;charset=utf-8," +
+            [headers, ...rows].map(e => e.join(",")).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "stacked_bar_chart_data.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
     const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions, monthlyEmissions } = calculateEmissions();
     (0, react_1.useEffect)(() => {
         fetchActivityData();
@@ -1856,20 +1918,22 @@ const ESGStackedBarChart = (props) => {
     }, [activityData, monthlyEmissions, totalEmissions, selectedLegend]);
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
         react_1.default.createElement(components_1.TitleBar, { title: "" },
-            react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
-                    setMonthFilter(null);
-                    setYearFilter(new Date().getFullYear());
-                    setActivityName("");
-                } },
-                react_1.default.createElement(components_1.FormField, null,
-                    react_1.default.createElement(components_1.Label, null, "Filter by Month"),
-                    react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (newMonth) => setMonthFilter(newMonth) })),
-                react_1.default.createElement(components_1.FormField, null,
-                    react_1.default.createElement(components_1.Label, null, "Filter by Year"),
-                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) })),
-                react_1.default.createElement(components_1.FormField, null,
-                    react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
-                    react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" })))),
+            react_1.default.createElement("div", { style: { display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" } },
+                react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
+                        setMonthFilter(null);
+                        setYearFilter(new Date().getFullYear());
+                        setActivityName("");
+                    } },
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Filter by Month"),
+                        react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (newMonth) => setMonthFilter(newMonth) })),
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Filter by Year"),
+                        react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) })),
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
+                        react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" }))),
+                react_1.default.createElement(components_1.Button, { title: "Export to CSV", onClick: exportToCSV }))),
         activityData.length > 0 && (react_1.default.createElement("div", { style: { display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' } },
             react_1.default.createElement("div", { style: legendItemStyle(selectedLegend === "all", "#888"), onClick: () => {
                     setSelectedLegend("all");
@@ -2036,6 +2100,28 @@ const AllData = (props) => {
             setLoading(false);
         }
     });
+    const exportToCSV = () => {
+        if (!activityData.length) {
+            toast.error("No data to export");
+            return;
+        }
+        const headers = ["Activity", "Year", "Month", "Value"];
+        const rows = activityData.map(row => [
+            row.activity,
+            row.year,
+            row.month,
+            row.value
+        ]);
+        const csvContent = "data:text/csv;charset=utf-8," +
+            [headers, ...rows].map(e => e.join(",")).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "activity_data.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
     (0, react_1.useEffect)(() => {
         fetchActivityData();
     }, [monthFilter, yearFilter]);
@@ -2142,7 +2228,8 @@ const AllData = (props) => {
                     react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (newMonth) => setMonthFilter(newMonth) })),
                 react_1.default.createElement(components_1.FormField, null,
                     react_1.default.createElement(components_1.Label, null, "Filter by Year"),
-                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) })))),
+                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) }))),
+            react_1.default.createElement(components_1.Button, { title: "Export to CSV", onClick: exportToCSV })),
         react_1.default.createElement("div", { style: { display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '12px', marginBottom: '12px', flexWrap: 'wrap' } },
             react_1.default.createElement("div", { style: legendItemStyle(selectedLegend === "all", "#888"), onClick: () => {
                     var _a;
@@ -2258,6 +2345,28 @@ const BarChartComponent = (props) => {
             toast.error("Failed to load data");
         }
     });
+    const exportToCSV = () => {
+        if (!activityData.length) {
+            toast.error("No data to export");
+            return;
+        }
+        const headers = ["Activity", "Year", "Month", "Value"];
+        const rows = activityData.map(row => [
+            row.activity,
+            row.year,
+            row.month,
+            row.value
+        ]);
+        const csvContent = "data:text/csv;charset=utf-8," +
+            [headers, ...rows].map(e => e.join(",")).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "activity_data.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
     const legendItemStyle = (active, color) => ({
         display: 'flex',
         alignItems: 'center',
@@ -2408,17 +2517,19 @@ const BarChartComponent = (props) => {
     };
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
         react_1.default.createElement(components_1.TitleBar, { title: "" },
-            react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
-                    setMonthFilter(null);
-                    setYearFilter(new Date().getFullYear());
-                    setActivityName("");
-                } },
-                react_1.default.createElement(components_1.FormField, null,
-                    react_1.default.createElement(components_1.Label, null, "Month"),
-                    react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (val) => setMonthFilter(val) })),
-                react_1.default.createElement(components_1.FormField, null,
-                    react_1.default.createElement(components_1.Label, null, "Year"),
-                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) })))),
+            react_1.default.createElement("div", { style: { display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" } },
+                react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
+                        setMonthFilter(null);
+                        setYearFilter(new Date().getFullYear());
+                        setActivityName("");
+                    } },
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Month"),
+                        react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (val) => setMonthFilter(val) })),
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Year"),
+                        react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) }))),
+                react_1.default.createElement(components_1.Button, { title: "Export to CSV", onClick: exportToCSV }))),
         react_1.default.createElement("div", { style: { display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' } },
             react_1.default.createElement("div", { style: legendItemStyle(selectedLegend === "all", "#888"), onClick: () => {
                     setSelectedLegend("all");
@@ -2582,6 +2693,33 @@ const ESGDonutChart = (props) => {
             .reduce((sum, item) => sum + item.totalCO2e, 0);
         const totalEmissions = scope1Total + scope2Total;
         return { dynamicEmissionData, scope1Total, scope2Total, totalEmissions };
+    };
+    const exportToCSV = () => {
+        const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions } = calculateEmissions();
+        if (!dynamicEmissionData.length) {
+            toast.error("No data to export");
+            return;
+        }
+        const headers = ["Source", "Scope", "Total CO₂e (kg)", "Scope 1 Total", "Scope 2 Total", "Total Emissions"];
+        const rows = dynamicEmissionData.map(row => [
+            row.source,
+            row.category,
+            row.totalCO2e.toFixed(2),
+            "",
+            "",
+            ""
+        ]);
+        // Add summary row at the bottom
+        rows.push(["", "", "", scope1Total.toFixed(2), scope2Total.toFixed(2), totalEmissions.toFixed(2)]);
+        const csvContent = "data:text/csv;charset=utf-8," +
+            [headers, ...rows].map(e => e.join(",")).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "carbon_emissions.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
     // Get calculated emissions (recalculates when activityData changes)
     const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions } = calculateEmissions();
@@ -2772,20 +2910,22 @@ const ESGDonutChart = (props) => {
     }, [activityData, dynamicEmissionData, scope1Total, scope2Total, totalEmissions]);
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
         react_1.default.createElement(components_1.TitleBar, { title: "" },
-            react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
-                    setMonthFilter(null);
-                    setYearFilter(new Date().getFullYear());
-                    setActivityName("");
-                } },
-                react_1.default.createElement(components_1.FormField, null,
-                    react_1.default.createElement(components_1.Label, null, "Filter by Month"),
-                    react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (newMonth) => setMonthFilter(newMonth) })),
-                react_1.default.createElement(components_1.FormField, null,
-                    react_1.default.createElement(components_1.Label, null, "Filter by Year"),
-                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) })),
-                react_1.default.createElement(components_1.FormField, null,
-                    react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
-                    react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" })))),
+            react_1.default.createElement("div", { style: { display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" } },
+                react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
+                        setMonthFilter(null);
+                        setYearFilter(new Date().getFullYear());
+                        setActivityName("");
+                    } },
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Filter by Month"),
+                        react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (newMonth) => setMonthFilter(newMonth) })),
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Filter by Year"),
+                        react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) })),
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
+                        react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" }))),
+                react_1.default.createElement(components_1.Button, { title: "Export to CSV", onClick: exportToCSV }))),
         react_1.default.createElement("div", { style: {
                 width: '100%',
                 height: '100%',
@@ -2853,7 +2993,7 @@ const ESGDonutChart = (props) => {
                             fontSize: '12px',
                             color: '#7f8c8d',
                             margin: 0
-                        } }, "Indirect Emissions from Electricity Consumption - HVAC")),
+                        } }, "Indirect Emissions from Electricity Consumption")),
                 react_1.default.createElement("div", { style: {
                         flex: 1,
                         minWidth: '200px',
