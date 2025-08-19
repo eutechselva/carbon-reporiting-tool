@@ -463,7 +463,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
               color: '#7f8c8d',
               margin: 0
             }}>
-             Indirect Emissions from Electricity Consumption - HVAC
+             Indirect Emissions from Electricity Consumption
             </p>
           </div>
 

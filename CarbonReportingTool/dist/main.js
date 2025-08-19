@@ -2993,7 +2993,7 @@ const ESGDonutChart = (props) => {
                             fontSize: '12px',
                             color: '#7f8c8d',
                             margin: 0
-                        } }, "Indirect Emissions from Electricity Consumption - HVAC")),
+                        } }, "Indirect Emissions from Electricity Consumption")),
                 react_1.default.createElement("div", { style: {
                         flex: 1,
                         minWidth: '200px',
