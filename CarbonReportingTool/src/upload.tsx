@@ -324,8 +324,40 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
   };
 
   const downloadEmptySheet = () => {
-    const headers = ["activity", "year", "month", "value"];
-    const csvContent = headers.join(",") + "\n";
+    // Define the template structure with predefined activities
+    const templateData = [
+      // Header row
+      ["Activity", "Year", "Month", "Value"],
+      
+      // Predefined activity rows with empty values for user input
+      ["Generator Fuel Consumption", "20xx", "Jan", ""],
+      ["Refrigerant Leakages/Refilling", "20xx", "Jan", ""],
+      
+      // Additional empty rows for more data entry
+      ["", "20xx", "", ""],
+      ["", "20xx", "", ""],
+      ["", "20xx", "", ""],
+      ["", "20xx", "", ""],
+      ["", "20xx", "", ""],
+      ["", "20xx", "", ""],
+      ["", "20xx", "", ""],
+      ["", "20xx", "", ""],
+      ["", "20xx", "", ""],
+      ["", "20xx", "", ""],
+    ];
+  
+    // Convert to CSV format
+    const csvContent = templateData
+      .map(row => row.map(cell => {
+        // Handle cells that might contain commas by wrapping in quotes
+        if (cell.includes(',')) {
+          return `"${cell}"`;
+        }
+        return cell;
+      }).join(','))
+      .join('\n');
+  
+    // Create and download the file
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
