@@ -396,7 +396,11 @@ const ESGStackedBarChart: React.FunctionComponent<IWidgetProps> = (props) => {
           </FormField>
         </FilterPanel>
 
-        <Button title="Export to CSV" onClick={exportToCSV} />
+        <Button
+                        icon='fas cloud-download-alt'
+                        title='Export'
+                        onClick={exportToCSV}
+                    />
       </div>
     </TitleBar>
 

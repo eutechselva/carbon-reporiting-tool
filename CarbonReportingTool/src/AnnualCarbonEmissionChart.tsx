@@ -115,7 +115,7 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
       return;
     }
 
-    const headers = ["Year", "Scope 1 (kgCO₂e)", "Scope 2 (kgCO₂e)", "Total (kgCO₂e)"];
+    const headers = ["Year", "Scope 1 (KgCO2e)", "Scope 2 (KgCO2e)", "Total (KgCO2e)"];
     const rows = annualData.map(row => [
       row.year,
       row.scope1.toFixed(2),
@@ -353,7 +353,11 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
             />
           </FormField>
         </FilterPanel>
-        <Button title="Export to CSV" onClick={exportToCSV} />
+        <Button
+                        icon='fas cloud-download-alt'
+                        title='Export'
+                        onClick={exportToCSV}
+                    />
         </div>
       </TitleBar>
 

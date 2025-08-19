@@ -124,7 +124,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
       return;
     }
 
-    const headers = ["Source", "Scope", "Total CO₂e (kg)", "Scope 1 Total", "Scope 2 Total", "Total Emissions"];
+    const headers = ["Source", "Scope", "Total CO2e (kg)", "Scope 1 Total", "Scope 2 Total", "Total Emissions"];
     const rows = dynamicEmissionData.map(row => [
       row.source,
       row.category,
@@ -382,7 +382,11 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
             />
           </FormField>
         </FilterPanel>
-        <Button title="Export to CSV" onClick={exportToCSV} />
+        <Button
+                        icon='fas cloud-download-alt'
+                        title='Export'
+                        onClick={exportToCSV}
+                    />
         </div>
       </TitleBar>
 

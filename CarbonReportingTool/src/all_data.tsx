@@ -240,6 +240,7 @@ const AllData: React.FunctionComponent<IWidgetProps> = (props) => {
   return (
     <WidgetWrapper>
       <TitleBar title="">
+      <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" }}>
         <FilterPanel
           onClear={() => {
             setMonthFilter(null);
@@ -261,7 +262,12 @@ const AllData: React.FunctionComponent<IWidgetProps> = (props) => {
             />
           </FormField>
         </FilterPanel>
-        <Button title="Export to CSV" onClick={exportToCSV} />
+                    <Button
+                        icon='fas cloud-download-alt'
+                        title='Export'
+                        onClick={exportToCSV}
+                    />
+               </div>
       </TitleBar>
 
       {/* ✅ Custom Legend */}

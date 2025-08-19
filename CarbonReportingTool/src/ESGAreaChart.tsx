@@ -180,7 +180,7 @@ const [activityNames, setActivityNames] = useState<string[]>([]);
       return;
     }
   
-    const headers = ["Activity", "Year", "Month", "Value (raw)", "Value (kgCO₂e)"];
+    const headers = ["Activity", "Year", "Month", "Value (raw)", "Value (KgCO2e)"];
     const rows = activityData.map(row => {
       const emissionFactor = emissionFactors[row.activity] || 0;
       const co2eValue = row.value * emissionFactor;
@@ -402,7 +402,11 @@ const [activityNames, setActivityNames] = useState<string[]>([]);
       </FormField>
     </FilterPanel>
 
-    <Button title="Export to CSV" onClick={exportToCSV} />
+    <Button
+                        icon='fas cloud-download-alt'
+                        title='Export'
+                        onClick={exportToCSV}
+                    />
   </div>
 </TitleBar>
 
