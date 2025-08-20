@@ -163,7 +163,7 @@ const AllData: React.FunctionComponent<IWidgetProps> = (props) => {
             name: activity,
             data: processedData[activity],
             type: 'line',
-            yAxis: activity === 'Electricity Consumption – HVAC' ? 1 : 0,
+            yAxis: activity === 'Electricity Consumption' ? 1 : 0,
             color: index === 0 ? '#7cb5ec' : index === 1 ? '#434348' : '#90ed7d',
             marker: {
               enabled: true,
@@ -201,7 +201,7 @@ const AllData: React.FunctionComponent<IWidgetProps> = (props) => {
         title: { text: 'Generator Fuel & Refrigerant (Units)', style: { color: '#666', fontSize: '12px', fontWeight: 'bold' } },
         labels: { style: { color: '#666' } }
       }, {
-        title: { text: 'HVAC Electricity (kWh)', style: { color: '#666', fontSize: '12px', fontWeight: 'bold' } },
+        title: { text: 'Electricity (kWh)', style: { color: '#666', fontSize: '12px', fontWeight: 'bold' } },
         labels: { style: { color: '#666' } },
         opposite: true
       }],

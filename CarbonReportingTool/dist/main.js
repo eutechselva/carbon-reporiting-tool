@@ -557,7 +557,7 @@ __webpack_require__(/*! ./AnnualCarbonChart.scss */ "./src/AnnualCarbonChart.scs
 const emissionFactors = {
     "Generator Fuel Consumption": 3.761,
     "Refrigerant Leakages/Refilling": 1.000,
-    "Electricity Consumption – HVAC": 0.412 // kgCO₂e per kWh
+    "Electricity Consumption": 0.412 // kgCO₂e per kWh
 };
 const AnnualCarbonEmissionChart = (props) => {
     const chartRef = (0, react_1.useRef)(null);
@@ -938,7 +938,7 @@ const components_1 = __webpack_require__(/*! uxp/components */ "uxp/components")
 const emissionFactors = {
     "Generator Fuel Consumption": 3.761,
     "Refrigerant Leakages/Refilling": 1.000,
-    "Electricity Consumption – HVAC": 0.412 // kgCO₂e per kWh
+    "Electricity Consumption": 0.412 // kgCO₂e per kWh
 };
 // Month sort helper
 const monthOrder = {
@@ -1353,12 +1353,12 @@ const emissionFactorsData = [
     },
     {
         scope: "Scope 2",
-        activity: "Electricity Consumption – HVAC",
+        activity: "Electricity Consumption",
         unit: "kWh",
         emissionFactor: 0.412,
         source: "Singapore EMA – Energy Statistics 2023",
         category: "Purchased Electricity",
-        description: "Grid electricity for HVAC systems"
+        description: "Grid electricity for systems"
     }
 ];
 const ESGEmissionFactorsTable = (props) => {
@@ -1618,7 +1618,7 @@ const components_1 = __webpack_require__(/*! uxp/components */ "uxp/components")
 const emissionFactors = {
     "Generator Fuel Consumption": 3.761,
     "Refrigerant Leakages/Refilling": 1.000,
-    "Electricity Consumption – HVAC": 0.412 // kgCO₂e per kWh
+    "Electricity Consumption": 0.412 // kgCO₂e per kWh
 };
 // Month sort helper
 const monthOrder = {
@@ -2147,7 +2147,7 @@ const AllData = (props) => {
                 name: activity,
                 data: processedData[activity],
                 type: 'line',
-                yAxis: activity === 'Electricity Consumption – HVAC' ? 1 : 0,
+                yAxis: activity === 'Electricity Consumption' ? 1 : 0,
                 color: index === 0 ? '#7cb5ec' : index === 1 ? '#434348' : '#90ed7d',
                 marker: {
                     enabled: true,
@@ -2182,7 +2182,7 @@ const AllData = (props) => {
                     title: { text: 'Generator Fuel & Refrigerant (Units)', style: { color: '#666', fontSize: '12px', fontWeight: 'bold' } },
                     labels: { style: { color: '#666' } }
                 }, {
-                    title: { text: 'HVAC Electricity (kWh)', style: { color: '#666', fontSize: '12px', fontWeight: 'bold' } },
+                    title: { text: 'Electricity (kWh)', style: { color: '#666', fontSize: '12px', fontWeight: 'bold' } },
                     labels: { style: { color: '#666' } },
                     opposite: true
                 }],
@@ -2411,7 +2411,7 @@ const BarChartComponent = (props) => {
                 name: activity,
                 data: processedData[activity],
                 type: 'column',
-                yAxis: activity === 'Electricity Consumption – HVAC' ? 1 : 0,
+                yAxis: activity === 'Electricity Consumption' ? 1 : 0,
                 color: index === 0 ? '#7cb5ec' : index === 1 ? '#434348' : '#90ed7d',
                 borderWidth: 0,
                 borderRadius: 2
@@ -2461,7 +2461,7 @@ const BarChartComponent = (props) => {
                     gridLineColor: '#e6e6e6'
                 }, {
                     title: {
-                        text: 'HVAC Electricity (kWh)',
+                        text: 'Electricity (kWh)',
                         style: { color: '#666', fontSize: '12px', fontWeight: 'bold' }
                     },
                     labels: { style: { color: '#666', fontSize: '11px' } },
@@ -2612,7 +2612,7 @@ const components_1 = __webpack_require__(/*! uxp/components */ "uxp/components")
 const emissionFactors = {
     "Generator Fuel Consumption": 3.761,
     "Refrigerant Leakages/Refilling": 1.000,
-    "Electricity Consumption – HVAC": 0.412 // kgCO₂e per kWh
+    "Electricity Consumption": 0.412 // kgCO₂e per kWh
 };
 const ESGDonutChart = (props) => {
     const chartRef = (0, react_1.useRef)(null);

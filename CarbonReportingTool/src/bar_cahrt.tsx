@@ -149,7 +149,7 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
             name: activity,
             data: processedData[activity],
             type: 'column',
-            yAxis: activity === 'Electricity Consumption – HVAC' ? 1 : 0,
+            yAxis: activity === 'Electricity Consumption' ? 1 : 0,
             color: index === 0 ? '#7cb5ec' : index === 1 ? '#434348' : '#90ed7d',
             borderWidth: 0,
             borderRadius: 2
@@ -201,7 +201,7 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
         gridLineColor: '#e6e6e6'
       }, {
         title: {
-          text: 'HVAC Electricity (kWh)',
+          text: 'Electricity (kWh)',
           style: { color: '#666', fontSize: '12px', fontWeight: 'bold' }
         },
         labels: { style: { color: '#666', fontSize: '11px' } },
