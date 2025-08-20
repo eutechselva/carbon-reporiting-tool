@@ -273,7 +273,11 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
             <Input type="number" value={yearFilter} onChange={(val) => setYearFilter(parseInt(val) || null)} />
           </FormField>
         </FilterPanel>
-        <Button title="Export to CSV" onClick={exportToCSV} />
+        <Button
+                        icon='fas cloud-download-alt'
+                        title='Export'
+                        onClick={exportToCSV}
+                    />
         </div>
       </TitleBar>
 
