@@ -470,16 +470,14 @@ const CarbonReportingTool: React.FunctionComponent<IWidgetProps> = (props) => {
             <div className="action-buttons">
               <Button
                 title="Review"
-                onClick={(e) => {
-                  e.stopPropagation();
+                onClick={() => {
                   setShowReviewModal(true);
                 }}
                 disabled={loading}
               />
               <Button
                 title="Cancel"
-                onClick={(e) => {
-                  e.stopPropagation();
+                onClick={() => {
                   resetState();
                 }}
                 disabled={loading}
