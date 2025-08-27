@@ -2,9 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import Highcharts, { SeriesColumnOptions, Chart } from 'highcharts';
 import {
   Button,
-  FilterPanel, FormField, Input, Label, Select, TitleBar, WidgetWrapper, useToast
+  DateRangePicker,
+  FilterPanel, FormField, Input, Label, Select, TitleBar, WidgetWrapper, toDate, useToast
 } from "uxp/components";
 import { IContextProvider } from "./uxp";
+import { getEndDate, getStartDate } from './utils';
 
 export interface IWidgetProps {
   uxpContext?: IContextProvider;
@@ -36,12 +38,25 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
   const monthOptions = Object.keys(monthOrder).map(m => ({ label: m, value: m }));
   const [selectedLegend, setSelectedLegend] = useState<string | null>("all");
 
+  const [startDate, setStartDate] = React.useState<Date | string | null>(null);
+  const [endDate, setEndDate] = React.useState<Date | string | null>(null);
   const fetchActivityData = async () => {
     try {
+          const params: any = {
+      year: yearFilter,
+      month: monthFilter,
+      activityName
+    };
+
+    // 🔧 Only add when both selected
+    if (startDate && endDate) {
+      params.startDate = getStartDate(toDate(startDate));
+      params.endDate = getEndDate(toDate(endDate));
+    }
       const result = await props.uxpContext?.executeAction(
         "carbon_reporting_80rr",
         "GetAllData",
-        { year: yearFilter, month: monthFilter, activityName },
+         params,
         { json: true }
       );
 
@@ -117,8 +132,9 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
     backgroundColor: color,
     display: 'inline-block'
   });
-  
-  useEffect(() => { fetchActivityData(); }, [monthFilter, yearFilter, activityName]);
+
+
+  useEffect(() => { fetchActivityData(); }, [monthFilter, yearFilter, activityName,startDate,endDate]);
 
   useEffect(() => {
     if (!chartRef.current) return;
@@ -263,6 +279,8 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
           setMonthFilter(null);
           setYearFilter(new Date().getFullYear());
           setActivityName("");
+          setStartDate(null);   // 🔧 clear date range
+          setEndDate(null);
         }}>
           <FormField>
             <Label>Month</Label>
@@ -271,6 +289,23 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
           <FormField>
             <Label>Year</Label>
             <Input type="number" value={yearFilter} onChange={(val) => setYearFilter(parseInt(val) || null)} />
+          </FormField>
+          <FormField>
+            <DateRangePicker
+                title="date range"
+                startDate={startDate || ''}
+                endDate={endDate || ''}
+                onChange={(s, e, pr) => {
+                    setStartDate(s);
+                    setEndDate(e);
+                }}
+                presets={{
+                    enable: false
+                }}
+                renderAsPill={{
+                    minWidth: 320
+                }}
+            />
           </FormField>
         </FilterPanel>
         <Button
