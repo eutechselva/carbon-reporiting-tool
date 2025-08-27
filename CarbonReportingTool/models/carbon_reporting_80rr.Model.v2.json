@@ -1,0 +1,1854 @@
+{
+  "models": [
+    {
+      "ApiRoutes": [],
+      "Definition": {
+        "actions": [
+          {
+            "canOverrideCredentials": false,
+            "capability": "",
+            "docs": "",
+            "initiate": false,
+            "name": "GetAllData",
+            "outputs": [
+              ""
+            ],
+            "parameters": [
+              "activityName",
+              "endDate",
+              "month",
+              "startDate",
+              "year"
+            ],
+            "parametersExtended": [
+              {
+                "dataType": "",
+                "docs": "",
+                "example": "",
+                "id": "activityName"
+              },
+              {
+                "dataType": "",
+                "docs": "",
+                "example": "",
+                "id": "endDate"
+              },
+              {
+                "dataType": "",
+                "docs": "",
+                "example": "",
+                "id": "month"
+              },
+              {
+                "dataType": "",
+                "docs": "",
+                "example": "",
+                "id": "startDate"
+              },
+              {
+                "dataType": "",
+                "docs": "",
+                "example": "",
+                "id": "year"
+              }
+            ],
+            "published": false,
+            "schema": "{\"type\":\"array\"}",
+            "schemaFrozen": false,
+            "static": true
+          },
+          {
+            "canOverrideCredentials": false,
+            "capability": "",
+            "docs": "",
+            "initiate": false,
+            "name": "InsertCarbonReport",
+            "outputs": [
+              ""
+            ],
+            "parameters": [
+              "CarbonInputData"
+            ],
+            "parametersExtended": [
+              {
+                "dataType": "",
+                "docs": "",
+                "example": "",
+                "id": "CarbonInputData"
+              }
+            ],
+            "published": false,
+            "schema": "",
+            "schemaFrozen": false,
+            "static": true
+          },
+          {
+            "canOverrideCredentials": false,
+            "capability": "",
+            "docs": "",
+            "initiate": false,
+            "name": "delete_all_data",
+            "outputs": [
+              ""
+            ],
+            "parameters": [],
+            "parametersExtended": [],
+            "published": false,
+            "schema": "",
+            "schemaFrozen": false,
+            "static": true
+          },
+          {
+            "canOverrideCredentials": false,
+            "capability": "",
+            "docs": "",
+            "initiate": false,
+            "name": "ums_integration",
+            "outputs": [
+              ""
+            ],
+            "parameters": [],
+            "parametersExtended": [],
+            "published": false,
+            "schema": "{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"year\":{\"type\":\"integer\"},\"month\":{\"type\":\"string\"},\"value\":{\"type\":\"number\"}},\"required\":[\"year\",\"month\",\"value\"]}}",
+            "schemaFrozen": false,
+            "static": true
+          }
+        ],
+        "attributes": [],
+        "flows": {
+          "blocks": [
+            {
+              "CollectionName": "bf3b2acb-939a-49db-b847-1d7709a84f75",
+              "configuration": "[]",
+              "connections": {
+                "inputs": [],
+                "outputs": []
+              },
+              "id": "889d0768-48da-462a-9d61-8302a0848de4",
+              "inputValues": [
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "activity",
+                  "label": "activity",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "month",
+                  "label": "month",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "trigger",
+                  "label": "Trigger",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "value",
+                  "label": "value",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "year",
+                  "label": "year",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "Data to be inserted",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "__data__",
+                  "label": "Data",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "text",
+                  "value": ""
+                }
+              ],
+              "outputValues": [
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "__error__",
+                  "label": "Error",
+                  "type": "error"
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "output",
+                  "label": "All Output",
+                  "type": ""
+                }
+              ],
+              "position": {
+                "left": 1594,
+                "top": 91
+              },
+              "ReceiveIndividualFields": false,
+              "surface": "InsertCarbonReport",
+              "timeout": 5000,
+              "title": "Insert one document",
+              "type": "modelcollections:insertone",
+              "UpdateAsAttributes": true,
+              "UseContentAwareAutoFill": false
+            },
+            {
+              "CollectionName": "bf3b2acb-939a-49db-b847-1d7709a84f75",
+              "configuration": "[]",
+              "connections": {
+                "inputs": [
+                  {
+                    "source": "f03c7a32-4d35-4522-9c54-207804f87cb1:output:output",
+                    "target": "377d5c18-6d43-407a-a05f-9382edb62f28:input:trigger"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "source": "377d5c18-6d43-407a-a05f-9382edb62f28:output:output",
+                    "target": "9d70e7da-5e87-444a-f024-4a6fb3dfdb8b:input:input"
+                  }
+                ]
+              },
+              "id": "377d5c18-6d43-407a-a05f-9382edb62f28",
+              "inputValues": [
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "trigger",
+                  "label": "Trigger",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                }
+              ],
+              "outputValues": [
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "__error__",
+                  "label": "Error",
+                  "type": "error"
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "output",
+                  "label": "All Output",
+                  "type": ""
+                }
+              ],
+              "position": {
+                "left": 303,
+                "top": 233
+              },
+              "ReceiveIndividualFields": false,
+              "surface": "delete_all_data",
+              "TakeFilterFromPin": false,
+              "timeout": 5000,
+              "title": "Delete all document",
+              "type": "modelcollections:deleteall",
+              "UpdateAsAttributes": false
+            },
+            {
+              "CollectionName": "bf3b2acb-939a-49db-b847-1d7709a84f75",
+              "configuration": "[{\"IsEither\":false,\"Conditions\":[{\"Attribute\":\"activity\",\"Operator\":\"eq\",\"Value\":\"activity\",\"IsPin\":true},{\"Attribute\":\"month\",\"Operator\":\"eq\",\"Value\":\"month\",\"IsPin\":true},{\"Attribute\":\"year\",\"Operator\":\"eq\",\"Value\":\"year\",\"IsPin\":true}],\"Groups\":[]}]",
+              "connections": {
+                "inputs": [
+                  {
+                    "source": "229e31bd-dfe6-496f-cf72-995b30ab8601:output:activity",
+                    "target": "10846fe3-13af-4077-d3e7-5860c8e8db9b:input:activity"
+                  },
+                  {
+                    "source": "229e31bd-dfe6-496f-cf72-995b30ab8601:output:month",
+                    "target": "10846fe3-13af-4077-d3e7-5860c8e8db9b:input:month"
+                  },
+                  {
+                    "source": "229e31bd-dfe6-496f-cf72-995b30ab8601:output:value",
+                    "target": "10846fe3-13af-4077-d3e7-5860c8e8db9b:input:value"
+                  },
+                  {
+                    "source": "229e31bd-dfe6-496f-cf72-995b30ab8601:output:year",
+                    "target": "10846fe3-13af-4077-d3e7-5860c8e8db9b:input:year"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "source": "10846fe3-13af-4077-d3e7-5860c8e8db9b:output:output",
+                    "target": "da571381-7d1f-483c-cc87-7a2a0f26fc5a:input:input"
+                  }
+                ]
+              },
+              "id": "10846fe3-13af-4077-d3e7-5860c8e8db9b",
+              "inputValues": [
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "activity",
+                  "label": "activity",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "month",
+                  "label": "month",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "trigger",
+                  "label": "Trigger",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "value",
+                  "label": "value",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "year",
+                  "label": "year",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "Data to be inserted",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "__data__",
+                  "label": "Data",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "text",
+                  "value": ""
+                }
+              ],
+              "outputValues": [
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "__error__",
+                  "label": "Error",
+                  "type": "error"
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "output",
+                  "label": "All Output",
+                  "type": ""
+                }
+              ],
+              "position": {
+                "left": 961,
+                "top": 213
+              },
+              "ReceiveIndividualFields": false,
+              "surface": "InsertCarbonReport",
+              "TakeFilterFromPin": false,
+              "timeout": 5000,
+              "title": "Update one document",
+              "type": "modelcollections:updateone",
+              "UpdateAsAttributes": true
+            },
+            {
+              "CollectionName": "bf3b2acb-939a-49db-b847-1d7709a84f75",
+              "configuration": "[{\"IsEither\":true,\"Conditions\":[{\"Attribute\":\"activity\",\"Operator\":\"eq\",\"Value\":\"activity\",\"IsPin\":true},{\"Attribute\":\"year\",\"Operator\":\"eq\",\"Value\":\"year\",\"IsPin\":true},{\"Attribute\":\"month\",\"Operator\":\"eq\",\"Value\":\"month\",\"IsPin\":true}],\"Groups\":[]}]",
+              "connections": {
+                "inputs": [],
+                "outputs": []
+              },
+              "id": "12b58595-14ec-49b1-f68e-4faa0ac01b8d",
+              "inputValues": [
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "activity",
+                  "label": "activity",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "month",
+                  "label": "month",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "trigger",
+                  "label": "Trigger",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "year",
+                  "label": "year",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                }
+              ],
+              "outputValues": [
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "__error__",
+                  "label": "Error",
+                  "type": "error"
+                },
+                {
+                  "dataType": "",
+                  "description": "Entire Result",
+                  "documentation": "",
+                  "example": "",
+                  "id": "output",
+                  "label": "All Output",
+                  "type": ""
+                }
+              ],
+              "position": {
+                "left": 1546,
+                "top": 398
+              },
+              "ReceiveIndividualFields": false,
+              "surface": "InsertCarbonReport",
+              "TakeFilterFromPin": false,
+              "timeout": 5000,
+              "title": "Find one document",
+              "type": "modelcollections:findone",
+              "UpdateAsAttributes": false
+            },
+            {
+              "actionName": "",
+              "connections": {
+                "inputs": [
+                  {
+                    "source": "66ca5ba6-8df2-4904-b733-c982a3c7c824:output:action",
+                    "target": "229e31bd-dfe6-496f-cf72-995b30ab8601:input:__actionlink__"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "source": "229e31bd-dfe6-496f-cf72-995b30ab8601:output:activity",
+                    "target": "10846fe3-13af-4077-d3e7-5860c8e8db9b:input:activity"
+                  },
+                  {
+                    "source": "229e31bd-dfe6-496f-cf72-995b30ab8601:output:month",
+                    "target": "10846fe3-13af-4077-d3e7-5860c8e8db9b:input:month"
+                  },
+                  {
+                    "source": "229e31bd-dfe6-496f-cf72-995b30ab8601:output:value",
+                    "target": "10846fe3-13af-4077-d3e7-5860c8e8db9b:input:value"
+                  },
+                  {
+                    "source": "229e31bd-dfe6-496f-cf72-995b30ab8601:output:year",
+                    "target": "10846fe3-13af-4077-d3e7-5860c8e8db9b:input:year"
+                  }
+                ]
+              },
+              "debug": false,
+              "id": "229e31bd-dfe6-496f-cf72-995b30ab8601",
+              "initiate": false,
+              "inputValues": [
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "__actionlink__",
+                  "label": "",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "actionlink",
+                  "value": ""
+                }
+              ],
+              "outputValues": [
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "__error__",
+                  "label": "Error",
+                  "type": "error"
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "activity",
+                  "label": "activity",
+                  "type": ""
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "month",
+                  "label": "month",
+                  "type": ""
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "output",
+                  "label": "All Output",
+                  "type": ""
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "value",
+                  "label": "value",
+                  "type": ""
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "year",
+                  "label": "year",
+                  "type": ""
+                }
+              ],
+              "position": {
+                "left": 690,
+                "top": 184
+              },
+              "published": false,
+              "roles": [],
+              "static": true,
+              "surface": "InsertCarbonReport",
+              "title": "Action",
+              "type": "linkedactionstart"
+            },
+            {
+              "actionName": "GetAllData",
+              "canOverrideCredentials": false,
+              "capability": "",
+              "connections": {
+                "inputs": [],
+                "outputs": [
+                  {
+                    "source": "00364c3a-0428-4d21-b36a-2b70c1150b55:output:activityName",
+                    "target": "a57e108c-d415-4951-d2c2-87a32284c3d1:input:activityName"
+                  },
+                  {
+                    "source": "00364c3a-0428-4d21-b36a-2b70c1150b55:output:endDate",
+                    "target": "a57e108c-d415-4951-d2c2-87a32284c3d1:input:endDate"
+                  },
+                  {
+                    "source": "00364c3a-0428-4d21-b36a-2b70c1150b55:output:month",
+                    "target": "a57e108c-d415-4951-d2c2-87a32284c3d1:input:month"
+                  },
+                  {
+                    "source": "00364c3a-0428-4d21-b36a-2b70c1150b55:output:startDate",
+                    "target": "a57e108c-d415-4951-d2c2-87a32284c3d1:input:startDate"
+                  },
+                  {
+                    "source": "00364c3a-0428-4d21-b36a-2b70c1150b55:output:year",
+                    "target": "a57e108c-d415-4951-d2c2-87a32284c3d1:input:year"
+                  }
+                ]
+              },
+              "debug": false,
+              "docs": "",
+              "id": "00364c3a-0428-4d21-b36a-2b70c1150b55",
+              "initiate": false,
+              "inputValues": [],
+              "outputValues": [
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "__error__",
+                  "label": "Error",
+                  "type": "error"
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "activityName",
+                  "label": "activityName",
+                  "type": ""
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "endDate",
+                  "label": "endDate",
+                  "type": ""
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "month",
+                  "label": "month",
+                  "type": ""
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "output",
+                  "label": "All Output",
+                  "type": ""
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "startDate",
+                  "label": "startDate",
+                  "type": ""
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "year",
+                  "label": "year",
+                  "type": ""
+                }
+              ],
+              "position": {
+                "left": 73,
+                "top": 113
+              },
+              "preProcessService": "",
+              "published": false,
+              "roles": [],
+              "schema": "{\"type\":\"array\"}",
+              "static": true,
+              "surface": "GetAllData",
+              "title": "Action",
+              "type": "actionstart"
+            },
+            {
+              "actionName": "InsertCarbonReport",
+              "canOverrideCredentials": false,
+              "capability": "",
+              "connections": {
+                "inputs": [],
+                "outputs": [
+                  {
+                    "source": "f51de8cf-9bf0-491b-9c58-5387bafc5608:output:CarbonInputData",
+                    "target": "3fe2523b-d626-457b-b783-6748d7e065a4:input:input"
+                  }
+                ]
+              },
+              "debug": true,
+              "docs": "",
+              "id": "f51de8cf-9bf0-491b-9c58-5387bafc5608",
+              "initiate": false,
+              "inputValues": [],
+              "outputValues": [
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "CarbonInputData",
+                  "label": "CarbonInputData",
+                  "type": ""
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "__error__",
+                  "label": "Error",
+                  "type": "error"
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "output",
+                  "label": "All Output",
+                  "type": ""
+                }
+              ],
+              "position": {
+                "left": 46,
+                "top": 197
+              },
+              "preProcessService": "",
+              "published": false,
+              "roles": [],
+              "schema": "",
+              "static": true,
+              "surface": "InsertCarbonReport",
+              "title": "Action",
+              "type": "actionstart"
+            },
+            {
+              "actionName": "delete_all_data",
+              "canOverrideCredentials": false,
+              "capability": "",
+              "connections": {
+                "inputs": [],
+                "outputs": [
+                  {
+                    "source": "f03c7a32-4d35-4522-9c54-207804f87cb1:output:output",
+                    "target": "377d5c18-6d43-407a-a05f-9382edb62f28:input:trigger"
+                  }
+                ]
+              },
+              "debug": false,
+              "docs": "",
+              "id": "f03c7a32-4d35-4522-9c54-207804f87cb1",
+              "initiate": false,
+              "inputValues": [],
+              "outputValues": [
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "__error__",
+                  "label": "Error",
+                  "type": "error"
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "output",
+                  "label": "All Output",
+                  "type": ""
+                }
+              ],
+              "position": {
+                "left": 60,
+                "top": 60
+              },
+              "preProcessService": "",
+              "published": false,
+              "roles": [],
+              "schema": "",
+              "static": true,
+              "surface": "delete_all_data",
+              "title": "Action",
+              "type": "actionstart"
+            },
+            {
+              "actionName": "ums_integration",
+              "cacheTime": "",
+              "connections": {
+                "inputs": [
+                  {
+                    "source": "405c5c42-e45e-4843-9b5f-0131c78ad974:output:Triggered",
+                    "target": "0c9788d9-9e52-46fc-c666-c32f237d1f43:input:trigger"
+                  }
+                ],
+                "outputs": []
+              },
+              "id": "0c9788d9-9e52-46fc-c666-c32f237d1f43",
+              "inputValues": [
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "instance",
+                  "label": "Instance",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "trigger",
+                  "label": "Trigger",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                }
+              ],
+              "isCachingEnabled": false,
+              "modelName": "carbon_reporting_80rr",
+              "outputValues": [
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "__error__",
+                  "label": "Error",
+                  "type": "error"
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "output",
+                  "label": "All Output",
+                  "type": ""
+                }
+              ],
+              "position": {
+                "left": 505,
+                "top": 182
+              },
+              "shouldCacheByUser": false,
+              "shouldCacheErrorResults": false,
+              "surface": "Lucy.60Minutes",
+              "title": "CallAction",
+              "type": "callaction"
+            },
+            {
+              "actionName": "ums_integration",
+              "canOverrideCredentials": false,
+              "capability": "",
+              "connections": {
+                "inputs": [],
+                "outputs": [
+                  {
+                    "source": "66dec43f-9973-49cf-fd6d-aefa2677d6ac:output:output",
+                    "target": "5439420c-3cde-4d6c-8dff-7ff07fb783ce:input:trigger"
+                  }
+                ]
+              },
+              "debug": true,
+              "docs": "",
+              "id": "66dec43f-9973-49cf-fd6d-aefa2677d6ac",
+              "initiate": false,
+              "inputValues": [],
+              "outputValues": [
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "__error__",
+                  "label": "Error",
+                  "type": "error"
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "output",
+                  "label": "All Output",
+                  "type": ""
+                }
+              ],
+              "position": {
+                "left": 60,
+                "top": 60
+              },
+              "preProcessService": "",
+              "published": false,
+              "roles": [],
+              "schema": "{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"year\":{\"type\":\"integer\"},\"month\":{\"type\":\"string\"},\"value\":{\"type\":\"number\"}},\"required\":[\"year\",\"month\",\"value\"]}}",
+              "static": true,
+              "surface": "ums_integration",
+              "title": "Action",
+              "type": "actionstart"
+            },
+            {
+              "canOverrideCredentials": false,
+              "connections": {
+                "inputs": [],
+                "outputs": [
+                  {
+                    "source": "405c5c42-e45e-4843-9b5f-0131c78ad974:output:Triggered",
+                    "target": "0c9788d9-9e52-46fc-c666-c32f237d1f43:input:trigger"
+                  }
+                ]
+              },
+              "correlations": [],
+              "debug": true,
+              "docs": "",
+              "eventConfiguration": {},
+              "eventData": {},
+              "eventDefinition": null,
+              "eventID": "Lucy.60Minutes",
+              "eventTitle": "Lucy.60Minutes",
+              "id": "405c5c42-e45e-4843-9b5f-0131c78ad974",
+              "initiate": false,
+              "inputValues": [],
+              "outputValues": [
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "Triggered",
+                  "label": "Triggered",
+                  "type": ""
+                }
+              ],
+              "parameters": {
+                "Triggered": "Set to 1 always"
+              },
+              "position": {
+                "left": 60,
+                "top": 60
+              },
+              "static": true,
+              "surface": "Lucy.60Minutes",
+              "title": "Lucy.60Minutes",
+              "type": "eventstart"
+            },
+            {
+              "code": "const currentYear = new Date().getFullYear();\n\nlucy.log(currentYear);\n\nlet fromEx = currentYear + '-01-01T00%3A01%3A00.000Z';\nlet toEx = currentYear + '-12-31T23%3A59%3A59.999Z';\n\nruntime.done({from : fromEx , to : toEx });",
+              "connections": {
+                "inputs": [
+                  {
+                    "source": "66dec43f-9973-49cf-fd6d-aefa2677d6ac:output:output",
+                    "target": "5439420c-3cde-4d6c-8dff-7ff07fb783ce:input:trigger"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "source": "5439420c-3cde-4d6c-8dff-7ff07fb783ce:output:from",
+                    "target": "4dc3d9cb-e06c-45b8-f3e6-bf7ecffc041d:input:from"
+                  },
+                  {
+                    "source": "5439420c-3cde-4d6c-8dff-7ff07fb783ce:output:to",
+                    "target": "4dc3d9cb-e06c-45b8-f3e6-bf7ecffc041d:input:to"
+                  }
+                ]
+              },
+              "description": "",
+              "id": "5439420c-3cde-4d6c-8dff-7ff07fb783ce",
+              "inputValues": [
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "trigger",
+                  "label": "Trigger",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                }
+              ],
+              "outputValues": [
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "__error__",
+                  "label": "Error",
+                  "type": "error"
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "from",
+                  "label": "from",
+                  "type": ""
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "to",
+                  "label": "to",
+                  "type": ""
+                }
+              ],
+              "position": {
+                "left": 191,
+                "top": 366
+              },
+              "surface": "ums_integration",
+              "timeoutMilliseconds": 5000,
+              "title": "ES6Javascript",
+              "type": "es6javascript"
+            },
+            {
+              "code": "let in_data = runtime.inputs().in_data;\n\nfunction extractConsumptionData(apiResponse) {\n  const monthNames = [\n    \"Jan\",\n    \"Feb\",\n    \"Mar\",\n    \"Apr\",\n    \"May\",\n    \"Jun\",\n    \"Jul\",\n    \"Aug\",\n    \"Sep\",\n    \"Oct\",\n    \"Nov\",\n    \"Dec\",\n  ];\n\n  const extractedData = [];\n\n  // Process each consumption record\n  apiResponse.consumptions.forEach((record) => {\n    const date = new Date(record.time);\n\n    const extractedRecord = {\n      year: date.getFullYear(),\n      month: monthNames[date.getMonth()],\n      value: record.value,\n    };\n\n    extractedData.push(extractedRecord);\n  });\n\n  return extractedData;\n}\n\nconst dbData = extractConsumptionData(JSON.parse(in_data));\n// runtime.done({ out_data: dbData });\n\ndbData.forEach((data) => {\n  lucy\n    .currentModel()\n    .collections()\n    .findOne(\n      \"carbon_reporting_80rr\",\n      {\n        activity: \"Electricity Consumption – HVAC\",\n        year: data[\"year\"].toString(),\n        month: data[\"month\"],\n      },\n      {}\n    )\n    .then((result) => {\n      if (Object.keys(result).length === 0) {\n          lucy.log('result.isEmpty');\n        lucy\n          .currentModel()\n          .collections()\n          .insertOne(\n            \"carbon_reporting_80rr\",\n            {\n              activity: \"Electricity Consumption – HVAC\",\n              year: data[\"year\"].toString(),\n              month: data[\"month\"],\n              value: data[\"value\"].toString(),\n            },\n            {}\n          );\n        runtime.done({ out_data: 'done' });\n          \n      } else {\n\n          lucy.log('result.isNotEmpty');\n          lucy.log(result);\n        // lucy\n        //   .currentModel()\n        //   .collections()\n        //   .updateOne(\n        //     \"carbon_reporting_80rr\",\n        //     { _id: result[\"_id\"] },\n        //     { value: data[\"value\"].toString() },\n        //     {}\n        //   );\n        runtime.done({ out_data: 'done' });\n      }\n      \n    });\n});\n\n\n",
+              "connections": {
+                "inputs": [
+                  {
+                    "source": "4dc3d9cb-e06c-45b8-f3e6-bf7ecffc041d:output:output",
+                    "target": "a53f4e6a-3d3b-477b-81a1-6c6f68321b3a:input:in_data"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "source": "a53f4e6a-3d3b-477b-81a1-6c6f68321b3a:output:out_data",
+                    "target": "67da4cc2-1411-45b0-d532-df291851175e:input:input"
+                  }
+                ]
+              },
+              "description": "",
+              "id": "a53f4e6a-3d3b-477b-81a1-6c6f68321b3a",
+              "inputValues": [
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "in_data",
+                  "label": "in_data",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "trigger",
+                  "label": "Trigger",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                }
+              ],
+              "outputValues": [
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "__error__",
+                  "label": "Error",
+                  "type": "error"
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "out_data",
+                  "label": "out_data",
+                  "type": ""
+                }
+              ],
+              "position": {
+                "left": 698,
+                "top": 92
+              },
+              "surface": "ums_integration",
+              "timeoutMilliseconds": 5000,
+              "title": "ES6Javascript",
+              "type": "es6javascript"
+            },
+            {
+              "code": "let { year, month, activityName, startDate, endDate } = runtime.inputs();\nlet collections = lucy.currentModel().collections();\n\nlet filters = { \"$and\": [] };\n\n// Add filters conditionally\nif (year) {\n    filters[\"$and\"].push({ year: year });\n}\nif (month) {\n    filters[\"$and\"].push({ month: month });\n}\nif (activityName) {\n    filters[\"$and\"].push({\n        activityName: {\n            \"$regex\": activityName,\n            \"$options\": \"i\"  // case-insensitive\n        }\n    });\n}\nif (startDate && endDate) {\n    filters[\"$and\"].push({\n        date: {\n            \"$gte\": new Date(startDate),\n            \"$lte\": new Date(endDate)\n        }\n    });\n}\n\n// Clean up empty $and if needed\nif (filters[\"$and\"].length === 0) {\n    delete filters[\"$and\"];\n}\n\n// Query the collection\ncollections.findMany('carbon_reporting_80rr', filters, {})\n    .then(res => runtime.done({ filteredData: res }))\n    .catch(e => runtime.error(e));\n",
+              "connections": {
+                "inputs": [
+                  {
+                    "source": "00364c3a-0428-4d21-b36a-2b70c1150b55:output:activityName",
+                    "target": "a57e108c-d415-4951-d2c2-87a32284c3d1:input:activityName"
+                  },
+                  {
+                    "source": "00364c3a-0428-4d21-b36a-2b70c1150b55:output:endDate",
+                    "target": "a57e108c-d415-4951-d2c2-87a32284c3d1:input:endDate"
+                  },
+                  {
+                    "source": "00364c3a-0428-4d21-b36a-2b70c1150b55:output:month",
+                    "target": "a57e108c-d415-4951-d2c2-87a32284c3d1:input:month"
+                  },
+                  {
+                    "source": "00364c3a-0428-4d21-b36a-2b70c1150b55:output:startDate",
+                    "target": "a57e108c-d415-4951-d2c2-87a32284c3d1:input:startDate"
+                  },
+                  {
+                    "source": "00364c3a-0428-4d21-b36a-2b70c1150b55:output:year",
+                    "target": "a57e108c-d415-4951-d2c2-87a32284c3d1:input:year"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "source": "a57e108c-d415-4951-d2c2-87a32284c3d1:output:filteredData",
+                    "target": "9e387892-daa2-45f6-adb4-367ebd1c0a64:input:input"
+                  }
+                ]
+              },
+              "description": "",
+              "id": "a57e108c-d415-4951-d2c2-87a32284c3d1",
+              "inputValues": [
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "activityName",
+                  "label": "activityName",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "endDate",
+                  "label": "endDate",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "month",
+                  "label": "month",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "startDate",
+                  "label": "startDate",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "trigger",
+                  "label": "Trigger",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "year",
+                  "label": "year",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                }
+              ],
+              "outputValues": [
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "__error__",
+                  "label": "Error",
+                  "type": "error"
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "filteredData",
+                  "label": "filteredData",
+                  "type": ""
+                }
+              ],
+              "position": {
+                "left": 441,
+                "top": 141
+              },
+              "surface": "GetAllData",
+              "timeoutMilliseconds": 5000,
+              "title": "ES6Javascript",
+              "type": "es6javascript"
+            },
+            {
+              "connections": {
+                "inputs": [
+                  {
+                    "source": "10846fe3-13af-4077-d3e7-5860c8e8db9b:output:output",
+                    "target": "da571381-7d1f-483c-cc87-7a2a0f26fc5a:input:input"
+                  }
+                ],
+                "outputs": []
+              },
+              "fieldName": "",
+              "id": "da571381-7d1f-483c-cc87-7a2a0f26fc5a",
+              "inputValues": [
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "input",
+                  "label": "Value",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "trigger",
+                  "label": "Trigger",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                }
+              ],
+              "outputValues": [],
+              "position": {
+                "left": 1202,
+                "top": 208
+              },
+              "surface": "InsertCarbonReport",
+              "title": "Output",
+              "type": "actionoutput2"
+            },
+            {
+              "connections": {
+                "inputs": [
+                  {
+                    "source": "377d5c18-6d43-407a-a05f-9382edb62f28:output:output",
+                    "target": "9d70e7da-5e87-444a-f024-4a6fb3dfdb8b:input:input"
+                  }
+                ],
+                "outputs": []
+              },
+              "fieldName": "",
+              "id": "9d70e7da-5e87-444a-f024-4a6fb3dfdb8b",
+              "inputValues": [
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "input",
+                  "label": "Value",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "trigger",
+                  "label": "Trigger",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                }
+              ],
+              "outputValues": [],
+              "position": {
+                "left": 615,
+                "top": 217
+              },
+              "surface": "delete_all_data",
+              "title": "Output",
+              "type": "actionoutput2"
+            },
+            {
+              "connections": {
+                "inputs": [
+                  {
+                    "source": "3fe2523b-d626-457b-b783-6748d7e065a4:output:output",
+                    "target": "66ca5ba6-8df2-4904-b733-c982a3c7c824:input:list"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "source": "66ca5ba6-8df2-4904-b733-c982a3c7c824:output:action",
+                    "target": "229e31bd-dfe6-496f-cf72-995b30ab8601:input:__actionlink__"
+                  }
+                ]
+              },
+              "id": "66ca5ba6-8df2-4904-b733-c982a3c7c824",
+              "inputValues": [
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "extra",
+                  "label": "Extra",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "list",
+                  "label": "Items",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "list",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "trigger",
+                  "label": "Trigger",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                }
+              ],
+              "outputValues": [
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "action",
+                  "label": "Action",
+                  "type": "actionlink"
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "done",
+                  "label": "Done",
+                  "type": ""
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "output",
+                  "label": "Output",
+                  "type": ""
+                }
+              ],
+              "position": {
+                "left": 501,
+                "top": 148
+              },
+              "sequential": true,
+              "surface": "InsertCarbonReport",
+              "title": "Repeat Action",
+              "type": "repeataction"
+            },
+            {
+              "connections": {
+                "inputs": [
+                  {
+                    "source": "5439420c-3cde-4d6c-8dff-7ff07fb783ce:output:from",
+                    "target": "4dc3d9cb-e06c-45b8-f3e6-bf7ecffc041d:input:from"
+                  },
+                  {
+                    "source": "5439420c-3cde-4d6c-8dff-7ff07fb783ce:output:to",
+                    "target": "4dc3d9cb-e06c-45b8-f3e6-bf7ecffc041d:input:to"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "source": "4dc3d9cb-e06c-45b8-f3e6-bf7ecffc041d:output:output",
+                    "target": "a53f4e6a-3d3b-477b-81a1-6c6f68321b3a:input:in_data"
+                  }
+                ]
+              },
+              "id": "4dc3d9cb-e06c-45b8-f3e6-bf7ecffc041d",
+              "inputValues": [
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "AccountName",
+                  "label": "Account",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "text",
+                  "value": "default"
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "from",
+                  "label": "from",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "to",
+                  "label": "to",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "trigger",
+                  "label": "Trigger",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                }
+              ],
+              "loadUserPrivateAccount": false,
+              "outputValues": [
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "__error__",
+                  "label": "Error",
+                  "type": "error"
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "output",
+                  "label": "All Output",
+                  "type": ""
+                }
+              ],
+              "position": {
+                "left": 418,
+                "top": 166
+              },
+              "surface": "ums_integration",
+              "timeout": 5000,
+              "title": "Monthly Data",
+              "type": "callwebservice:UMS:Monthly Data"
+            },
+            {
+              "connections": {
+                "inputs": [
+                  {
+                    "source": "a53f4e6a-3d3b-477b-81a1-6c6f68321b3a:output:out_data",
+                    "target": "67da4cc2-1411-45b0-d532-df291851175e:input:input"
+                  }
+                ],
+                "outputs": []
+              },
+              "fieldName": "",
+              "id": "67da4cc2-1411-45b0-d532-df291851175e",
+              "inputValues": [
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "input",
+                  "label": "Value",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "trigger",
+                  "label": "Trigger",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                }
+              ],
+              "outputValues": [],
+              "position": {
+                "left": 951,
+                "top": 151
+              },
+              "surface": "ums_integration",
+              "title": "Output",
+              "type": "actionoutput2"
+            },
+            {
+              "connections": {
+                "inputs": [
+                  {
+                    "source": "a57e108c-d415-4951-d2c2-87a32284c3d1:output:filteredData",
+                    "target": "9e387892-daa2-45f6-adb4-367ebd1c0a64:input:input"
+                  }
+                ],
+                "outputs": []
+              },
+              "fieldName": "",
+              "id": "9e387892-daa2-45f6-adb4-367ebd1c0a64",
+              "inputValues": [
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "input",
+                  "label": "Value",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "trigger",
+                  "label": "Trigger",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                }
+              ],
+              "outputValues": [],
+              "position": {
+                "left": 701,
+                "top": 139
+              },
+              "surface": "GetAllData",
+              "title": "Output",
+              "type": "actionoutput2"
+            },
+            {
+              "connections": {
+                "inputs": [
+                  {
+                    "source": "f51de8cf-9bf0-491b-9c58-5387bafc5608:output:CarbonInputData",
+                    "target": "3fe2523b-d626-457b-b783-6748d7e065a4:input:input"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "source": "3fe2523b-d626-457b-b783-6748d7e065a4:output:output",
+                    "target": "66ca5ba6-8df2-4904-b733-c982a3c7c824:input:list"
+                  }
+                ]
+              },
+              "id": "3fe2523b-d626-457b-b783-6748d7e065a4",
+              "inputValues": [
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "input",
+                  "label": "Input",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                },
+                {
+                  "description": "",
+                  "disablelog": "",
+                  "documentation": "",
+                  "id": "trigger",
+                  "label": "Trigger",
+                  "transformation": "",
+                  "transformationOptions": "",
+                  "type": "",
+                  "value": ""
+                }
+              ],
+              "outputValues": [
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "__error__",
+                  "label": "Error",
+                  "type": "error"
+                },
+                {
+                  "dataType": "",
+                  "description": "",
+                  "documentation": "",
+                  "example": "",
+                  "id": "output",
+                  "label": "Output",
+                  "type": ""
+                }
+              ],
+              "position": {
+                "left": 280,
+                "top": 166
+              },
+              "surface": "InsertCarbonReport",
+              "title": "Parse JSON",
+              "type": "parsejson"
+            }
+          ],
+          "position": {
+            "left": 0,
+            "top": 0
+          }
+        },
+        "sources": [
+          {
+            "canOverrideCredentials": false,
+            "capability": "",
+            "docs": "",
+            "initiate": false,
+            "name": "GetAllData",
+            "outputs": [
+              ""
+            ],
+            "parameters": [
+              "activityName",
+              "endDate",
+              "month",
+              "startDate",
+              "year"
+            ],
+            "parametersExtended": [
+              {
+                "dataType": "",
+                "docs": "",
+                "example": "",
+                "id": "activityName"
+              },
+              {
+                "dataType": "",
+                "docs": "",
+                "example": "",
+                "id": "endDate"
+              },
+              {
+                "dataType": "",
+                "docs": "",
+                "example": "",
+                "id": "month"
+              },
+              {
+                "dataType": "",
+                "docs": "",
+                "example": "",
+                "id": "startDate"
+              },
+              {
+                "dataType": "",
+                "docs": "",
+                "example": "",
+                "id": "year"
+              }
+            ],
+            "published": false,
+            "schema": "{\"type\":\"array\"}",
+            "schemaFrozen": false,
+            "static": true
+          },
+          {
+            "canOverrideCredentials": false,
+            "capability": "",
+            "docs": "",
+            "initiate": false,
+            "name": "InsertCarbonReport",
+            "outputs": [
+              ""
+            ],
+            "parameters": [
+              "CarbonInputData"
+            ],
+            "parametersExtended": [
+              {
+                "dataType": "",
+                "docs": "",
+                "example": "",
+                "id": "CarbonInputData"
+              }
+            ],
+            "published": false,
+            "schema": "",
+            "schemaFrozen": false,
+            "static": true
+          },
+          {
+            "canOverrideCredentials": false,
+            "capability": "",
+            "docs": "",
+            "initiate": false,
+            "name": "delete_all_data",
+            "outputs": [
+              ""
+            ],
+            "parameters": [],
+            "parametersExtended": [],
+            "published": false,
+            "schema": "",
+            "schemaFrozen": false,
+            "static": true
+          },
+          {
+            "canOverrideCredentials": false,
+            "capability": "",
+            "docs": "",
+            "initiate": false,
+            "name": "ums_integration",
+            "outputs": [
+              ""
+            ],
+            "parameters": [],
+            "parametersExtended": [],
+            "published": false,
+            "schema": "{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"year\":{\"type\":\"integer\"},\"month\":{\"type\":\"string\"},\"value\":{\"type\":\"number\"}},\"required\":[\"year\",\"month\",\"value\"]}}",
+            "schemaFrozen": false,
+            "static": true
+          }
+        ],
+        "uioptions": {},
+        "version": "v2"
+      },
+      "Icon": "",
+      "JSModules": [],
+      "Key": "3210",
+      "MetadataDictionary": "null",
+      "ModelCollections": [
+        {
+          "Attributes": "[{\"name\":\"activity\",\"dataType\":\"string\"},{\"name\":\"year\",\"dataType\":\"string\"},{\"name\":\"month\",\"dataType\":\"string\"},{\"name\":\"value\",\"dataType\":\"string\"}]",
+          "GUID": "bf3b2acb-939a-49db-b847-1d7709a84f75",
+          "MapKey": "3210",
+          "Name": "carbon_reporting_80rr"
+        }
+      ],
+      "Name": "carbon_reporting_80rr",
+      "Roles": [],
+      "UIDefinition": null
+    }
+  ],
+  "version": "2.0"
+}
