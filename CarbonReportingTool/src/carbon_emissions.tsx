@@ -158,8 +158,20 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
   }, [monthFilter, yearFilter, activityName]);
 
   useEffect(() => {
-    if (chartRef.current && dynamicEmissionData.length > 0) {
+    const chart = chartRef.current;
+    if (chart) {
       // Prepare scope data for outer donut ring
+    // A helper function to find the chart instance
+    const highchartsChart = Highcharts.charts.find(c => c && c.container.parentNode === chart);
+
+    if (dynamicEmissionData.length === 0) {
+      // If there's no data, destroy the existing chart instance
+      // and prevent further rendering.
+      if (highchartsChart) {
+        highchartsChart.destroy();
+      }
+      return;
+    }
       const scopeData = [
         {
           name: 'Scope 1 Emissions',
@@ -522,8 +534,6 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
           border: '1px solid #e9ecef'
         }}
       />
-      
-
 
         {/* Loading State */}
         {loading && (

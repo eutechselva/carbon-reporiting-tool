@@ -59,7 +59,9 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
          params,
         { json: true }
       );
-
+      // 👀 Debug log raw backend response
+      console.log("Backend raw result:", result);
+      console.log("Params sent:", params);
       const cleanedData = result?.map((row: any) => ({
         activity: row.activity,
         year: row.year,
@@ -133,8 +135,12 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
     display: 'inline-block'
   });
 
-
-  useEffect(() => { fetchActivityData(); }, [monthFilter, yearFilter, activityName,startDate,endDate]);
+useEffect(() => {
+  
+    fetchActivityData();
+  
+}, [monthFilter, yearFilter, activityName, startDate, endDate]);
+  useEffect(() => { fetchActivityData(); }, [monthFilter, yearFilter, activityName]);
 
   useEffect(() => {
     if (!chartRef.current) return;
