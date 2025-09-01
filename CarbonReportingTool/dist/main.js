@@ -25082,6 +25082,9 @@ const BarChartComponent = (props) => {
                 params.endDate = (0, utils_1.getEndDate)((0, components_1.toDate)(endDate));
             }
             const result = yield ((_a = props.uxpContext) === null || _a === void 0 ? void 0 : _a.executeAction("carbon_reporting_80rr", "GetAllData", params, { json: true }));
+            // 👀 Debug log raw backend response
+            console.log("Backend raw result:", result);
+            console.log("Params sent:", params);
             const cleanedData = (result === null || result === void 0 ? void 0 : result.map((row) => ({
                 activity: row.activity,
                 year: row.year,
@@ -25140,7 +25143,10 @@ const BarChartComponent = (props) => {
         backgroundColor: color,
         display: 'inline-block'
     });
-    (0, react_1.useEffect)(() => { fetchActivityData(); }, [monthFilter, yearFilter, activityName, startDate, endDate]);
+    (0, react_1.useEffect)(() => {
+        fetchActivityData();
+    }, [monthFilter, yearFilter, activityName, startDate, endDate]);
+    (0, react_1.useEffect)(() => { fetchActivityData(); }, [monthFilter, yearFilter, activityName]);
     (0, react_1.useEffect)(() => {
         if (!chartRef.current)
             return;
@@ -25491,8 +25497,19 @@ const ESGDonutChart = (props) => {
         fetchActivityData();
     }, [monthFilter, yearFilter, activityName]);
     (0, react_1.useEffect)(() => {
-        if (chartRef.current && dynamicEmissionData.length > 0) {
+        const chart = chartRef.current;
+        if (chart) {
             // Prepare scope data for outer donut ring
+            // A helper function to find the chart instance
+            const highchartsChart = highcharts_1.default.charts.find(c => c && c.container.parentNode === chart);
+            if (dynamicEmissionData.length === 0) {
+                // If there's no data, destroy the existing chart instance
+                // and prevent further rendering.
+                if (highchartsChart) {
+                    highchartsChart.destroy();
+                }
+                return;
+            }
             const scopeData = [
                 {
                     name: 'Scope 1 Emissions',
