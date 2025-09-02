@@ -26,22 +26,26 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
   const chartRef = useRef(null);
   const toast = useToast();
   const chartInstance = useRef<Highcharts.Chart | null>(null);
-const [selectedLegend, setSelectedLegend] = useState<string | null>("all");
-const [activityNames, setActivityNames] = useState<string[]>([]);
+  const [selectedLegend, setSelectedLegend] = useState<string | null>("all");
+  const [activityNames, setActivityNames] = useState<string[]>([]);
 
   const [loading, setLoading] = useState(false);
   const [activityData, setActivityData] = useState<any[]>([]);
-  const [monthFilter, setMonthFilter] = useState<any>(null);
-  const [yearFilter, setYearFilter] = useState<any>(new Date().getFullYear());
+  
+  // Updated filter states to match bar_chart component
+  const [fromMonth, setFromMonth] = useState<any>("Jan");
+  const [toMonth, setToMonth] = useState<any>("Dec");
+  const [fromYear, setFromYear] = useState<any>(new Date().getFullYear());
+  const [toYear, setToYear] = useState<any>(new Date().getFullYear());
   const [activityName, setActivityName] = useState<string>("");
 
   const monthOptions = [
-    { label: "Jan", value: "Jan" }, { label: "Feb", value: "Feb" },
-    { label: "Mar", value: "Mar" }, { label: "Apr", value: "Apr" },
-    { label: "May", value: "May" }, { label: "Jun", value: "Jun" },
-    { label: "Jul", value: "Jul" }, { label: "Aug", value: "Aug" },
-    { label: "Sep", value: "Sep" }, { label: "Oct", value: "Oct" },
-    { label: "Nov", value: "Nov" }, { label: "Dec", value: "Dec" },
+    { label: "January", value: "Jan" }, { label: "February", value: "Feb" },
+    { label: "March", value: "Mar" }, { label: "April", value: "Apr" },
+    { label: "May", value: "May" }, { label: "June", value: "Jun" },
+    { label: "July", value: "Jul" }, { label: "August", value: "Aug" },
+    { label: "September", value: "Sep" }, { label: "October", value: "Oct" },
+    { label: "November", value: "Nov" }, { label: "December", value: "Dec" },
   ];
 
   const fetchActivityData = async () => {
@@ -49,14 +53,24 @@ const [activityNames, setActivityNames] = useState<string[]>([]);
 
     setLoading(true);
     try {
+      // Updated params to match bar_chart structure
+      const params = {
+        fromYear: fromYear,
+        toYear: toYear,
+        fromMonth: fromMonth,
+        toMonth: toMonth,
+        activityName: activityName
+      };
+
       const result = await props.uxpContext.executeAction(
         "carbon_reporting_80rr",
         "GetAllData",
-        { year: yearFilter, month: monthFilter, activityName: activityName },
+        params,
         { json: true }
       );
 
       console.log("Fetched emission data:", result);
+      console.log("Params sent:", params);
       
       const cleanedData = result?.map((row: any) => ({
         activity: row.activity,
@@ -164,6 +178,7 @@ const [activityNames, setActivityNames] = useState<string[]>([]);
     backgroundColor: color,
     display: 'inline-block'
   });
+
   const showAllSeries = () => {
     chartInstance.current?.series.forEach(s => s.show());
   };
@@ -174,6 +189,7 @@ const [activityNames, setActivityNames] = useState<string[]>([]);
       else s.hide();
     });
   };
+
   const exportToCSV = () => {
     if (!activityData.length) {
       toast.error("No data to export");
@@ -202,9 +218,10 @@ const [activityNames, setActivityNames] = useState<string[]>([]);
   
   const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions, monthlyEmissions } = calculateEmissions();
 
+  // Updated useEffect to use new filter states
   useEffect(() => {
     fetchActivityData();
-  }, [monthFilter, yearFilter, activityName]);
+  }, [fromMonth, toMonth, fromYear, toYear, activityName]);
 
   useEffect(() => {
     if (chartRef.current && Object.keys(monthlyEmissions).length > 0) {
@@ -216,14 +233,13 @@ const [activityNames, setActivityNames] = useState<string[]>([]);
         Object.values(monthlyEmissions).flatMap(monthData => Object.keys(monthData))
       ));
 
-// Filter based on selectedLegend
-        const filteredActivities = selectedLegend === "all"
-          ? activities
-          : activities.filter((a) => a === selectedLegend);
+      // Filter based on selectedLegend
+      const filteredActivities = selectedLegend === "all"
+        ? activities
+        : activities.filter((a) => a === selectedLegend);
 
-        // Create series for each filtered activity
-        const series: Highcharts.SeriesAreaOptions[] = filteredActivities.map((activity, index) => {
-
+      // Create series for each filtered activity
+      const series: Highcharts.SeriesAreaOptions[] = filteredActivities.map((activity, index) => {
         const isScope1 = activity.includes("Generator") || activity.includes("Refrigerant");
         const data = months.map(month => monthlyEmissions[month]?.[activity] || 0);
         
@@ -281,7 +297,7 @@ const [activityNames, setActivityNames] = useState<string[]>([]);
         yAxis: {
           min: 0,
           title: {
-            text: 'Carbon Emissions (kgCO₂e)',
+            text: 'Carbon Emissions (kgCOâ‚‚e)',
             style: {
               fontSize: '14px',
               fontWeight: 'bold',
@@ -304,13 +320,13 @@ const [activityNames, setActivityNames] = useState<string[]>([]);
           borderRadius: 8,
           shadow: true,
           headerFormat: '<b>{point.key}</b><br/>',
-          pointFormat: '<span style="color:{series.color}">●</span> {series.name}: <b>{point.y:.1f} kgCO₂e</b><br/>',
+          pointFormat: '<span style="color:{series.color}">â—</span> {series.name}: <b>{point.y:.1f} kgCOâ‚‚e</b><br/>',
           style: {
             fontSize: '12px'
           }
         },
         legend: {
-          enabled:false
+          enabled: false
         },
         plotOptions: {
           area: {
@@ -358,97 +374,124 @@ const [activityNames, setActivityNames] = useState<string[]>([]);
           }]
         }
       };
-      chartInstance.current = Highcharts.chart(chartRef.current, chartConfig); // Only once
-
+      chartInstance.current = Highcharts.chart(chartRef.current, chartConfig);
     }
   }, [activityData, monthlyEmissions, totalEmissions]);
 
   return (
     <WidgetWrapper>
-<TitleBar title="">
-  <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" }}>
-    <FilterPanel
-      onClear={() => {
-        setMonthFilter(null);
-        setYearFilter(new Date().getFullYear());
-        setActivityName("");
-      }}
-    >
-      <FormField>
-        <Label>Filter by Month</Label>
-        <Select
-          options={monthOptions}
-          selected={monthFilter}
-          onChange={(newMonth) => setMonthFilter(newMonth)}
-        />
-      </FormField>
+      <TitleBar title="">
+        <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" }}>
+          <FilterPanel
+            onClear={() => {
+              setFromMonth("Jan");
+              setToMonth("Dec");
+              setFromYear(new Date().getFullYear());
+              setToYear(new Date().getFullYear());
+              setActivityName("");
+            }}
+          >
+            {/* Date Range Filters - Same as bar_chart component */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "15px" }}>
+              <FormField>
+                <Label>From Month</Label>
+                <Select
+                  options={monthOptions}
+                  selected={fromMonth}
+                  onChange={(newMonth) => setFromMonth(newMonth)}
+                  placeholder="Select start month"
+                />
+              </FormField>
 
-      <FormField>
-        <Label>Filter by Year</Label>
-        <Input
-          type="number"
-          value={yearFilter}
-          onChange={(val) => setYearFilter(parseInt(val) || null)}
-        />
-      </FormField>
+              <FormField>
+                <Label>To Month</Label>
+                <Select
+                  options={monthOptions}
+                  selected={toMonth}
+                  onChange={(newMonth) => setToMonth(newMonth)}
+                  placeholder="Select end month"
+                />
+              </FormField>
+            </div>
 
-      <FormField>
-        <Label>Filter by Activity</Label>
-        <Input
-          value={activityName}
-          onChange={(val) => setActivityName(val)}
-          placeholder="Enter activity name"
-        />
-      </FormField>
-    </FilterPanel>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "15px" }}>
+              <FormField>
+                <Label>From Year</Label>
+                <Input
+                  type="number"
+                  value={fromYear || ""}
+                  onChange={(val) => setFromYear(parseInt(val) || null)}
+                  placeholder="Start year"
+                />
+              </FormField>
 
-    <Button
-                        icon='fas cloud-download-alt'
-                        title='Export'
-                        onClick={exportToCSV}
-                    />
-  </div>
-</TitleBar>
+              <FormField>
+                <Label>To Year</Label>
+                <Input
+                  type="number"
+                  value={toYear || ""}
+                  onChange={(val) => setToYear(parseInt(val) || null)}
+                  placeholder="End year"
+                />
+              </FormField>
+            </div>
+
+            <FormField>
+              <Label>Filter by Activity</Label>
+              <Input
+                value={activityName}
+                onChange={(val) => setActivityName(val)}
+                placeholder="Enter activity name"
+              />
+            </FormField>
+          </FilterPanel>
+
+          <Button
+            icon='fas cloud-download-alt'
+            title='Export'
+            onClick={exportToCSV}
+          />
+        </div>
+      </TitleBar>
 
       {activityData.length > 0 && (
-  <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
-    <div
-      style={legendItemStyle(selectedLegend === "all", "#888")}
-      onClick={() => {
-        setSelectedLegend("all");
-        showAllSeries();
-      }}
-    >
-      <span style={legendDotStyle("#888")}></span>
-      All
-    </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
+          <div
+            style={legendItemStyle(selectedLegend === "all", "#888")}
+            onClick={() => {
+              setSelectedLegend("all");
+              showAllSeries();
+            }}
+          >
+            <span style={legendDotStyle("#888")}></span>
+            All
+          </div>
 
-    {activityNames.map(name => {
-      const rawColor = chartInstance.current?.series.find(s => s.name === name)?.color;
-      const color = typeof rawColor === 'string' ? rawColor : "#ccc";
+          {activityNames.map(name => {
+            const rawColor = chartInstance.current?.series.find(s => s.name === name)?.color;
+            const color = typeof rawColor === 'string' ? rawColor : "#ccc";
 
-      return (
-        <div
-          key={name}
-          style={legendItemStyle(selectedLegend === name, color)}
-          onClick={() => {
-            setSelectedLegend(name);
-            showOnlySeries(name);
-          }}
-        >
-          <span style={legendDotStyle(color)}></span>
-          {name}
+            return (
+              <div
+                key={name}
+                style={legendItemStyle(selectedLegend === name, color)}
+                onClick={() => {
+                  setSelectedLegend(name);
+                  showOnlySeries(name);
+                }}
+              >
+                <span style={legendDotStyle(color)}></span>
+                {name}
+              </div>
+            );
+          })}
         </div>
-      );
-    })}
-  </div>
-)}
+      )}
 
       <div style={{ 
         width: '100%', 
         height: '100%', 
         padding: '20px', 
-        // backgroundColor: '#f8f9fa',
         fontFamily: 'Arial, sans-serif'
       }}>
         {/* Loading State */}
@@ -459,7 +502,6 @@ const [activityNames, setActivityNames] = useState<string[]>([]);
             color: '#7f8c8d',
             backgroundColor: 'white',
             borderRadius: '12px',
-            // boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
           }}>
             Loading emissions data...
           </div>
@@ -473,7 +515,6 @@ const [activityNames, setActivityNames] = useState<string[]>([]);
             color: '#7f8c8d',
             backgroundColor: 'white',
             borderRadius: '12px',
-            // boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
           }}>
             No emission data found for the selected filters.
           </div>
@@ -489,8 +530,6 @@ const [activityNames, setActivityNames] = useState<string[]>([]);
               minHeight: '500px',
               backgroundColor: 'white',
               borderRadius: '12px',
-              // boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              // border: '1px solid #e9ecef'
             }}
           />
         )}

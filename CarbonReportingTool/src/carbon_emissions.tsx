@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import Highcharts from 'highcharts';
 import { WidgetWrapper, TitleBar, FilterPanel, FormField, Select, Input, Label, useToast, Button } from "uxp/components";
 import { IContextProvider } from "./uxp";
@@ -22,17 +22,21 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
   
   const [loading, setLoading] = useState(false);
   const [activityData, setActivityData] = useState<any[]>([]);
-  const [monthFilter, setMonthFilter] = useState<any>(null);
-  const [yearFilter, setYearFilter] = useState<any>(new Date().getFullYear()); // Current year as default
+  
+  // Updated filter states for date ranges
+  const [fromMonth, setFromMonth] = useState<any>("Jan");
+  const [toMonth, setToMonth] = useState<any>("Dec");
+  const [fromYear, setFromYear] = useState<any>(new Date().getFullYear());
+  const [toYear, setToYear] = useState<any>(new Date().getFullYear());
   const [activityName, setActivityName] = useState<string>("");
 
   const monthOptions = [
-    { label: "Jan", value: "Jan" }, { label: "Feb", value: "Feb" },
-    { label: "Mar", value: "Mar" }, { label: "Apr", value: "Apr" },
-    { label: "May", value: "May" }, { label: "Jun", value: "Jun" },
-    { label: "Jul", value: "Jul" }, { label: "Aug", value: "Aug" },
-    { label: "Sep", value: "Sep" }, { label: "Oct", value: "Oct" },
-    { label: "Nov", value: "Nov" }, { label: "Dec", value: "Dec" },
+    { label: "January", value: "Jan" }, { label: "February", value: "Feb" },
+    { label: "March", value: "Mar" }, { label: "April", value: "Apr" },
+    { label: "May", value: "May" }, { label: "June", value: "Jun" },
+    { label: "July", value: "Jul" }, { label: "August", value: "Aug" },
+    { label: "September", value: "Sep" }, { label: "October", value: "Oct" },
+    { label: "November", value: "Nov" }, { label: "December", value: "Dec" },
   ];
 
   const fetchActivityData = async () => {
@@ -43,7 +47,13 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
       const result = await props.uxpContext.executeAction(
         "carbon_reporting_80rr",
         "GetAllData",
-        { year: yearFilter, month: monthFilter, activityName: activityName },
+        { 
+          fromYear: fromYear,
+          toYear: toYear, 
+          fromMonth: fromMonth, 
+          toMonth: toMonth, 
+          activityName: activityName 
+        },
         { json: true }
       );
 
@@ -56,10 +66,15 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
         value: parseFloat(row.value)
       })) || [];
 
-      setActivityData(cleanedData);
+      // Small delay to ensure state update completes
+      setTimeout(() => {
+        setActivityData(cleanedData);
+      }, 10);
+      
     } catch (error: any) {
       console.error("Error loading emission data:", error);
       toast.error("Failed to load activity data.");
+      setActivityData([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -150,15 +165,67 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
     document.body.removeChild(link);
   };
 
-  // Get calculated emissions (recalculates when activityData changes)
-  const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions } = calculateEmissions();
-
   useEffect(() => {
     fetchActivityData();
-  }, [monthFilter, yearFilter, activityName]);
+  }, [fromMonth, toMonth, fromYear, toYear, activityName, props.uxpContext]);
 
+  // Move calculateEmissions inside useEffect to ensure it uses fresh data
   useEffect(() => {
     const chart = chartRef.current;
+    
+    // Calculate emissions fresh with current activityData
+    const calculateEmissionsForChart = () => {
+      if (activityData.length === 0) {
+        return { 
+          dynamicEmissionData: [], 
+          scope1Total: 0, 
+          scope2Total: 0, 
+          totalEmissions: 0 
+        };
+      }
+
+      const emissionsByActivity: { [key: string]: number } = {};
+      
+      // Group and sum values by activity from real API data
+      activityData.forEach(item => {
+        if (!emissionsByActivity[item.activity]) {
+          emissionsByActivity[item.activity] = 0;
+        }
+        emissionsByActivity[item.activity] += item.value;
+      });
+
+      // Apply emission factors to calculate real CO2e emissions
+      const dynamicEmissionData = Object.keys(emissionsByActivity).map(activity => {
+        const totalActivityValue = emissionsByActivity[activity];
+        const emissionFactor = emissionFactors[activity] || 0;
+        const calculatedCO2e = totalActivityValue * emissionFactor;
+        
+        const isScope1 = activity.includes("Generator") || activity.includes("Refrigerant");
+        
+        return {
+          source: activity,
+          totalCO2e: calculatedCO2e,
+          scope: isScope1 ? 1 : 2,
+          category: isScope1 ? "Scope 1" : "Scope 2"
+        };
+      });
+
+      // Calculate scope totals from dynamic data
+      const scope1Total = dynamicEmissionData
+        .filter(item => item.scope === 1)
+        .reduce((sum, item) => sum + item.totalCO2e, 0);
+
+      const scope2Total = dynamicEmissionData
+        .filter(item => item.scope === 2)
+        .reduce((sum, item) => sum + item.totalCO2e, 0);
+
+      const totalEmissions = scope1Total + scope2Total;
+
+      return { dynamicEmissionData, scope1Total, scope2Total, totalEmissions };
+    };
+
+    const { dynamicEmissionData, scope1Total, scope2Total, totalEmissions } = calculateEmissionsForChart();
+    
     if (chart) {
       // Prepare scope data for outer donut ring
     // A helper function to find the chart instance
@@ -354,7 +421,12 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
       // Create the dynamic chart
       Highcharts.chart(chartRef.current, chartConfig);
     }
-  }, [activityData, dynamicEmissionData, scope1Total, scope2Total, totalEmissions]);
+  }, [activityData]); // Only depend on activityData changes
+
+  // Get calculated emissions using useMemo to prevent unnecessary recalculations
+  const { dynamicEmissionData: memoizedEmissionData, scope1Total, scope2Total, totalEmissions } = useMemo(() => {
+    return calculateEmissions();
+  }, [activityData]);
 
   return (
     <WidgetWrapper>
@@ -362,28 +434,57 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
       <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" }}>
         <FilterPanel
           onClear={() => {
-            setMonthFilter(null);
-            setYearFilter(new Date().getFullYear());
+            setFromMonth(null);
+            setToMonth(null);
+            setFromYear(null);
+            setToYear(null);
             setActivityName("");
           }}
         >
-          <FormField>
-            <Label>Filter by Month</Label>
-            <Select
-              options={monthOptions}
-              selected={monthFilter}
-              onChange={(newMonth) => setMonthFilter(newMonth)}
-            />
-          </FormField>
+          {/* Date Range Filters */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "15px" }}>
+            <FormField>
+              <Label>From Month</Label>
+              <Select
+                options={monthOptions}
+                selected={fromMonth}
+                onChange={(newMonth) => setFromMonth(newMonth)}
+                placeholder="Select start month"
+              />
+            </FormField>
 
-          <FormField>
-            <Label>Filter by Year</Label>
-            <Input
-              type="number"
-              value={yearFilter}
-              onChange={(val) => setYearFilter(parseInt(val) || null)}
-            />
-          </FormField>
+            <FormField>
+              <Label>To Month</Label>
+              <Select
+                options={monthOptions}
+                selected={toMonth}
+                onChange={(newMonth) => setToMonth(newMonth)}
+                placeholder="Select end month"
+              />
+            </FormField>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "15px" }}>
+            <FormField>
+              <Label>From Year</Label>
+              <Input
+                type="number"
+                value={fromYear || ""}
+                onChange={(val) => setFromYear(parseInt(val) || null)}
+                placeholder="Start year"
+              />
+            </FormField>
+
+            <FormField>
+              <Label>To Year</Label>
+              <Input
+                type="number"
+                value={toYear || ""}
+                onChange={(val) => setToYear(parseInt(val) || null)}
+                placeholder="End year"
+              />
+            </FormField>
+          </div>
 
           <FormField>
             <Label>Filter by Activity</Label>
@@ -395,10 +496,10 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
           </FormField>
         </FilterPanel>
         <Button
-                        icon='fas cloud-download-alt'
-                        title='Export'
-                        onClick={exportToCSV}
-                    />
+          icon='fas cloud-download-alt'
+          title='Export'
+          onClick={exportToCSV}
+        />
         </div>
       </TitleBar>
 

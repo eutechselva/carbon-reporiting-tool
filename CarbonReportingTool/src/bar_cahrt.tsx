@@ -2,11 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import Highcharts, { SeriesColumnOptions, Chart } from 'highcharts';
 import {
   Button,
-  DateRangePicker,
-  FilterPanel, FormField, Input, Label, Select, TitleBar, WidgetWrapper, toDate, useToast
+  FilterPanel, FormField, Input, Label, Select, TitleBar, WidgetWrapper, useToast
 } from "uxp/components";
 import { IContextProvider } from "./uxp";
-import { getEndDate, getStartDate } from './utils';
 
 export interface IWidgetProps {
   uxpContext?: IContextProvider;
@@ -30,33 +28,41 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
   const toast = useToast();
 
   const [activityData, setActivityData] = useState([]);
-  const [monthFilter, setMonthFilter] = useState<any>(null);
-  const [yearFilter, setYearFilter] = useState<any>(new Date().getFullYear());
-  const [activityName, setActivityName] = useState<any>("");
+  
+  // Updated filter states to match carbon emissions component with current year defaults
+  const [fromMonth, setFromMonth] = useState<any>("Jan");
+  const [toMonth, setToMonth] = useState<any>("Dec");
+  const [fromYear, setFromYear] = useState<any>(new Date().getFullYear());
+  const [toYear, setToYear] = useState<any>(new Date().getFullYear());
+  const [activityName, setActivityName] = useState<string>("");
+  
   const [activityNames, setActivityNames] = useState<string[]>([]); // 🔧 for custom legend
 
-  const monthOptions = Object.keys(monthOrder).map(m => ({ label: m, value: m }));
+  const monthOptions = [
+    { label: "January", value: "Jan" }, { label: "February", value: "Feb" },
+    { label: "March", value: "Mar" }, { label: "April", value: "Apr" },
+    { label: "May", value: "May" }, { label: "June", value: "Jun" },
+    { label: "July", value: "Jul" }, { label: "August", value: "Aug" },
+    { label: "September", value: "Sep" }, { label: "October", value: "Oct" },
+    { label: "November", value: "Nov" }, { label: "December", value: "Dec" },
+  ];
+  
   const [selectedLegend, setSelectedLegend] = useState<string | null>("all");
 
-  const [startDate, setStartDate] = React.useState<Date | string | null>(null);
-  const [endDate, setEndDate] = React.useState<Date | string | null>(null);
   const fetchActivityData = async () => {
     try {
-          const params: any = {
-      year: yearFilter,
-      month: monthFilter,
-      activityName
-    };
+      const params: any = {
+        fromYear: fromYear,
+        toYear: toYear,
+        fromMonth: fromMonth,
+        toMonth: toMonth,
+        activityName: activityName
+      };
 
-    // 🔧 Only add when both selected
-    if (startDate && endDate) {
-      params.startDate = getStartDate(toDate(startDate));
-      params.endDate = getEndDate(toDate(endDate));
-    }
       const result = await props.uxpContext?.executeAction(
         "carbon_reporting_80rr",
         "GetAllData",
-         params,
+        params,
         { json: true }
       );
       // 👀 Debug log raw backend response
@@ -87,6 +93,7 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
       toast.error("Failed to load data");
     }
   };
+
   const exportToCSV = () => {
     if (!activityData.length) {
       toast.error("No data to export");
@@ -113,6 +120,7 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
     link.click();
     document.body.removeChild(link);
   };
+
   const legendItemStyle = (active: boolean, color: string): React.CSSProperties => ({
     display: 'flex',
     alignItems: 'center',
@@ -135,12 +143,10 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
     display: 'inline-block'
   });
 
-useEffect(() => {
-  
+  // Updated useEffect to use new filter states
+  useEffect(() => {
     fetchActivityData();
-  
-}, [monthFilter, yearFilter, activityName, startDate, endDate]);
-  useEffect(() => { fetchActivityData(); }, [monthFilter, yearFilter, activityName]);
+  }, [fromMonth, toMonth, fromYear, toYear, activityName]);
 
   useEffect(() => {
     if (!chartRef.current) return;
@@ -280,81 +286,108 @@ useEffect(() => {
   return (
     <WidgetWrapper>
       <TitleBar title="">
-      <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" }}>
-        <FilterPanel onClear={() => {
-          setMonthFilter(null);
-          setYearFilter(new Date().getFullYear());
-          setActivityName("");
-          setStartDate(null);   // 🔧 clear date range
-          setEndDate(null);
-        }}>
-          <FormField>
-            <Label>Month</Label>
-            <Select options={monthOptions} selected={monthFilter} onChange={(val) => setMonthFilter(val)} />
-          </FormField>
-          <FormField>
-            <Label>Year</Label>
-            <Input type="number" value={yearFilter} onChange={(val) => setYearFilter(parseInt(val) || null)} />
-          </FormField>
-          <FormField>
-            <DateRangePicker
-                title="date range"
-                startDate={startDate || ''}
-                endDate={endDate || ''}
-                onChange={(s, e, pr) => {
-                    setStartDate(s);
-                    setEndDate(e);
-                }}
-                presets={{
-                    enable: false
-                }}
-                renderAsPill={{
-                    minWidth: 320
-                }}
-            />
-          </FormField>
-        </FilterPanel>
-        <Button
-                        icon='fas cloud-download-alt'
-                        title='Export'
-                        onClick={exportToCSV}
-                    />
+        <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" }}>
+          <FilterPanel onClear={() => {
+            setFromMonth("Jan");
+            setToMonth("Dec");
+            setFromYear(new Date().getFullYear());
+            setToYear(new Date().getFullYear());
+            setActivityName("");
+          }}>
+            {/* Date Range Filters - Same as carbon emissions component */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "15px" }}>
+              <FormField>
+                <Label>From Month</Label>
+                <Select
+                  options={monthOptions}
+                  selected={fromMonth}
+                  onChange={(newMonth) => setFromMonth(newMonth)}
+                  placeholder="Select start month"
+                />
+              </FormField>
+
+              <FormField>
+                <Label>To Month</Label>
+                <Select
+                  options={monthOptions}
+                  selected={toMonth}
+                  onChange={(newMonth) => setToMonth(newMonth)}
+                  placeholder="Select end month"
+                />
+              </FormField>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "15px" }}>
+              <FormField>
+                <Label>From Year</Label>
+                <Input
+                  type="number"
+                  value={fromYear || ""}
+                  onChange={(val) => setFromYear(parseInt(val) || null)}
+                  placeholder="Start year"
+                />
+              </FormField>
+
+              <FormField>
+                <Label>To Year</Label>
+                <Input
+                  type="number"
+                  value={toYear || ""}
+                  onChange={(val) => setToYear(parseInt(val) || null)}
+                  placeholder="End year"
+                />
+              </FormField>
+            </div>
+
+            <FormField>
+              <Label>Filter by Activity</Label>
+              <Input
+                value={activityName}
+                onChange={(val) => setActivityName(val)}
+                placeholder="Enter activity name"
+              />
+            </FormField>
+          </FilterPanel>
+          <Button
+            icon='fas cloud-download-alt'
+            title='Export'
+            onClick={exportToCSV}
+          />
         </div>
       </TitleBar>
 
       {/* 🔧 Custom Legend */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
-  <div
-    style={legendItemStyle(selectedLegend === "all", "#888")}
-    onClick={() => {
-      setSelectedLegend("all");
-      showAllSeries();
-    }}
-  >
-    <span style={legendDotStyle("#888")}></span>
-    All
-  </div>
+        <div
+          style={legendItemStyle(selectedLegend === "all", "#888")}
+          onClick={() => {
+            setSelectedLegend("all");
+            showAllSeries();
+          }}
+        >
+          <span style={legendDotStyle("#888")}></span>
+          All
+        </div>
 
-  {activityNames.map((name, idx) => {
-  const rawColor = chartInstance.current?.series.find(s => s.name === name)?.color;
-  const color = typeof rawColor === 'string' ? rawColor : "#ccc";
+        {activityNames.map((name, idx) => {
+          const rawColor = chartInstance.current?.series.find(s => s.name === name)?.color;
+          const color = typeof rawColor === 'string' ? rawColor : "#ccc";
 
-    return (
-      <div
-        key={name}
-        style={legendItemStyle(selectedLegend === name, color)}
-        onClick={() => {
-          setSelectedLegend(name);
-          showOnlySeries(name);
-        }}
-      >
-        <span style={legendDotStyle(color)}></span>
-        {name}
+          return (
+            <div
+              key={name}
+              style={legendItemStyle(selectedLegend === name, color)}
+              onClick={() => {
+                setSelectedLegend(name);
+                showOnlySeries(name);
+              }}
+            >
+              <span style={legendDotStyle(color)}></span>
+              {name}
+            </div>
+          );
+        })}
       </div>
-    );
-  })}
-</div>
-
 
       <div style={{ width: '100%', height: '100%', padding: '20px' }}>
         <div
