@@ -62,6 +62,7 @@ const AllData: React.FunctionComponent<IWidgetProps> = (props) => {
   const [monthFilter, setMonthFilter] = useState<any>(null);
   const [yearFilter, setYearFilter] = useState<any>(new Date().getFullYear());
   const [activityName, setActivityName] = useState<string>("");
+    const [availableActivities, setAvailableActivities] = useState<string[]>([]); // 🆕 for dropdown options
 
   const monthOptions = [
     { label: "Jan", value: "Jan" }, { label: "Feb", value: "Feb" },
@@ -71,7 +72,21 @@ const AllData: React.FunctionComponent<IWidgetProps> = (props) => {
     { label: "Sep", value: "Sep" }, { label: "Oct", value: "Oct" },
     { label: "Nov", value: "Nov" }, { label: "Dec", value: "Dec" },
   ];
-
+  // 🆕 Fetch available activities for dropdown
+  const fetchAvailableActivities = async () => {
+    try {
+      const result = await props.uxpContext?.executeAction(
+        "carbon_reporting_80rr",
+        "getAllActivities",
+        {},
+        { json: true }
+      );
+      console.log("Available activities:", result);
+      setAvailableActivities(result || []);
+    } catch (error) {
+      console.error("Error fetching activities:", error);
+    }
+  };
   const fetchActivityData = async () => {
     if (!props.uxpContext) return;
 
@@ -134,7 +149,10 @@ const AllData: React.FunctionComponent<IWidgetProps> = (props) => {
   };
   useEffect(() => {
     fetchActivityData();
-  }, [monthFilter, yearFilter]);
+  }, [monthFilter, yearFilter,activityName]);
+  useEffect(() => {
+  fetchAvailableActivities();
+}, []);
 
   useEffect(() => {
     if (!chartRef.current) return;
@@ -236,7 +254,14 @@ const AllData: React.FunctionComponent<IWidgetProps> = (props) => {
 
     chartInstance.current = Highcharts.chart(chartRef.current, chartConfig);
   }, [activityData]);
-
+  // 🆕 Convert activities array to Select options with "All" as default
+  const activityOptions = [
+    { label: "All Activities", value: "" },
+    ...availableActivities.map(activity => ({
+      label: activity,
+      value: activity
+    }))
+  ];
   return (
     <WidgetWrapper>
       <TitleBar title="">
@@ -261,6 +286,15 @@ const AllData: React.FunctionComponent<IWidgetProps> = (props) => {
               onChange={(val) => setYearFilter(parseInt(val) || null)}
             />
           </FormField>
+                      <FormField>
+                        <Label>Filter by Activity</Label>
+                        <Select
+                          options={activityOptions}
+                          selected={activityName}
+                          onChange={(val) => setActivityName(val)}
+                          placeholder="Select activity"
+                        />
+                      </FormField>
         </FilterPanel>
                     <Button
                         icon='fas cloud-download-alt'

@@ -38,7 +38,7 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
   const [fromYear, setFromYear] = useState<any>(new Date().getFullYear());
   const [toYear, setToYear] = useState<any>(new Date().getFullYear());
   const [activityName, setActivityName] = useState<string>("");
-
+  const [availableActivities, setAvailableActivities] = useState<string[]>([]); // 🆕 for dropdown options
   const monthOptions = [
     { label: "January", value: "Jan" }, { label: "February", value: "Feb" },
     { label: "March", value: "Mar" }, { label: "April", value: "Apr" },
@@ -47,7 +47,25 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
     { label: "September", value: "Sep" }, { label: "October", value: "Oct" },
     { label: "November", value: "Nov" }, { label: "December", value: "Dec" },
   ];
-
+    // 🆕 Fetch available activities for dropdown
+  const fetchAvailableActivities = async () => {
+    try {
+      const result = await props.uxpContext?.executeAction(
+        "carbon_reporting_80rr",
+        "getAllActivities",
+        {},
+        { json: true }
+      );
+      console.log("Available activities:", result);
+      setAvailableActivities(result || []);
+    } catch (error) {
+      console.error("Error fetching activities:", error);
+    }
+  };
+    // 🆕 Load activities on component mount
+    useEffect(() => {
+      fetchAvailableActivities();
+    }, []);
   const fetchActivityData = async () => {
     if (!props.uxpContext) return;
 
@@ -377,7 +395,14 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
       chartInstance.current = Highcharts.chart(chartRef.current, chartConfig);
     }
   }, [activityData, monthlyEmissions, totalEmissions]);
-
+  // 🆕 Convert activities array to Select options with "All" as default
+  const activityOptions = [
+    { label: "All Activities", value: "" },
+    ...availableActivities.map(activity => ({
+      label: activity,
+      value: activity
+    }))
+  ];
   return (
     <WidgetWrapper>
       <TitleBar title="">
@@ -438,10 +463,11 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
 
             <FormField>
               <Label>Filter by Activity</Label>
-              <Input
-                value={activityName}
+              <Select
+                options={activityOptions}
+                selected={activityName}
                 onChange={(val) => setActivityName(val)}
-                placeholder="Enter activity name"
+                placeholder="Select activity"
               />
             </FormField>
           </FilterPanel>

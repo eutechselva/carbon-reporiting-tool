@@ -27,7 +27,26 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
   const [activityData, setActivityData] = useState<any[]>([]);
   const [yearFilter, setYearFilter] = useState<any>(null);
   const [activityName, setActivityName] = useState<string>("");
-
+  const [availableActivities, setAvailableActivities] = useState<string[]>([]); // 🆕 for dropdown options
+    // 🆕 Fetch available activities for dropdown
+  const fetchAvailableActivities = async () => {
+    try {
+      const result = await props.uxpContext?.executeAction(
+        "carbon_reporting_80rr",
+        "getAllActivities",
+        {},
+        { json: true }
+      );
+      console.log("Available activities:", result);
+      setAvailableActivities(result || []);
+    } catch (error) {
+      console.error("Error fetching activities:", error);
+    }
+  };
+    // 🆕 Load activities on component mount
+    useEffect(() => {
+      fetchAvailableActivities();
+    }, []);
   const fetchActivityData = async () => {
     if (!props.uxpContext) return;
 
@@ -322,7 +341,14 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
       chartInstance.current = Highcharts.chart(chartRef.current, chartConfig);
     }
   }, [annualData, totalEmissions, selectedLegend]);
-
+  // 🆕 Convert activities array to Select options with "All" as default
+  const activityOptions = [
+    { label: "All Activities", value: "" },
+    ...availableActivities.map(activity => ({
+      label: activity,
+      value: activity
+    }))
+  ];
   return (
     <WidgetWrapper>
 
@@ -344,14 +370,16 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
             />
           </FormField>
 
-          <FormField>
-            <Label>Filter by Activity</Label>
-            <Input
-              value={activityName}
-              onChange={(val) => setActivityName(val)}
-              placeholder="Enter activity name"
-            />
-          </FormField>
+
+                      <FormField>
+                        <Label>Filter by Activity</Label>
+                        <Select
+                          options={activityOptions}
+                          selected={activityName}
+                          onChange={(val) => setActivityName(val)}
+                          placeholder="Select activity"
+                        />
+                      </FormField>
         </FilterPanel>
         <Button
                         icon='fas cloud-download-alt'

@@ -22,7 +22,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
   
   const [loading, setLoading] = useState(false);
   const [activityData, setActivityData] = useState<any[]>([]);
-  
+      const [availableActivities, setAvailableActivities] = useState<string[]>([]); // 🆕 for dropdown options
   // Updated filter states for date ranges
   const [fromMonth, setFromMonth] = useState<any>("Jan");
   const [toMonth, setToMonth] = useState<any>("Dec");
@@ -38,7 +38,21 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
     { label: "September", value: "Sep" }, { label: "October", value: "Oct" },
     { label: "November", value: "Nov" }, { label: "December", value: "Dec" },
   ];
-
+  // 🆕 Fetch available activities for dropdown
+  const fetchAvailableActivities = async () => {
+    try {
+      const result = await props.uxpContext?.executeAction(
+        "carbon_reporting_80rr",
+        "getAllActivities",
+        {},
+        { json: true }
+      );
+      console.log("Available activities:", result);
+      setAvailableActivities(result || []);
+    } catch (error) {
+      console.error("Error fetching activities:", error);
+    }
+  };
   const fetchActivityData = async () => {
     if (!props.uxpContext) return;
 
@@ -168,7 +182,9 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
   useEffect(() => {
     fetchActivityData();
   }, [fromMonth, toMonth, fromYear, toYear, activityName, props.uxpContext]);
-
+  useEffect(() => {
+  fetchAvailableActivities();
+}, []);
   // Move calculateEmissions inside useEffect to ensure it uses fresh data
   useEffect(() => {
     const chart = chartRef.current;
@@ -427,7 +443,14 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
   const { dynamicEmissionData: memoizedEmissionData, scope1Total, scope2Total, totalEmissions } = useMemo(() => {
     return calculateEmissions();
   }, [activityData]);
-
+  // 🆕 Convert activities array to Select options with "All" as default
+  const activityOptions = [
+    { label: "All Activities", value: "" },
+    ...availableActivities.map(activity => ({
+      label: activity,
+      value: activity
+    }))
+  ];
   return (
     <WidgetWrapper>
       <TitleBar title="">
@@ -486,14 +509,15 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
             </FormField>
           </div>
 
-          <FormField>
-            <Label>Filter by Activity</Label>
-            <Input
-              value={activityName}
-              onChange={(val) => setActivityName(val)}
-              placeholder="Enter activity name"
-            />
-          </FormField>
+                      <FormField>
+                        <Label>Filter by Activity</Label>
+                        <Select
+                          options={activityOptions}
+                          selected={activityName}
+                          onChange={(val) => setActivityName(val)}
+                          placeholder="Select activity"
+                        />
+                      </FormField>
         </FilterPanel>
         <Button
           icon='fas cloud-download-alt'
