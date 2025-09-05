@@ -568,6 +568,23 @@ const AnnualCarbonEmissionChart = (props) => {
     const [activityData, setActivityData] = (0, react_1.useState)([]);
     const [yearFilter, setYearFilter] = (0, react_1.useState)(null);
     const [activityName, setActivityName] = (0, react_1.useState)("");
+    const [availableActivities, setAvailableActivities] = (0, react_1.useState)([]); // 🆕 for dropdown options
+    // 🆕 Fetch available activities for dropdown
+    const fetchAvailableActivities = () => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
+        try {
+            const result = yield ((_a = props.uxpContext) === null || _a === void 0 ? void 0 : _a.executeAction("carbon_reporting_80rr", "getAllActivities", {}, { json: true }));
+            console.log("Available activities:", result);
+            setAvailableActivities(result || []);
+        }
+        catch (error) {
+            console.error("Error fetching activities:", error);
+        }
+    });
+    // 🆕 Load activities on component mount
+    (0, react_1.useEffect)(() => {
+        fetchAvailableActivities();
+    }, []);
     const fetchActivityData = () => __awaiter(void 0, void 0, void 0, function* () {
         if (!props.uxpContext)
             return;
@@ -839,6 +856,14 @@ const AnnualCarbonEmissionChart = (props) => {
             chartInstance.current = highcharts_1.default.chart(chartRef.current, chartConfig);
         }
     }, [annualData, totalEmissions, selectedLegend]);
+    // 🆕 Convert activities array to Select options with "All" as default
+    const activityOptions = [
+        { label: "All Activities", value: "" },
+        ...availableActivities.map(activity => ({
+            label: activity,
+            value: activity
+        }))
+    ];
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
         react_1.default.createElement(components_1.TitleBar, { title: "" },
             react_1.default.createElement("div", { style: { display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" } },
@@ -851,7 +876,7 @@ const AnnualCarbonEmissionChart = (props) => {
                         react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter || "", onChange: (val) => setYearFilter(val ? parseInt(val) : null), placeholder: "Enter year" })),
                     react_1.default.createElement(components_1.FormField, null,
                         react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
-                        react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" }))),
+                        react_1.default.createElement(components_1.Select, { options: activityOptions, selected: activityName, onChange: (val) => setActivityName(val), placeholder: "Select activity" }))),
                 react_1.default.createElement(components_1.Button, { icon: 'fas cloud-download-alt', title: 'Export', onClick: exportToCSV }))),
         annualData.length > 0 && (react_1.default.createElement("div", { className: "annual-carbon-chart__legend" },
             react_1.default.createElement("div", { className: `annual-carbon-chart__legend-item ${selectedLegend === "all" ? 'annual-carbon-chart__legend-item--active scope-all' : ''}`, onClick: () => {
@@ -959,6 +984,7 @@ const ESGAreaChart = (props) => {
     const [fromYear, setFromYear] = (0, react_1.useState)(new Date().getFullYear());
     const [toYear, setToYear] = (0, react_1.useState)(new Date().getFullYear());
     const [activityName, setActivityName] = (0, react_1.useState)("");
+    const [availableActivities, setAvailableActivities] = (0, react_1.useState)([]); // 🆕 for dropdown options
     const monthOptions = [
         { label: "January", value: "Jan" }, { label: "February", value: "Feb" },
         { label: "March", value: "Mar" }, { label: "April", value: "Apr" },
@@ -967,6 +993,22 @@ const ESGAreaChart = (props) => {
         { label: "September", value: "Sep" }, { label: "October", value: "Oct" },
         { label: "November", value: "Nov" }, { label: "December", value: "Dec" },
     ];
+    // 🆕 Fetch available activities for dropdown
+    const fetchAvailableActivities = () => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
+        try {
+            const result = yield ((_a = props.uxpContext) === null || _a === void 0 ? void 0 : _a.executeAction("carbon_reporting_80rr", "getAllActivities", {}, { json: true }));
+            console.log("Available activities:", result);
+            setAvailableActivities(result || []);
+        }
+        catch (error) {
+            console.error("Error fetching activities:", error);
+        }
+    });
+    // 🆕 Load activities on component mount
+    (0, react_1.useEffect)(() => {
+        fetchAvailableActivities();
+    }, []);
     const fetchActivityData = () => __awaiter(void 0, void 0, void 0, function* () {
         if (!props.uxpContext)
             return;
@@ -1256,6 +1298,14 @@ const ESGAreaChart = (props) => {
             chartInstance.current = highcharts_1.default.chart(chartRef.current, chartConfig);
         }
     }, [activityData, monthlyEmissions, totalEmissions]);
+    // 🆕 Convert activities array to Select options with "All" as default
+    const activityOptions = [
+        { label: "All Activities", value: "" },
+        ...availableActivities.map(activity => ({
+            label: activity,
+            value: activity
+        }))
+    ];
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
         react_1.default.createElement(components_1.TitleBar, { title: "" },
             react_1.default.createElement("div", { style: { display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" } },
@@ -1282,7 +1332,7 @@ const ESGAreaChart = (props) => {
                             react_1.default.createElement(components_1.Input, { type: "number", value: toYear || "", onChange: (val) => setToYear(parseInt(val) || null), placeholder: "End year" }))),
                     react_1.default.createElement(components_1.FormField, null,
                         react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
-                        react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" }))),
+                        react_1.default.createElement(components_1.Select, { options: activityOptions, selected: activityName, onChange: (val) => setActivityName(val), placeholder: "Select activity" }))),
                 react_1.default.createElement(components_1.Button, { icon: 'fas cloud-download-alt', title: 'Export', onClick: exportToCSV }))),
         activityData.length > 0 && (react_1.default.createElement("div", { style: { display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' } },
             react_1.default.createElement("div", { style: legendItemStyle(selectedLegend === "all", "#888"), onClick: () => {
@@ -1654,6 +1704,7 @@ const ESGStackedBarChart = (props) => {
     const [monthFilter, setMonthFilter] = (0, react_1.useState)(null);
     const [yearFilter, setYearFilter] = (0, react_1.useState)(new Date().getFullYear());
     const [activityName, setActivityName] = (0, react_1.useState)("");
+    const [availableActivities, setAvailableActivities] = (0, react_1.useState)([]); // 🆕 for dropdown options
     const monthOptions = [
         { label: "Jan", value: "Jan" }, { label: "Feb", value: "Feb" },
         { label: "Mar", value: "Mar" }, { label: "Apr", value: "Apr" },
@@ -1662,6 +1713,22 @@ const ESGStackedBarChart = (props) => {
         { label: "Sep", value: "Sep" }, { label: "Oct", value: "Oct" },
         { label: "Nov", value: "Nov" }, { label: "Dec", value: "Dec" },
     ];
+    // 🆕 Fetch available activities for dropdown
+    const fetchAvailableActivities = () => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
+        try {
+            const result = yield ((_a = props.uxpContext) === null || _a === void 0 ? void 0 : _a.executeAction("carbon_reporting_80rr", "getAllActivities", {}, { json: true }));
+            console.log("Available activities:", result);
+            setAvailableActivities(result || []);
+        }
+        catch (error) {
+            console.error("Error fetching activities:", error);
+        }
+    });
+    // 🆕 Load activities on component mount
+    (0, react_1.useEffect)(() => {
+        fetchAvailableActivities();
+    }, []);
     const fetchActivityData = () => __awaiter(void 0, void 0, void 0, function* () {
         if (!props.uxpContext)
             return;
@@ -1934,6 +2001,14 @@ const ESGStackedBarChart = (props) => {
             chartInstance.current = highcharts_1.default.chart(chartRef.current, chartConfig);
         }
     }, [activityData, monthlyEmissions, totalEmissions, selectedLegend]);
+    // 🆕 Convert activities array to Select options with "All" as default
+    const activityOptions = [
+        { label: "All Activities", value: "" },
+        ...availableActivities.map(activity => ({
+            label: activity,
+            value: activity
+        }))
+    ];
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
         react_1.default.createElement(components_1.TitleBar, { title: "" },
             react_1.default.createElement("div", { style: { display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" } },
@@ -1950,7 +2025,7 @@ const ESGStackedBarChart = (props) => {
                         react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) })),
                     react_1.default.createElement(components_1.FormField, null,
                         react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
-                        react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" }))),
+                        react_1.default.createElement(components_1.Select, { options: activityOptions, selected: activityName, onChange: (val) => setActivityName(val), placeholder: "Select activity" }))),
                 react_1.default.createElement(components_1.Button, { icon: 'fas cloud-download-alt', title: 'Export', onClick: exportToCSV }))),
         activityData.length > 0 && (react_1.default.createElement("div", { style: { display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' } },
             react_1.default.createElement("div", { style: legendItemStyle(selectedLegend === "all", "#888"), onClick: () => {
@@ -2087,6 +2162,7 @@ const AllData = (props) => {
     const [monthFilter, setMonthFilter] = (0, react_1.useState)(null);
     const [yearFilter, setYearFilter] = (0, react_1.useState)(new Date().getFullYear());
     const [activityName, setActivityName] = (0, react_1.useState)("");
+    const [availableActivities, setAvailableActivities] = (0, react_1.useState)([]); // 🆕 for dropdown options
     const monthOptions = [
         { label: "Jan", value: "Jan" }, { label: "Feb", value: "Feb" },
         { label: "Mar", value: "Mar" }, { label: "Apr", value: "Apr" },
@@ -2095,6 +2171,18 @@ const AllData = (props) => {
         { label: "Sep", value: "Sep" }, { label: "Oct", value: "Oct" },
         { label: "Nov", value: "Nov" }, { label: "Dec", value: "Dec" },
     ];
+    // 🆕 Fetch available activities for dropdown
+    const fetchAvailableActivities = () => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
+        try {
+            const result = yield ((_a = props.uxpContext) === null || _a === void 0 ? void 0 : _a.executeAction("carbon_reporting_80rr", "getAllActivities", {}, { json: true }));
+            console.log("Available activities:", result);
+            setAvailableActivities(result || []);
+        }
+        catch (error) {
+            console.error("Error fetching activities:", error);
+        }
+    });
     const fetchActivityData = () => __awaiter(void 0, void 0, void 0, function* () {
         if (!props.uxpContext)
             return;
@@ -2142,7 +2230,10 @@ const AllData = (props) => {
     };
     (0, react_1.useEffect)(() => {
         fetchActivityData();
-    }, [monthFilter, yearFilter]);
+    }, [monthFilter, yearFilter, activityName]);
+    (0, react_1.useEffect)(() => {
+        fetchAvailableActivities();
+    }, []);
     (0, react_1.useEffect)(() => {
         if (!chartRef.current)
             return;
@@ -2234,6 +2325,14 @@ const AllData = (props) => {
         };
         chartInstance.current = highcharts_1.default.chart(chartRef.current, chartConfig);
     }, [activityData]);
+    // 🆕 Convert activities array to Select options with "All" as default
+    const activityOptions = [
+        { label: "All Activities", value: "" },
+        ...availableActivities.map(activity => ({
+            label: activity,
+            value: activity
+        }))
+    ];
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
         react_1.default.createElement(components_1.TitleBar, { title: "" },
             react_1.default.createElement("div", { style: { display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" } },
@@ -2247,7 +2346,10 @@ const AllData = (props) => {
                         react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (newMonth) => setMonthFilter(newMonth) })),
                     react_1.default.createElement(components_1.FormField, null,
                         react_1.default.createElement(components_1.Label, null, "Filter by Year"),
-                        react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) }))),
+                        react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) })),
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
+                        react_1.default.createElement(components_1.Select, { options: activityOptions, selected: activityName, onChange: (val) => setActivityName(val), placeholder: "Select activity" }))),
                 react_1.default.createElement(components_1.Button, { icon: 'fas cloud-download-alt', title: 'Export', onClick: exportToCSV }))),
         react_1.default.createElement("div", { style: { display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '12px', marginBottom: '12px', flexWrap: 'wrap' } },
             react_1.default.createElement("div", { style: legendItemStyle(selectedLegend === "all", "#888"), onClick: () => {
@@ -2345,6 +2447,7 @@ const BarChartComponent = (props) => {
     const [toYear, setToYear] = (0, react_1.useState)(new Date().getFullYear());
     const [activityName, setActivityName] = (0, react_1.useState)("");
     const [activityNames, setActivityNames] = (0, react_1.useState)([]); // 🔧 for custom legend
+    const [availableActivities, setAvailableActivities] = (0, react_1.useState)([]); // 🆕 for dropdown options
     const monthOptions = [
         { label: "January", value: "Jan" }, { label: "February", value: "Feb" },
         { label: "March", value: "Mar" }, { label: "April", value: "Apr" },
@@ -2354,8 +2457,20 @@ const BarChartComponent = (props) => {
         { label: "November", value: "Nov" }, { label: "December", value: "Dec" },
     ];
     const [selectedLegend, setSelectedLegend] = (0, react_1.useState)("all");
-    const fetchActivityData = () => __awaiter(void 0, void 0, void 0, function* () {
+    // 🆕 Fetch available activities for dropdown
+    const fetchAvailableActivities = () => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
+        try {
+            const result = yield ((_a = props.uxpContext) === null || _a === void 0 ? void 0 : _a.executeAction("carbon_reporting_80rr", "getAllActivities", {}, { json: true }));
+            console.log("Available activities:", result);
+            setAvailableActivities(result || []);
+        }
+        catch (error) {
+            console.error("Error fetching activities:", error);
+        }
+    });
+    const fetchActivityData = () => __awaiter(void 0, void 0, void 0, function* () {
+        var _b;
         try {
             const params = {
                 fromYear: fromYear,
@@ -2364,7 +2479,7 @@ const BarChartComponent = (props) => {
                 toMonth: toMonth,
                 activityName: activityName
             };
-            const result = yield ((_a = props.uxpContext) === null || _a === void 0 ? void 0 : _a.executeAction("carbon_reporting_80rr", "GetAllData", params, { json: true }));
+            const result = yield ((_b = props.uxpContext) === null || _b === void 0 ? void 0 : _b.executeAction("carbon_reporting_80rr", "GetAllData", params, { json: true }));
             // 👀 Debug log raw backend response
             console.log("Backend raw result:", result);
             console.log("Params sent:", params);
@@ -2376,7 +2491,6 @@ const BarChartComponent = (props) => {
             }))) || [];
             setActivityData(cleanedData);
             // 🔧 collect distinct activity names for legend
-            const distinctActivities = Array.from(new Set(cleanedData.map((item) => item.activity)));
             setActivityNames(Array.from(new Set(cleanedData.map((item) => item.activity))));
         }
         catch (error) {
@@ -2426,6 +2540,10 @@ const BarChartComponent = (props) => {
         backgroundColor: color,
         display: 'inline-block'
     });
+    // 🆕 Load activities on component mount
+    (0, react_1.useEffect)(() => {
+        fetchAvailableActivities();
+    }, []);
     // Updated useEffect to use new filter states
     (0, react_1.useEffect)(() => {
         fetchActivityData();
@@ -2557,6 +2675,14 @@ const BarChartComponent = (props) => {
                 s.hide();
         });
     };
+    // 🆕 Convert activities array to Select options with "All" as default
+    const activityOptions = [
+        { label: "All Activities", value: "" },
+        ...availableActivities.map(activity => ({
+            label: activity,
+            value: activity
+        }))
+    ];
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
         react_1.default.createElement(components_1.TitleBar, { title: "" },
             react_1.default.createElement("div", { style: { display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" } },
@@ -2583,7 +2709,7 @@ const BarChartComponent = (props) => {
                             react_1.default.createElement(components_1.Input, { type: "number", value: toYear || "", onChange: (val) => setToYear(parseInt(val) || null), placeholder: "End year" }))),
                     react_1.default.createElement(components_1.FormField, null,
                         react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
-                        react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" }))),
+                        react_1.default.createElement(components_1.Select, { options: activityOptions, selected: activityName, onChange: (val) => setActivityName(val), placeholder: "Select activity" }))),
                 react_1.default.createElement(components_1.Button, { icon: 'fas cloud-download-alt', title: 'Export', onClick: exportToCSV }))),
         react_1.default.createElement("div", { style: { display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' } },
             react_1.default.createElement("div", { style: legendItemStyle(selectedLegend === "all", "#888"), onClick: () => {
@@ -2674,6 +2800,7 @@ const ESGDonutChart = (props) => {
     const toast = (0, components_1.useToast)();
     const [loading, setLoading] = (0, react_1.useState)(false);
     const [activityData, setActivityData] = (0, react_1.useState)([]);
+    const [availableActivities, setAvailableActivities] = (0, react_1.useState)([]); // 🆕 for dropdown options
     // Updated filter states for date ranges
     const [fromMonth, setFromMonth] = (0, react_1.useState)("Jan");
     const [toMonth, setToMonth] = (0, react_1.useState)("Dec");
@@ -2688,6 +2815,18 @@ const ESGDonutChart = (props) => {
         { label: "September", value: "Sep" }, { label: "October", value: "Oct" },
         { label: "November", value: "Nov" }, { label: "December", value: "Dec" },
     ];
+    // 🆕 Fetch available activities for dropdown
+    const fetchAvailableActivities = () => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
+        try {
+            const result = yield ((_a = props.uxpContext) === null || _a === void 0 ? void 0 : _a.executeAction("carbon_reporting_80rr", "getAllActivities", {}, { json: true }));
+            console.log("Available activities:", result);
+            setAvailableActivities(result || []);
+        }
+        catch (error) {
+            console.error("Error fetching activities:", error);
+        }
+    });
     const fetchActivityData = () => __awaiter(void 0, void 0, void 0, function* () {
         if (!props.uxpContext)
             return;
@@ -2792,6 +2931,9 @@ const ESGDonutChart = (props) => {
     (0, react_1.useEffect)(() => {
         fetchActivityData();
     }, [fromMonth, toMonth, fromYear, toYear, activityName, props.uxpContext]);
+    (0, react_1.useEffect)(() => {
+        fetchAvailableActivities();
+    }, []);
     // Move calculateEmissions inside useEffect to ensure it uses fresh data
     (0, react_1.useEffect)(() => {
         const chart = chartRef.current;
@@ -3032,6 +3174,14 @@ const ESGDonutChart = (props) => {
     const { dynamicEmissionData: memoizedEmissionData, scope1Total, scope2Total, totalEmissions } = (0, react_1.useMemo)(() => {
         return calculateEmissions();
     }, [activityData]);
+    // 🆕 Convert activities array to Select options with "All" as default
+    const activityOptions = [
+        { label: "All Activities", value: "" },
+        ...availableActivities.map(activity => ({
+            label: activity,
+            value: activity
+        }))
+    ];
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
         react_1.default.createElement(components_1.TitleBar, { title: "" },
             react_1.default.createElement("div", { style: { display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" } },
@@ -3058,7 +3208,7 @@ const ESGDonutChart = (props) => {
                             react_1.default.createElement(components_1.Input, { type: "number", value: toYear || "", onChange: (val) => setToYear(parseInt(val) || null), placeholder: "End year" }))),
                     react_1.default.createElement(components_1.FormField, null,
                         react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
-                        react_1.default.createElement(components_1.Input, { value: activityName, onChange: (val) => setActivityName(val), placeholder: "Enter activity name" }))),
+                        react_1.default.createElement(components_1.Select, { options: activityOptions, selected: activityName, onChange: (val) => setActivityName(val), placeholder: "Select activity" }))),
                 react_1.default.createElement(components_1.Button, { icon: 'fas cloud-download-alt', title: 'Export', onClick: exportToCSV }))),
         react_1.default.createElement("div", { style: {
                 width: '100%',
