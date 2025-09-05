@@ -37,6 +37,7 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
   const [activityName, setActivityName] = useState<string>("");
   
   const [activityNames, setActivityNames] = useState<string[]>([]); // 🔧 for custom legend
+  const [availableActivities, setAvailableActivities] = useState<string[]>([]); // 🆕 for dropdown options
 
   const monthOptions = [
     { label: "January", value: "Jan" }, { label: "February", value: "Feb" },
@@ -48,6 +49,22 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
   ];
   
   const [selectedLegend, setSelectedLegend] = useState<string | null>("all");
+
+  // 🆕 Fetch available activities for dropdown
+  const fetchAvailableActivities = async () => {
+    try {
+      const result = await props.uxpContext?.executeAction(
+        "carbon_reporting_80rr",
+        "getAllActivities",
+        {},
+        { json: true }
+      );
+      console.log("Available activities:", result);
+      setAvailableActivities(result || []);
+    } catch (error) {
+      console.error("Error fetching activities:", error);
+    }
+  };
 
   const fetchActivityData = async () => {
     try {
@@ -78,10 +95,6 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
       setActivityData(cleanedData);
 
       // 🔧 collect distinct activity names for legend
-      const distinctActivities = Array.from(new Set(
-        cleanedData.map((item: { activity: string }) => item.activity)
-      ));
-      
       setActivityNames(
         Array.from(new Set(
           cleanedData.map((item: any) => item.activity as string)
@@ -142,6 +155,11 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
     backgroundColor: color,
     display: 'inline-block'
   });
+
+  // 🆕 Load activities on component mount
+  useEffect(() => {
+    fetchAvailableActivities();
+  }, []);
 
   // Updated useEffect to use new filter states
   useEffect(() => {
@@ -283,6 +301,15 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
     });
   };
 
+  // 🆕 Convert activities array to Select options with "All" as default
+  const activityOptions = [
+    { label: "All Activities", value: "" },
+    ...availableActivities.map(activity => ({
+      label: activity,
+      value: activity
+    }))
+  ];
+
   return (
     <WidgetWrapper>
       <TitleBar title="">
@@ -339,12 +366,14 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
               </FormField>
             </div>
 
+            {/* 🆕 Replaced Input with Select for activities */}
             <FormField>
               <Label>Filter by Activity</Label>
-              <Input
-                value={activityName}
+              <Select
+                options={activityOptions}
+                selected={activityName}
                 onChange={(val) => setActivityName(val)}
-                placeholder="Enter activity name"
+                placeholder="Select activity"
               />
             </FormField>
           </FilterPanel>
