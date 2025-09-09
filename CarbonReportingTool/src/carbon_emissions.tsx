@@ -60,7 +60,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
     try {
       const result = await props.uxpContext.executeAction(
         "carbon_reporting_80rr",
-        "GetAllData",
+        "GetDataPieChart",
         { 
           fromYear: fromYear,
           toYear: toYear, 

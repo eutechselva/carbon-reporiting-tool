@@ -38,6 +38,8 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
   const [fromYear, setFromYear] = useState<any>(new Date().getFullYear());
   const [toYear, setToYear] = useState<any>(new Date().getFullYear());
   const [activityName, setActivityName] = useState<string>("");
+    const [monthFilter, setMonthFilter] = useState<any>(null); 
+    const [yearFilter, setYearFilter] = useState<any>(new Date().getFullYear());
   const [availableActivities, setAvailableActivities] = useState<string[]>([]); // 🆕 for dropdown options
   const monthOptions = [
     { label: "January", value: "Jan" }, { label: "February", value: "Feb" },
@@ -83,7 +85,7 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
       const result = await props.uxpContext.executeAction(
         "carbon_reporting_80rr",
         "GetAllData",
-        params,
+        { year: yearFilter, month: monthFilter, activityName: activityName },
         { json: true }
       );
 
@@ -239,7 +241,7 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
   // Updated useEffect to use new filter states
   useEffect(() => {
     fetchActivityData();
-  }, [fromMonth, toMonth, fromYear, toYear, activityName]);
+  }, [monthFilter,yearFilter, activityName]);
 
   useEffect(() => {
     if (chartRef.current && Object.keys(monthlyEmissions).length > 0) {
@@ -409,15 +411,17 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
         <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" }}>
           <FilterPanel
             onClear={() => {
-              setFromMonth("Jan");
-              setToMonth("Dec");
-              setFromYear(new Date().getFullYear());
-              setToYear(new Date().getFullYear());
+              // setFromMonth("Jan");
+              // setToMonth("Dec");
+              // setFromYear(new Date().getFullYear());
+              // setToYear(new Date().getFullYear());
               setActivityName("");
+              setMonthFilter(null)
+              setYearFilter(new Date().getFullYear())
             }}
           >
             {/* Date Range Filters - Same as bar_chart component */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "15px" }}>
+            {/* <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "15px" }}>
               <FormField>
                 <Label>From Month</Label>
                 <Select
@@ -459,8 +463,16 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
                   placeholder="End year"
                 />
               </FormField>
-            </div>
+            </div> */}
 
+            <FormField> 
+              <Label>Filter by Month</Label> 
+              <Select options={monthOptions} selected={monthFilter} onChange={(newMonth) => setMonthFilter(newMonth)} /> 
+            </FormField> 
+            <FormField> 
+              <Label>Filter by Year</Label> 
+              <Input type="number" value={yearFilter} onChange={(val) => setYearFilter(parseInt(val) || null)} /> 
+            </FormField>
             <FormField>
               <Label>Filter by Activity</Label>
               <Select

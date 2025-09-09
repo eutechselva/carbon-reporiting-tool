@@ -25,7 +25,7 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
 
   const [loading, setLoading] = useState(false);
   const [activityData, setActivityData] = useState<any[]>([]);
-  const [yearFilter, setYearFilter] = useState<any>(null);
+  const [yearFilter, setYearFilter] = useState<any>(new Date().getFullYear());
   const [activityName, setActivityName] = useState<string>("");
   const [availableActivities, setAvailableActivities] = useState<string[]>([]); // 🆕 for dropdown options
     // 🆕 Fetch available activities for dropdown
