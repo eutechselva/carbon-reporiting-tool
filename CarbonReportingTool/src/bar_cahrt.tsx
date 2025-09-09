@@ -5,6 +5,7 @@ import {
   FilterPanel, FormField, Input, Label, Select, TitleBar, WidgetWrapper, useToast
 } from "uxp/components";
 import { IContextProvider } from "./uxp";
+import { setYear } from "date-fns";
 
 export interface IWidgetProps {
   uxpContext?: IContextProvider;
@@ -35,7 +36,8 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
   const [fromYear, setFromYear] = useState<any>(new Date().getFullYear());
   const [toYear, setToYear] = useState<any>(new Date().getFullYear());
   const [activityName, setActivityName] = useState<string>("");
-  
+  const [monthFilter, setMonthFilter] = useState<any>(null); 
+  const [yearFilter, setYearFilter] = useState<any>(new Date().getFullYear());
   const [activityNames, setActivityNames] = useState<string[]>([]); // 🔧 for custom legend
   const [availableActivities, setAvailableActivities] = useState<string[]>([]); // 🆕 for dropdown options
 
@@ -79,7 +81,7 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
       const result = await props.uxpContext?.executeAction(
         "carbon_reporting_80rr",
         "GetAllData",
-        params,
+       { year: yearFilter, month: monthFilter, activityName: activityName },
         { json: true }
       );
       // 👀 Debug log raw backend response
@@ -164,7 +166,7 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
   // Updated useEffect to use new filter states
   useEffect(() => {
     fetchActivityData();
-  }, [fromMonth, toMonth, fromYear, toYear, activityName]);
+  }, [monthFilter,yearFilter, activityName]);
 
   useEffect(() => {
     if (!chartRef.current) return;
@@ -315,57 +317,23 @@ const BarChartComponent: React.FunctionComponent<IWidgetProps> = (props) => {
       <TitleBar title="">
         <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" }}>
           <FilterPanel onClear={() => {
-            setFromMonth("Jan");
-            setToMonth("Dec");
-            setFromYear(new Date().getFullYear());
-            setToYear(new Date().getFullYear());
+            // setFromMonth("Jan");
+            // setToMonth("Dec");
+            // setFromYear(new Date().getFullYear());
+            // setToYear(new Date().getFullYear());
+            setMonthFilter(null)
+            setYearFilter(new Date().getFullYear())
             setActivityName("");
           }}>
             {/* Date Range Filters - Same as carbon emissions component */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "15px" }}>
-              <FormField>
-                <Label>From Month</Label>
-                <Select
-                  options={monthOptions}
-                  selected={fromMonth}
-                  onChange={(newMonth) => setFromMonth(newMonth)}
-                  placeholder="Select start month"
-                />
-              </FormField>
-
-              <FormField>
-                <Label>To Month</Label>
-                <Select
-                  options={monthOptions}
-                  selected={toMonth}
-                  onChange={(newMonth) => setToMonth(newMonth)}
-                  placeholder="Select end month"
-                />
-              </FormField>
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "15px" }}>
-              <FormField>
-                <Label>From Year</Label>
-                <Input
-                  type="number"
-                  value={fromYear || ""}
-                  onChange={(val) => setFromYear(parseInt(val) || null)}
-                  placeholder="Start year"
-                />
-              </FormField>
-
-              <FormField>
-                <Label>To Year</Label>
-                <Input
-                  type="number"
-                  value={toYear || ""}
-                  onChange={(val) => setToYear(parseInt(val) || null)}
-                  placeholder="End year"
-                />
-              </FormField>
-            </div>
-
+            <FormField> 
+              <Label>Filter by Month</Label> 
+              <Select options={monthOptions} selected={monthFilter} onChange={(newMonth) => setMonthFilter(newMonth)} /> 
+            </FormField> 
+            <FormField> 
+              <Label>Filter by Year</Label> 
+              <Input type="number" value={yearFilter} onChange={(val) => setYearFilter(parseInt(val) || null)} /> 
+            </FormField>
             {/* 🆕 Replaced Input with Select for activities */}
             <FormField>
               <Label>Filter by Activity</Label>
