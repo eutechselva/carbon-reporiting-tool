@@ -566,7 +566,7 @@ const AnnualCarbonEmissionChart = (props) => {
     const [selectedLegend, setSelectedLegend] = (0, react_1.useState)("all");
     const [loading, setLoading] = (0, react_1.useState)(false);
     const [activityData, setActivityData] = (0, react_1.useState)([]);
-    const [yearFilter, setYearFilter] = (0, react_1.useState)(null);
+    const [yearFilter, setYearFilter] = (0, react_1.useState)(new Date().getFullYear());
     const [activityName, setActivityName] = (0, react_1.useState)("");
     const [availableActivities, setAvailableActivities] = (0, react_1.useState)([]); // 🆕 for dropdown options
     // 🆕 Fetch available activities for dropdown
@@ -984,6 +984,8 @@ const ESGAreaChart = (props) => {
     const [fromYear, setFromYear] = (0, react_1.useState)(new Date().getFullYear());
     const [toYear, setToYear] = (0, react_1.useState)(new Date().getFullYear());
     const [activityName, setActivityName] = (0, react_1.useState)("");
+    const [monthFilter, setMonthFilter] = (0, react_1.useState)(null);
+    const [yearFilter, setYearFilter] = (0, react_1.useState)(new Date().getFullYear());
     const [availableActivities, setAvailableActivities] = (0, react_1.useState)([]); // 🆕 for dropdown options
     const monthOptions = [
         { label: "January", value: "Jan" }, { label: "February", value: "Feb" },
@@ -1022,7 +1024,7 @@ const ESGAreaChart = (props) => {
                 toMonth: toMonth,
                 activityName: activityName
             };
-            const result = yield props.uxpContext.executeAction("carbon_reporting_80rr", "GetAllData", params, { json: true });
+            const result = yield props.uxpContext.executeAction("carbon_reporting_80rr", "GetAllData", { year: yearFilter, month: monthFilter, activityName: activityName }, { json: true });
             console.log("Fetched emission data:", result);
             console.log("Params sent:", params);
             const cleanedData = (result === null || result === void 0 ? void 0 : result.map((row) => ({
@@ -1152,7 +1154,7 @@ const ESGAreaChart = (props) => {
     // Updated useEffect to use new filter states
     (0, react_1.useEffect)(() => {
         fetchActivityData();
-    }, [fromMonth, toMonth, fromYear, toYear, activityName]);
+    }, [monthFilter, yearFilter, activityName]);
     (0, react_1.useEffect)(() => {
         if (chartRef.current && Object.keys(monthlyEmissions).length > 0) {
             // Get sorted months
@@ -1310,26 +1312,20 @@ const ESGAreaChart = (props) => {
         react_1.default.createElement(components_1.TitleBar, { title: "" },
             react_1.default.createElement("div", { style: { display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" } },
                 react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
-                        setFromMonth("Jan");
-                        setToMonth("Dec");
-                        setFromYear(new Date().getFullYear());
-                        setToYear(new Date().getFullYear());
+                        // setFromMonth("Jan");
+                        // setToMonth("Dec");
+                        // setFromYear(new Date().getFullYear());
+                        // setToYear(new Date().getFullYear());
                         setActivityName("");
+                        setMonthFilter(null);
+                        setYearFilter(new Date().getFullYear());
                     } },
-                    react_1.default.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "15px" } },
-                        react_1.default.createElement(components_1.FormField, null,
-                            react_1.default.createElement(components_1.Label, null, "From Month"),
-                            react_1.default.createElement(components_1.Select, { options: monthOptions, selected: fromMonth, onChange: (newMonth) => setFromMonth(newMonth), placeholder: "Select start month" })),
-                        react_1.default.createElement(components_1.FormField, null,
-                            react_1.default.createElement(components_1.Label, null, "To Month"),
-                            react_1.default.createElement(components_1.Select, { options: monthOptions, selected: toMonth, onChange: (newMonth) => setToMonth(newMonth), placeholder: "Select end month" }))),
-                    react_1.default.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "15px" } },
-                        react_1.default.createElement(components_1.FormField, null,
-                            react_1.default.createElement(components_1.Label, null, "From Year"),
-                            react_1.default.createElement(components_1.Input, { type: "number", value: fromYear || "", onChange: (val) => setFromYear(parseInt(val) || null), placeholder: "Start year" })),
-                        react_1.default.createElement(components_1.FormField, null,
-                            react_1.default.createElement(components_1.Label, null, "To Year"),
-                            react_1.default.createElement(components_1.Input, { type: "number", value: toYear || "", onChange: (val) => setToYear(parseInt(val) || null), placeholder: "End year" }))),
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Filter by Month"),
+                        react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (newMonth) => setMonthFilter(newMonth) })),
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Filter by Year"),
+                        react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) })),
                     react_1.default.createElement(components_1.FormField, null,
                         react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
                         react_1.default.createElement(components_1.Select, { options: activityOptions, selected: activityName, onChange: (val) => setActivityName(val), placeholder: "Select activity" }))),
@@ -2446,6 +2442,8 @@ const BarChartComponent = (props) => {
     const [fromYear, setFromYear] = (0, react_1.useState)(new Date().getFullYear());
     const [toYear, setToYear] = (0, react_1.useState)(new Date().getFullYear());
     const [activityName, setActivityName] = (0, react_1.useState)("");
+    const [monthFilter, setMonthFilter] = (0, react_1.useState)(null);
+    const [yearFilter, setYearFilter] = (0, react_1.useState)(new Date().getFullYear());
     const [activityNames, setActivityNames] = (0, react_1.useState)([]); // 🔧 for custom legend
     const [availableActivities, setAvailableActivities] = (0, react_1.useState)([]); // 🆕 for dropdown options
     const monthOptions = [
@@ -2479,7 +2477,7 @@ const BarChartComponent = (props) => {
                 toMonth: toMonth,
                 activityName: activityName
             };
-            const result = yield ((_b = props.uxpContext) === null || _b === void 0 ? void 0 : _b.executeAction("carbon_reporting_80rr", "GetAllData", params, { json: true }));
+            const result = yield ((_b = props.uxpContext) === null || _b === void 0 ? void 0 : _b.executeAction("carbon_reporting_80rr", "GetAllData", { year: yearFilter, month: monthFilter, activityName: activityName }, { json: true }));
             // 👀 Debug log raw backend response
             console.log("Backend raw result:", result);
             console.log("Params sent:", params);
@@ -2547,7 +2545,7 @@ const BarChartComponent = (props) => {
     // Updated useEffect to use new filter states
     (0, react_1.useEffect)(() => {
         fetchActivityData();
-    }, [fromMonth, toMonth, fromYear, toYear, activityName]);
+    }, [monthFilter, yearFilter, activityName]);
     (0, react_1.useEffect)(() => {
         if (!chartRef.current)
             return;
@@ -2687,26 +2685,20 @@ const BarChartComponent = (props) => {
         react_1.default.createElement(components_1.TitleBar, { title: "" },
             react_1.default.createElement("div", { style: { display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start" } },
                 react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
-                        setFromMonth("Jan");
-                        setToMonth("Dec");
-                        setFromYear(new Date().getFullYear());
-                        setToYear(new Date().getFullYear());
+                        // setFromMonth("Jan");
+                        // setToMonth("Dec");
+                        // setFromYear(new Date().getFullYear());
+                        // setToYear(new Date().getFullYear());
+                        setMonthFilter(null);
+                        setYearFilter(new Date().getFullYear());
                         setActivityName("");
                     } },
-                    react_1.default.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "15px" } },
-                        react_1.default.createElement(components_1.FormField, null,
-                            react_1.default.createElement(components_1.Label, null, "From Month"),
-                            react_1.default.createElement(components_1.Select, { options: monthOptions, selected: fromMonth, onChange: (newMonth) => setFromMonth(newMonth), placeholder: "Select start month" })),
-                        react_1.default.createElement(components_1.FormField, null,
-                            react_1.default.createElement(components_1.Label, null, "To Month"),
-                            react_1.default.createElement(components_1.Select, { options: monthOptions, selected: toMonth, onChange: (newMonth) => setToMonth(newMonth), placeholder: "Select end month" }))),
-                    react_1.default.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "15px" } },
-                        react_1.default.createElement(components_1.FormField, null,
-                            react_1.default.createElement(components_1.Label, null, "From Year"),
-                            react_1.default.createElement(components_1.Input, { type: "number", value: fromYear || "", onChange: (val) => setFromYear(parseInt(val) || null), placeholder: "Start year" })),
-                        react_1.default.createElement(components_1.FormField, null,
-                            react_1.default.createElement(components_1.Label, null, "To Year"),
-                            react_1.default.createElement(components_1.Input, { type: "number", value: toYear || "", onChange: (val) => setToYear(parseInt(val) || null), placeholder: "End year" }))),
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Filter by Month"),
+                        react_1.default.createElement(components_1.Select, { options: monthOptions, selected: monthFilter, onChange: (newMonth) => setMonthFilter(newMonth) })),
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Filter by Year"),
+                        react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter, onChange: (val) => setYearFilter(parseInt(val) || null) })),
                     react_1.default.createElement(components_1.FormField, null,
                         react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
                         react_1.default.createElement(components_1.Select, { options: activityOptions, selected: activityName, onChange: (val) => setActivityName(val), placeholder: "Select activity" }))),
@@ -2832,7 +2824,7 @@ const ESGDonutChart = (props) => {
             return;
         setLoading(true);
         try {
-            const result = yield props.uxpContext.executeAction("carbon_reporting_80rr", "GetAllData", {
+            const result = yield props.uxpContext.executeAction("carbon_reporting_80rr", "GetDataPieChart", {
                 fromYear: fromYear,
                 toYear: toYear,
                 fromMonth: fromMonth,
