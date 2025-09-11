@@ -740,7 +740,7 @@ const AnnualCarbonEmissionChart = (props) => {
                             fontSize: '11px'
                         },
                         formatter: function () {
-                            return this.value.toLocaleString();
+                            return this.value.toFixed(2);
                         }
                     },
                     gridLineWidth: 1,
@@ -755,14 +755,14 @@ const AnnualCarbonEmissionChart = (props) => {
                         formatter: function () {
                             // Add null check for this.total
                             const total = this.total;
-                            return total != null ? total.toLocaleString() + ' kgCO₂e' : '';
+                            return total != null ? total.toFixed(2) + ' kgCO₂e' : '';
                         }
                     }
                 },
                 tooltip: {
                     headerFormat: '<b>Year {point.key}</b><br/>',
                     pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y:,.1f} kgCO₂e</b><br/>',
-                    footerFormat: 'Total: <b>{point.total:,.1f} kgCO₂e</b>',
+                    footerFormat: 'Total: <b>{point.total:,.2f} kgCO₂e</b>',
                     shared: true,
                     backgroundColor: 'rgba(255, 255, 255, 0.95)',
                     borderColor: '#ccc',
@@ -777,7 +777,7 @@ const AnnualCarbonEmissionChart = (props) => {
                         });
                         const total = (_b = this.points) === null || _b === void 0 ? void 0 : _b.reduce((sum, point) => sum + (point.y || 0), 0);
                         if (total != null) {
-                            tooltip += `Total: <b>${total.toLocaleString()} kgCO₂e</b>`;
+                            tooltip += `Total: <b>${total.toFixed(2)} kgCO₂e</b>`;
                         }
                         return tooltip;
                     }
@@ -798,7 +798,7 @@ const AnnualCarbonEmissionChart = (props) => {
                             },
                             formatter: function () {
                                 const value = this.y;
-                                return value > 0 ? value.toLocaleString() : '';
+                                return value > 0 ? value.toFixed(2) : '';
                             }
                         },
                         borderWidth: 0,
