@@ -317,7 +317,7 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
         yAxis: {
           min: 0,
           title: {
-            text: 'Carbon Emissions (kgCOâ‚‚e)',
+            text: 'Carbon Emissions (kgCO₂e)',
             style: {
               fontSize: '14px',
               fontWeight: 'bold',
@@ -340,7 +340,7 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
           borderRadius: 8,
           shadow: true,
           headerFormat: '<b>{point.key}</b><br/>',
-          pointFormat: '<span style="color:{series.color}">â—</span> {series.name}: <b>{point.y:.1f} kgCOâ‚‚e</b><br/>',
+          pointFormat: '{series.name}:<b>{point.y:.1f} KgCO₂e</b><br/>',
           style: {
             fontSize: '12px'
           }

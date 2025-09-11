@@ -11,6 +11,7 @@ import ESGStackedBarChart from "./ESGStackedBarChart";
 import ESGAreaChart from "./ESGAreaChart";
 import AnnualCarbonEmissionChart from "./AnnualCarbonEmissionChart";
 import CarbonReportingTool from "./upload";
+import AnnualCarbonEmissionWithBaselineComparison from "./AnnualCarbonEmissionWithBaselineComparison";
 
 
 
@@ -24,6 +25,7 @@ registerWidget({ id: "ESG_Donut_Chart", widget: ESGDonutChart });
 registerWidget({ id: "ESGEmissionFactorsTable", widget: ESGEmissionFactorsTable });
 registerWidget({ id: "ESGStackedBarChart", widget: ESGStackedBarChart });
 registerWidget({ id: "AnnualCarbonEmissionChart", widget: AnnualCarbonEmissionChart });
+registerWidget({ id: "AnnualCarbonEmissionWithBaselineComparison", widget: AnnualCarbonEmissionWithBaselineComparison });
 registerWidget({ id: "ESGAreaChart", widget: ESGAreaChart });
 
 

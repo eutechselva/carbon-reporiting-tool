@@ -64,6 +64,14 @@
             "tags":[],
             "category":"",
             "isTemplate": false
+        },        {
+            "id": "AnnualCarbonEmissionWithBaselineComparison",
+            "name": "AnnualCarbonEmissionWithBaselineComparison",
+            "description": "AnnualCarbonEmissionWithBaselineComparison",
+            "icon": "",
+            "tags":[],
+            "category":"",
+            "isTemplate": false
         },
         {
             "id": "ESGAreaChart",
