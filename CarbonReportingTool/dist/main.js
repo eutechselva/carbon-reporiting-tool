@@ -8,7 +8,7 @@
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"id":"dfb0f20b-787a-4dc3-f8f9-e3ee85e42314","author":"selva","widgets":[{"id":"CarbonReportingTool","name":"CarbonReportingTool","description":"CarbonReportingTool","icon":"","tags":[],"category":"","isTemplate":false},{"id":"all_data","name":"all_data","description":"all_data","icon":"","tags":[],"category":"","isTemplate":false},{"id":"bar_chart","name":"bar_chart","description":"bar_chart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESG_Donut_Chart","name":"ESG_Donut_Chart","description":"ESG_Donut_Chart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESGEmissionFactorsTable","name":"ESGEmissionFactorsTable","description":"ESGEmissionFactorsTable","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESGStackedBarChart","name":"ESGStackedBarChart","description":"ESGStackedBarChart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"AnnualCarbonEmissionChart","name":"AnnualCarbonEmissionChart","description":"AnnualCarbonEmissionChart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESGAreaChart","name":"ESGAreaChart","description":"ESGAreaChart","icon":"","tags":[],"category":"","isTemplate":false}],"sidebarLinks":[],"uis":[],"menuItems":[]}');
+module.exports = /*#__PURE__*/JSON.parse('{"id":"dfb0f20b-787a-4dc3-f8f9-e3ee85e42314","author":"selva","widgets":[{"id":"CarbonReportingTool","name":"CarbonReportingTool","description":"CarbonReportingTool","icon":"","tags":[],"category":"","isTemplate":false},{"id":"all_data","name":"all_data","description":"all_data","icon":"","tags":[],"category":"","isTemplate":false},{"id":"bar_chart","name":"bar_chart","description":"bar_chart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESG_Donut_Chart","name":"ESG_Donut_Chart","description":"ESG_Donut_Chart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESGEmissionFactorsTable","name":"ESGEmissionFactorsTable","description":"ESGEmissionFactorsTable","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESGStackedBarChart","name":"ESGStackedBarChart","description":"ESGStackedBarChart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"AnnualCarbonEmissionChart","name":"AnnualCarbonEmissionChart","description":"AnnualCarbonEmissionChart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"AnnualCarbonEmissionWithBaselineComparison","name":"AnnualCarbonEmissionWithBaselineComparison","description":"AnnualCarbonEmissionWithBaselineComparison","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESGAreaChart","name":"ESGAreaChart","description":"ESGAreaChart","icon":"","tags":[],"category":"","isTemplate":false}],"sidebarLinks":[],"uis":[],"menuItems":[]}');
 
 /***/ }),
 
@@ -912,6 +912,268 @@ exports["default"] = AnnualCarbonEmissionChart;
 
 /***/ }),
 
+/***/ "./src/AnnualCarbonEmissionWithBaselineComparison.tsx":
+/*!************************************************************!*\
+  !*** ./src/AnnualCarbonEmissionWithBaselineComparison.tsx ***!
+  \************************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const react_1 = __importStar(__webpack_require__(/*! react */ "react"));
+const highcharts_1 = __importDefault(__webpack_require__(/*! highcharts */ "./node_modules/highcharts/highcharts.js"));
+const components_1 = __webpack_require__(/*! uxp/components */ "uxp/components");
+__webpack_require__(/*! ./AnnualCarbonChart.scss */ "./src/AnnualCarbonChart.scss");
+// Emission factors for calculations
+const emissionFactors = {
+    "Generator Fuel Consumption": 3.761,
+    "Refrigerant Leakages/Refilling": 1.0,
+    "Electricity Consumption – HVAC": 0.412, // kgCO₂e per kWh
+};
+const AnnualCarbonEmissionWithBaselineComparison = (props) => {
+    const chartRef = (0, react_1.useRef)(null);
+    const chartInstance = (0, react_1.useRef)(null);
+    const toast = (0, components_1.useToast)();
+    const [loading, setLoading] = (0, react_1.useState)(false);
+    const [activityData, setActivityData] = (0, react_1.useState)([]);
+    const [yearFilter, setYearFilter] = (0, react_1.useState)(new Date().getFullYear());
+    const [activityName, setActivityName] = (0, react_1.useState)("");
+    const [availableActivities, setAvailableActivities] = (0, react_1.useState)([]);
+    // Baseline year
+    const baselineYear = 2022;
+    // 🔹 Fetch available activities
+    const fetchAvailableActivities = () => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
+        try {
+            const result = yield ((_a = props.uxpContext) === null || _a === void 0 ? void 0 : _a.executeAction("carbon_reporting_80rr", "getAllActivities", {}, { json: true }));
+            setAvailableActivities(result || []);
+        }
+        catch (error) {
+            console.error("Error fetching activities:", error);
+        }
+    });
+    (0, react_1.useEffect)(() => {
+        fetchAvailableActivities();
+    }, []);
+    // 🔹 Fetch activity data
+    const fetchActivityData = () => __awaiter(void 0, void 0, void 0, function* () {
+        if (!props.uxpContext)
+            return;
+        setLoading(true);
+        try {
+            const result = yield props.uxpContext.executeAction("carbon_reporting_80rr", "GetAllData", { year: yearFilter, month: null, activityName: activityName }, { json: true });
+            const cleanedData = (result === null || result === void 0 ? void 0 : result.map((row) => ({
+                activity: row.activity,
+                year: row.year,
+                month: row.month,
+                value: parseFloat(row.value),
+            }))) || [];
+            setActivityData(cleanedData);
+        }
+        catch (error) {
+            console.error("Error loading emission data:", error);
+            toast.error("Failed to load activity data.");
+        }
+        finally {
+            setLoading(false);
+        }
+    });
+    (0, react_1.useEffect)(() => {
+        fetchActivityData();
+    }, [yearFilter, activityName]);
+    // 🔹 Calculate annual emissions by year
+    const calculateAnnualEmissions = () => {
+        if (activityData.length === 0)
+            return [];
+        const yearlyEmissions = {};
+        activityData.forEach((item) => {
+            const year = item.year.toString();
+            if (!yearlyEmissions[year]) {
+                yearlyEmissions[year] = { scope1: 0, scope2: 0 };
+            }
+            const emissionFactor = emissionFactors[item.activity] || 0;
+            const calculatedEmission = item.value * emissionFactor;
+            const isScope1 = item.activity.includes("Generator") ||
+                item.activity.includes("Refrigerant");
+            if (isScope1) {
+                yearlyEmissions[year].scope1 += calculatedEmission;
+            }
+            else {
+                yearlyEmissions[year].scope2 += calculatedEmission;
+            }
+        });
+        return Object.keys(yearlyEmissions)
+            .sort((a, b) => parseInt(a) - parseInt(b))
+            .map((year) => ({
+            year: parseInt(year),
+            scope1: yearlyEmissions[year].scope1,
+            scope2: yearlyEmissions[year].scope2,
+            total: yearlyEmissions[year].scope1 + yearlyEmissions[year].scope2,
+        }));
+    };
+    const annualData = calculateAnnualEmissions();
+    const baselineData = annualData.find((d) => d.year === baselineYear);
+    const baselineValue = baselineData ? baselineData.total : 4000;
+    // 🔹 Build chart
+    (0, react_1.useEffect)(() => {
+        if (chartRef.current && annualData.length > 0) {
+            const years = annualData.map((d) => d.year.toString());
+            const scope1Data = annualData.map((d) => d.scope1);
+            const scope2Data = annualData.map((d) => d.scope2);
+            // constant baseline across all years
+            const baselineSeries = years.map(() => baselineValue);
+            const chartConfig = {
+                chart: {
+                    type: "column",
+                    height: 450,
+                    backgroundColor: "transparent",
+                },
+                title: {
+                    text: "Annual Scope 1 & 2 Carbon Emissions vs Baseline (2022)",
+                    style: { fontSize: "20px", fontWeight: "bold" },
+                },
+                xAxis: {
+                    categories: years,
+                    title: { text: "Year" },
+                },
+                yAxis: {
+                    min: 0,
+                    title: { text: "Emissions (tCO₂e)" },
+                    plotLines: baselineValue > 0
+                        ? [
+                            {
+                                color: "red",
+                                dashStyle: "Dash",
+                                width: 2,
+                                value: baselineValue,
+                                zIndex: 5,
+                                label: {
+                                    text: `Baseline 2022: ${baselineValue.toLocaleString()} tCO₂e`,
+                                    align: "right",
+                                    verticalAlign: "bottom",
+                                    style: { color: "red", fontWeight: "bold" },
+                                    y: -5,
+                                },
+                            },
+                        ]
+                        : [],
+                },
+                plotOptions: {
+                    column: {
+                        stacking: "normal",
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.y && this.y > 0 ? this.y.toLocaleString() : "";
+                            },
+                        },
+                    },
+                },
+                series: [
+                    {
+                        name: "Scope 1",
+                        data: scope1Data,
+                        type: "column",
+                        color: "#1f77b4",
+                    },
+                    {
+                        name: "Scope 2",
+                        data: scope2Data,
+                        type: "column",
+                        color: "#ff7f0e",
+                    },
+                    {
+                        name: "Baseline (2022)",
+                        data: baselineSeries,
+                        type: "line",
+                        color: "red",
+                        dashStyle: "Dash",
+                        marker: { enabled: false },
+                        enableMouseTracking: false,
+                    },
+                ],
+                tooltip: {
+                    shared: true,
+                    footerFormat: "Total: <b>{point.total}</b> tCO₂e",
+                },
+                legend: { enabled: true },
+                credits: { enabled: false },
+            };
+            chartInstance.current = highcharts_1.default.chart(chartRef.current, chartConfig);
+            // 🔹 Add % change annotations above bars
+            if (baselineValue > 0) {
+                annualData.forEach((d, i) => {
+                    var _a;
+                    const pctChange = ((d.total - baselineValue) / baselineValue) * 100 || 0;
+                    const label = `${pctChange >= 0 ? "+" : ""}${pctChange.toFixed(1)}% vs 2022`;
+                    (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.renderer.text(label, chartInstance.current.xAxis[0].toPixels(i) + 20, chartInstance.current.yAxis[0].toPixels(d.total) - 10).css({ color: "#000", fontSize: "11px", fontWeight: "bold" }).add();
+                });
+            }
+        }
+    }, [annualData, baselineValue]);
+    // 🔹 Activity dropdown options
+    const activityOptions = [
+        { label: "All Activities", value: "" },
+        ...availableActivities.map((a) => ({ label: a, value: a })),
+    ];
+    return (react_1.default.createElement(components_1.WidgetWrapper, null,
+        react_1.default.createElement(components_1.TitleBar, { title: "Annual Carbon Emissions with Baseline Comparison" },
+            react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
+                    setYearFilter(null);
+                    setActivityName("");
+                } },
+                react_1.default.createElement(components_1.FormField, null,
+                    react_1.default.createElement(components_1.Label, null, "Filter by Year"),
+                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter || "", onChange: (val) => setYearFilter(val ? parseInt(val) : null), placeholder: "Enter year" })),
+                react_1.default.createElement(components_1.FormField, null,
+                    react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
+                    react_1.default.createElement(components_1.Select, { options: activityOptions, selected: activityName, onChange: (val) => setActivityName(val), placeholder: "Select activity" })))),
+        react_1.default.createElement("div", { className: "annual-carbon-chart" },
+            loading && react_1.default.createElement("div", null, "\uD83D\uDCCA Loading emission data..."),
+            !loading && annualData.length === 0 && (react_1.default.createElement("div", null, "\uD83D\uDCC8 No emission data found for selected filters.")),
+            !loading && annualData.length > 0 && (react_1.default.createElement("div", { ref: chartRef, className: "annual-carbon-chart__chart" })))));
+};
+exports["default"] = AnnualCarbonEmissionWithBaselineComparison;
+
+
+/***/ }),
+
 /***/ "./src/ESGAreaChart.tsx":
 /*!******************************!*\
   !*** ./src/ESGAreaChart.tsx ***!
@@ -1220,7 +1482,7 @@ const ESGAreaChart = (props) => {
                 yAxis: {
                     min: 0,
                     title: {
-                        text: 'Carbon Emissions (kgCOâ‚‚e)',
+                        text: 'Carbon Emissions (kgCO₂e)',
                         style: {
                             fontSize: '14px',
                             fontWeight: 'bold',
@@ -1243,7 +1505,7 @@ const ESGAreaChart = (props) => {
                     borderRadius: 8,
                     shadow: true,
                     headerFormat: '<b>{point.key}</b><br/>',
-                    pointFormat: '<span style="color:{series.color}">â—</span> {series.name}: <b>{point.y:.1f} kgCOâ‚‚e</b><br/>',
+                    pointFormat: '{series.name}:<b>{point.y:.1f} KgCO₂e</b><br/>',
                     style: {
                         fontSize: '12px'
                     }
@@ -1941,7 +2203,7 @@ const ESGStackedBarChart = (props) => {
                         },
                         formatter: function () {
                             var _a;
-                            return ((_a = this.total) === null || _a === void 0 ? void 0 : _a.toFixed(1)) + 'kgCO₂e';
+                            return ((_a = this.total) === null || _a === void 0 ? void 0 : _a.toFixed(1)) + ' kgCO₂e';
                         }
                     }
                 },
@@ -3355,6 +3617,7 @@ const ESGStackedBarChart_1 = __importDefault(__webpack_require__(/*! ./ESGStacke
 const ESGAreaChart_1 = __importDefault(__webpack_require__(/*! ./ESGAreaChart */ "./src/ESGAreaChart.tsx"));
 const AnnualCarbonEmissionChart_1 = __importDefault(__webpack_require__(/*! ./AnnualCarbonEmissionChart */ "./src/AnnualCarbonEmissionChart.tsx"));
 const upload_1 = __importDefault(__webpack_require__(/*! ./upload */ "./src/upload.tsx"));
+const AnnualCarbonEmissionWithBaselineComparison_1 = __importDefault(__webpack_require__(/*! ./AnnualCarbonEmissionWithBaselineComparison */ "./src/AnnualCarbonEmissionWithBaselineComparison.tsx"));
 (0, uxp_1.registerWidget)({ id: "CarbonReportingTool", widget: upload_1.default });
 (0, uxp_1.registerWidget)({ id: "all_data", widget: all_data_1.default });
 (0, uxp_1.registerWidget)({ id: "bar_chart", widget: bar_cahrt_1.default });
@@ -3362,6 +3625,7 @@ const upload_1 = __importDefault(__webpack_require__(/*! ./upload */ "./src/uplo
 (0, uxp_1.registerWidget)({ id: "ESGEmissionFactorsTable", widget: ESGEmissionFactorsTable_1.default });
 (0, uxp_1.registerWidget)({ id: "ESGStackedBarChart", widget: ESGStackedBarChart_1.default });
 (0, uxp_1.registerWidget)({ id: "AnnualCarbonEmissionChart", widget: AnnualCarbonEmissionChart_1.default });
+(0, uxp_1.registerWidget)({ id: "AnnualCarbonEmissionWithBaselineComparison", widget: AnnualCarbonEmissionWithBaselineComparison_1.default });
 (0, uxp_1.registerWidget)({ id: "ESGAreaChart", widget: ESGAreaChart_1.default });
 /**
  * Register as a Sidebar Link
