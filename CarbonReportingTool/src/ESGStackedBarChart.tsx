@@ -319,7 +319,7 @@ const ESGStackedBarChart: React.FunctionComponent<IWidgetProps> = (props) => {
               fontSize: '10px'
             },
             formatter: function() {
-              return this.total?.toFixed(1) + 'kgCO₂e';
+              return this.total?.toFixed(1) + ' kgCO₂e';
             }
           }
         },
