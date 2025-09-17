@@ -38,9 +38,10 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
   const [yearFilter, setYearFilter] = useState<any>(new Date().getFullYear());
   const [activityName, setActivityName] = useState<string>("");
   const [availableActivities, setAvailableActivities] = useState<string[]>([]);
-
-  // Baseline year
-  const baselineYear = 2022;
+  const [baselineYear, setBaselineYear] = useState<any>(2022); // default baseline year
+  const [availableYears, setAvailableYears] = useState<any[]>([]); // dropdown years
+  const [availableBaselineYears, setAvailableBaselineYears] = useState<any[]>([]);
+  const [baselineData, setBaselineData] = useState<any[]>([]); // 🔹 Store baseline data
 
   // 🔹 Fetch available activities
   const fetchAvailableActivities = async () => {
@@ -57,9 +58,51 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
     }
   };
 
-  useEffect(() => {
-    fetchAvailableActivities();
-  }, []);
+  // 🔹 Fetch baseline data and years
+  const fetchBaselineYears = async () => {
+    try {
+      const result = await props.uxpContext?.executeAction(
+        "carbon_reporting_80rr",
+        "getAllBaselines",
+        {},
+        { json: true }
+      );
+
+      if (result && Array.isArray(result)) {
+        setBaselineData(result); // 🔹 Store the full baseline data
+        const years = Array.from(new Set(result.map((r: any) => r.year))).sort();
+        setAvailableBaselineYears(years);
+        if (years.length > 0 && !years.includes(baselineYear)) {
+          setBaselineYear(years[0]); // default to first baseline year if not set
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching baseline years:", error);
+      setAvailableBaselineYears([2022]); // fallback
+      setBaselineData([]); // 🔹 Clear baseline data on error
+    }
+  };
+
+  // 🔹 Fetch baseline year from backend
+  const fetchBaselineYear = async () => {
+    try {
+      const result = await props.uxpContext?.executeAction(
+        "carbon_reporting_80rr",
+        "getSelectedBaselineYear",
+        {},
+        { json: true }
+      );
+
+      if (result && result.year) {
+        setBaselineYear(result.year);
+      } else {
+        setBaselineYear(2022); // fallback default
+      }
+    } catch (error) {
+      console.error("Error fetching baseline year:", error);
+      setBaselineYear(2022); // fallback
+    }
+  };
 
   // 🔹 Fetch activity data
   const fetchActivityData = async () => {
@@ -83,6 +126,10 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
         })) || [];
 
       setActivityData(cleanedData);
+
+      // Build available years for baseline dropdown
+      const years = Array.from(new Set(cleanedData.map((d: any) => d.year))).sort();
+      setAvailableYears(years);
     } catch (error: any) {
       console.error("Error loading emission data:", error);
       toast.error("Failed to load activity data.");
@@ -90,6 +137,12 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchAvailableActivities();
+    fetchBaselineYear(); // fetch baseline year on mount
+    fetchBaselineYears(); // 👈 added
+  }, []);
 
   useEffect(() => {
     fetchActivityData();
@@ -133,8 +186,57 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
   };
 
   const annualData = calculateAnnualEmissions();
-  const baselineData = annualData.find((d) => d.year === baselineYear);
-  const baselineValue = baselineData ? baselineData.total : 4000;
+
+  // 🔹 Calculate baseline value from baseline data
+  const calculateBaselineValue = () => {
+    if (baselineData.length === 0 || !baselineYear) {
+      console.log("No baseline data or year, using fallback");
+      return 4000; // fallback
+    }
+
+    // Filter baseline data for the selected year and activity
+    const filteredBaselines = baselineData.filter((item: any) => {
+      const yearMatches = item.year === baselineYear;
+      const activityMatches = !activityName || item.activity === activityName;
+      return yearMatches && activityMatches;
+    });
+
+    console.log("Filtered baselines:", filteredBaselines);
+
+    if (filteredBaselines.length === 0) {
+      console.log("No matching baseline found, using fallback");
+      return 4000; // fallback if no matching baseline found
+    }
+
+    // If the baseline data already contains calculated emissions (tCO2e), use it directly
+    // Otherwise, apply emission factors
+    let totalBaseline = 0;
+    filteredBaselines.forEach((item: any) => {
+      // Check if the value is already in tCO2e (likely if it's a large number like 1293)
+      // or if it needs to be multiplied by emission factor
+      const rawValue = parseFloat(item.value || 0);
+      
+      // If the baseline value is already calculated emissions, use it directly
+      // You can identify this by checking if it's a reasonable emission value
+      if (rawValue > 100) {
+        // Likely already calculated emissions
+        totalBaseline += rawValue;
+      } else {
+        // Apply emission factor
+        const emissionFactor = emissionFactors[item.activity] || 0;
+        totalBaseline += rawValue * emissionFactor;
+      }
+    });
+
+    console.log("Calculated baseline value:", totalBaseline);
+    return totalBaseline;
+  };
+
+  const baselineValue = calculateBaselineValue();
+
+  console.log('baselineYear:', baselineYear);
+  console.log('baselineValue:', baselineValue);
+  console.log('baselineData:', baselineData);
 
   // 🔹 Build chart
   useEffect(() => {
@@ -153,36 +255,41 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
           backgroundColor: "transparent",
         },
         title: {
-          text: "Annual Scope 1 & 2 Carbon Emissions vs Baseline (2022)",
+          text: `Annual Scope 1 & 2 Carbon Emissions vs Baseline (${baselineYear})`,
           style: { fontSize: "20px", fontWeight: "bold" },
         },
         xAxis: {
           categories: years,
           title: { text: "Year" },
         },
-yAxis: {
-  min: 0,
-  title: { text: "Emissions (tCO₂e)" },
-  plotLines:
-    baselineValue > 0
-      ? [
-          {
-            color: "red",
-            dashStyle: "Dash",
-            width: 2,
-            value: baselineValue,
-            zIndex: 5,
-            label: {
-              text: `Baseline 2022: ${baselineValue.toLocaleString()} tCO₂e`,
-              align: "right",
-              verticalAlign: "bottom",
-              style: { color: "red", fontWeight: "bold" },
-              y: -5,
-            },
-          },
-        ]
-      : [],
-},
+        yAxis: {
+          min: 0,
+          title: { text: "Emissions (tCO₂e)" },
+          plotLines:
+            baselineValue > 0
+              ? [
+                  {
+                    color: "red",
+                    dashStyle: "Dash",
+                    width: 3, // Made thicker for visibility
+                    value: baselineValue,
+                    zIndex: 10, // Higher z-index to ensure it's on top
+                    label: {
+                      text: `Baseline ${baselineYear}: ${Math.round(baselineValue).toLocaleString()} tCO₂e`,
+                      align: "right",
+                      verticalAlign: "bottom",
+                      style: { 
+                        color: "red", 
+                        fontWeight: "bold",
+                        backgroundColor: "white",
+                        padding: "2px"
+                      },
+                      y: -5,
+                    },
+                  },
+                ]
+              : [],
+        },
 
         plotOptions: {
           column: {
@@ -209,7 +316,7 @@ yAxis: {
             color: "#ff7f0e",
           },
           {
-            name: "Baseline (2022)",
+            name: `Baseline (${baselineYear})`,
             data: baselineSeries,
             type: "line",
             color: "red",
@@ -230,25 +337,39 @@ yAxis: {
 
       // 🔹 Add % change annotations above bars
       if (baselineValue > 0) {
-        annualData.forEach((d, i) => {
-          const pctChange =
-            ((d.total - baselineValue) / baselineValue) * 100 || 0;
-          const label = `${pctChange >= 0 ? "+" : ""}${pctChange.toFixed(
-            1
-          )}% vs 2022`;
+        setTimeout(() => {
+          annualData.forEach((d, i) => {
+            const pctChange =
+              ((d.total - baselineValue) / baselineValue) * 100 || 0;
+            const label = `${pctChange >= 0 ? "+" : ""}${pctChange.toFixed(
+              1
+            )}% vs ${baselineYear}`;
 
-          chartInstance.current?.renderer
-            .text(
-              label,
-              (chartInstance.current.xAxis[0] as any).toPixels(i) + 20,
-              (chartInstance.current.yAxis[0] as any).toPixels(d.total) - 10
-            )
-            .css({ color: "#000", fontSize: "11px", fontWeight: "bold" })
-            .add();
-        });
+            if (chartInstance.current && chartInstance.current.xAxis && chartInstance.current.yAxis) {
+              const xPos = chartInstance.current.xAxis[0].toPixels(i);
+              const yPos = chartInstance.current.yAxis[0].toPixels(d.total) - 15;
+              
+              console.log(`Adding annotation at position: x=${xPos}, y=${yPos}, label=${label}`);
+
+              chartInstance.current.renderer
+                .text(
+                  label,
+                  xPos - 30, // Center the text better
+                  yPos
+                )
+                .css({ 
+                  color: "#000", 
+                  fontSize: "11px", 
+                  fontWeight: "bold",
+                  textAnchor: "middle"
+                })
+                .add();
+            }
+          });
+        }, 100); // Small delay to ensure chart is fully rendered
       }
     }
-  }, [annualData, baselineValue]);
+  }, [annualData, baselineValue, baselineYear]);
 
   // 🔹 Activity dropdown options
   const activityOptions = [
@@ -261,8 +382,15 @@ yAxis: {
       <TitleBar title="Annual Carbon Emissions with Baseline Comparison">
         <FilterPanel
           onClear={() => {
-            setYearFilter(null);
-            setActivityName("");
+            setYearFilter(new Date().getFullYear()); // Current year
+            setActivityName(""); // All activities
+            // Set to lowest available baseline year
+            if (availableBaselineYears.length > 0) {
+              const lowestYear = Math.min(...availableBaselineYears);
+              setBaselineYear(lowestYear);
+            } else {
+              setBaselineYear(2022);
+            }
           }}
         >
           <FormField>
@@ -282,6 +410,16 @@ yAxis: {
               selected={activityName}
               onChange={(val) => setActivityName(val)}
               placeholder="Select activity"
+            />
+          </FormField>
+
+          <FormField>
+            <Label>Select Baseline Year</Label>
+            <Select
+              options={availableBaselineYears.map((y) => ({ label: y.toString(), value: y }))}
+              selected={baselineYear}
+              onChange={(val) => setBaselineYear(val)}
+              placeholder="Select baseline year"
             />
           </FormField>
         </FilterPanel>

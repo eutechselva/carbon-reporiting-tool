@@ -81,6 +81,16 @@
             "tags":[],
             "category":"",
             "isTemplate": false
+        },
+
+        {
+            "id": "BaselineValueManagement",
+            "name": "BaselineValueManagement",
+            "description": "BaselineValueManagement",
+            "icon": "",
+            "tags":[],
+            "category":"",
+            "isTemplate": false
         }
     ],
     "sidebarLinks": [
