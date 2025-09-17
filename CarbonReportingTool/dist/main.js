@@ -8,7 +8,7 @@
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"id":"dfb0f20b-787a-4dc3-f8f9-e3ee85e42314","author":"selva","widgets":[{"id":"CarbonReportingTool","name":"CarbonReportingTool","description":"CarbonReportingTool","icon":"","tags":[],"category":"","isTemplate":false},{"id":"all_data","name":"all_data","description":"all_data","icon":"","tags":[],"category":"","isTemplate":false},{"id":"bar_chart","name":"bar_chart","description":"bar_chart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESG_Donut_Chart","name":"ESG_Donut_Chart","description":"ESG_Donut_Chart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESGEmissionFactorsTable","name":"ESGEmissionFactorsTable","description":"ESGEmissionFactorsTable","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESGStackedBarChart","name":"ESGStackedBarChart","description":"ESGStackedBarChart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"AnnualCarbonEmissionChart","name":"AnnualCarbonEmissionChart","description":"AnnualCarbonEmissionChart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"AnnualCarbonEmissionWithBaselineComparison","name":"AnnualCarbonEmissionWithBaselineComparison","description":"AnnualCarbonEmissionWithBaselineComparison","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESGAreaChart","name":"ESGAreaChart","description":"ESGAreaChart","icon":"","tags":[],"category":"","isTemplate":false}],"sidebarLinks":[],"uis":[],"menuItems":[]}');
+module.exports = /*#__PURE__*/JSON.parse('{"id":"dfb0f20b-787a-4dc3-f8f9-e3ee85e42314","author":"selva","widgets":[{"id":"CarbonReportingTool","name":"CarbonReportingTool","description":"CarbonReportingTool","icon":"","tags":[],"category":"","isTemplate":false},{"id":"all_data","name":"all_data","description":"all_data","icon":"","tags":[],"category":"","isTemplate":false},{"id":"bar_chart","name":"bar_chart","description":"bar_chart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESG_Donut_Chart","name":"ESG_Donut_Chart","description":"ESG_Donut_Chart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESGEmissionFactorsTable","name":"ESGEmissionFactorsTable","description":"ESGEmissionFactorsTable","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESGStackedBarChart","name":"ESGStackedBarChart","description":"ESGStackedBarChart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"AnnualCarbonEmissionChart","name":"AnnualCarbonEmissionChart","description":"AnnualCarbonEmissionChart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"AnnualCarbonEmissionWithBaselineComparison","name":"AnnualCarbonEmissionWithBaselineComparison","description":"AnnualCarbonEmissionWithBaselineComparison","icon":"","tags":[],"category":"","isTemplate":false},{"id":"ESGAreaChart","name":"ESGAreaChart","description":"ESGAreaChart","icon":"","tags":[],"category":"","isTemplate":false},{"id":"BaselineValueManagement","name":"BaselineValueManagement","description":"BaselineValueManagement","icon":"","tags":[],"category":"","isTemplate":false}],"sidebarLinks":[],"uis":[],"menuItems":[]}');
 
 /***/ }),
 
@@ -34,6 +34,23 @@ var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../node_modules/css-lo
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
 exports.push([module.id, ".annual-carbon-chart {\n  width: 100%;\n  height: 100%;\n  padding: 20px;\n  font-family: \"Arial\", sans-serif;\n}\n.annual-carbon-chart__legend {\n  display: flex;\n  justify-content: center;\n  gap: 12px;\n  margin-bottom: 16px;\n  flex-wrap: wrap;\n}\n.annual-carbon-chart__legend-item {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  padding: 6px 12px;\n  border-radius: 4px;\n  background-color: transparent;\n  cursor: pointer;\n  font-size: 13px;\n  font-weight: normal;\n  border: 1px solid transparent;\n  transition: all 0.2s ease;\n}\n.annual-carbon-chart__legend-item:hover {\n  background-color: rgba(240, 248, 255, 0.5);\n}\n.annual-carbon-chart__legend-item--active {\n  background-color: #f0f8ff;\n  font-weight: bold;\n}\n.annual-carbon-chart__legend-item--active.scope-all {\n  border-color: #888;\n}\n.annual-carbon-chart__legend-item--active.scope-1 {\n  border-color: #FF6B6B;\n}\n.annual-carbon-chart__legend-item--active.scope-2 {\n  border-color: #4ECDC4;\n}\n.annual-carbon-chart__legend-dot {\n  width: 12px;\n  height: 12px;\n  border-radius: 50%;\n  display: inline-block;\n}\n.annual-carbon-chart__legend-dot--all {\n  background-color: #888;\n}\n.annual-carbon-chart__legend-dot--scope-1 {\n  background-color: #FF6B6B;\n}\n.annual-carbon-chart__legend-dot--scope-2 {\n  background-color: #4ECDC4;\n}\n.annual-carbon-chart__summary {\n  display: flex;\n  justify-content: space-around;\n  padding: 16px;\n  background-color: #f8f9fa;\n  border-radius: 8px;\n  margin: 16px 20px;\n  gap: 16px;\n}\n.annual-carbon-chart__summary-item {\n  text-align: center;\n}\n.annual-carbon-chart__summary-item-value {\n  font-size: 24px;\n  font-weight: bold;\n}\n.annual-carbon-chart__summary-item-value--scope-1 {\n  color: #FF6B6B;\n}\n.annual-carbon-chart__summary-item-value--scope-2 {\n  color: #4ECDC4;\n}\n.annual-carbon-chart__summary-item-value--total {\n  color: #2c3e50;\n}\n.annual-carbon-chart__summary-item-label {\n  font-size: 12px;\n  color: #666;\n  margin-top: 4px;\n}\n.annual-carbon-chart__state {\n  text-align: center;\n  padding: 60px;\n  color: #7f8c8d;\n  background-color: white;\n  border-radius: 12px;\n  font-size: 16px;\n}\n.annual-carbon-chart__state-icon {\n  margin-bottom: 16px;\n  font-size: 24px;\n}\n.annual-carbon-chart__state-subtitle {\n  font-size: 14px;\n  margin-top: 8px;\n  color: #95a5a6;\n}\n.annual-carbon-chart__chart {\n  width: 100%;\n  height: 500px;\n  min-height: 500px;\n  background-color: white;\n  border-radius: 12px;\n}\n\n@media (max-width: 768px) {\n  .annual-carbon-chart {\n    padding: 16px;\n  }\n  .annual-carbon-chart__legend {\n    gap: 8px;\n  }\n  .annual-carbon-chart__legend-item {\n    font-size: 12px;\n    padding: 5px 10px;\n  }\n  .annual-carbon-chart__legend-dot {\n    width: 10px;\n    height: 10px;\n  }\n  .annual-carbon-chart__summary {\n    flex-direction: column;\n    gap: 12px;\n    margin: 12px 16px;\n    padding: 12px;\n  }\n  .annual-carbon-chart__summary-item-value {\n    font-size: 20px;\n  }\n  .annual-carbon-chart__chart {\n    height: 400px;\n    min-height: 400px;\n  }\n}\n@media (max-width: 480px) {\n  .annual-carbon-chart {\n    padding: 12px;\n  }\n  .annual-carbon-chart__legend {\n    flex-direction: column;\n    align-items: center;\n    gap: 6px;\n  }\n  .annual-carbon-chart__legend-item {\n    min-width: 120px;\n    justify-content: center;\n  }\n  .annual-carbon-chart__summary {\n    margin: 8px 12px;\n  }\n  .annual-carbon-chart__summary-item-value {\n    font-size: 18px;\n  }\n}", ""]);
+// Exports
+module.exports = exports;
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src/BaselineValueManagement.scss":
+/*!***********************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src/BaselineValueManagement.scss ***!
+  \***********************************************************************************************************************/
+/***/ ((module, exports, __webpack_require__) => {
+
+// Imports
+var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+exports = ___CSS_LOADER_API_IMPORT___(false);
+// Module
+exports.push([module.id, "/* BaselineValueManagement.scss */\n/* ===== Modal Styles ===== */\n.uxp-modal .modal-body {\n  padding: 20px;\n  font-size: 14px;\n  color: #333;\n}\n\n.uxp-modal .baseline-comparison {\n  display: flex;\n  justify-content: space-between;\n  margin: 15px 0;\n  padding: 10px;\n  background: #f9f9f9;\n  border-radius: 8px;\n}\n\n.uxp-modal .baseline-comparison .label {\n  font-weight: 600;\n  margin-right: 6px;\n}\n\n.uxp-modal .baseline-comparison .value {\n  font-weight: bold;\n  color: #444;\n}\n\n.uxp-modal .confirmation-message {\n  margin: 15px 0;\n  font-size: 15px;\n  font-weight: 500;\n  color: #222;\n}\n\n.uxp-modal .warning-note {\n  margin-top: 10px;\n  color: #a94442;\n  font-size: 13px;\n}\n\n/* Footer buttons aligned properly */\n.uxp-modal .modal-footer {\n  display: flex;\n  justify-content: flex-end;\n  gap: 10px;\n  margin-top: 20px;\n}\n\n/* Primary and secondary button styles */\n.btn-primary {\n  background-color: #e53935;\n  color: white;\n  border-radius: 6px;\n  padding: 8px 16px;\n  font-weight: 600;\n}\n\n.btn-primary:hover {\n  background-color: #c62828;\n}\n\n.btn-secondary {\n  background-color: #f1f1f1;\n  color: #444;\n  border-radius: 6px;\n  padding: 8px 16px;\n}\n\n.btn-secondary:hover {\n  background-color: #e0e0e0;\n}\n\n/* ===== Form Section ===== */\n.baseline-form {\n  margin-top: 20px;\n}\n\n.form-section {\n  background: #fff;\n  border-radius: 10px;\n  padding: 20px;\n  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);\n}\n\n.form-actions {\n  margin-top: 15px;\n  display: flex;\n  gap: 10px;\n}\n\n/* ===== Table Styles ===== */\n.baseline-table table {\n  width: 100%;\n  border-collapse: collapse;\n  margin-top: 15px;\n}\n\n.baseline-table th,\n.baseline-table td {\n  padding: 10px;\n  text-align: left;\n  border-bottom: 1px solid #e5e5e5;\n}\n\n.baseline-table th {\n  background: #f7f7f7;\n  font-weight: 600;\n}\n\n.baseline-table tr:hover {\n  background: #fafafa;\n}", ""]);
 // Exports
 module.exports = exports;
 
@@ -975,8 +992,10 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
     const [yearFilter, setYearFilter] = (0, react_1.useState)(new Date().getFullYear());
     const [activityName, setActivityName] = (0, react_1.useState)("");
     const [availableActivities, setAvailableActivities] = (0, react_1.useState)([]);
-    // Baseline year
-    const baselineYear = 2022;
+    const [baselineYear, setBaselineYear] = (0, react_1.useState)(2022); // default baseline year
+    const [availableYears, setAvailableYears] = (0, react_1.useState)([]); // dropdown years
+    const [availableBaselineYears, setAvailableBaselineYears] = (0, react_1.useState)([]);
+    const [baselineData, setBaselineData] = (0, react_1.useState)([]); // 🔹 Store baseline data
     // 🔹 Fetch available activities
     const fetchAvailableActivities = () => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
@@ -988,9 +1007,43 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
             console.error("Error fetching activities:", error);
         }
     });
-    (0, react_1.useEffect)(() => {
-        fetchAvailableActivities();
-    }, []);
+    // 🔹 Fetch baseline data and years
+    const fetchBaselineYears = () => __awaiter(void 0, void 0, void 0, function* () {
+        var _b;
+        try {
+            const result = yield ((_b = props.uxpContext) === null || _b === void 0 ? void 0 : _b.executeAction("carbon_reporting_80rr", "getAllBaselines", {}, { json: true }));
+            if (result && Array.isArray(result)) {
+                setBaselineData(result); // 🔹 Store the full baseline data
+                const years = Array.from(new Set(result.map((r) => r.year))).sort();
+                setAvailableBaselineYears(years);
+                if (years.length > 0 && !years.includes(baselineYear)) {
+                    setBaselineYear(years[0]); // default to first baseline year if not set
+                }
+            }
+        }
+        catch (error) {
+            console.error("Error fetching baseline years:", error);
+            setAvailableBaselineYears([2022]); // fallback
+            setBaselineData([]); // 🔹 Clear baseline data on error
+        }
+    });
+    // 🔹 Fetch baseline year from backend
+    const fetchBaselineYear = () => __awaiter(void 0, void 0, void 0, function* () {
+        var _c;
+        try {
+            const result = yield ((_c = props.uxpContext) === null || _c === void 0 ? void 0 : _c.executeAction("carbon_reporting_80rr", "getSelectedBaselineYear", {}, { json: true }));
+            if (result && result.year) {
+                setBaselineYear(result.year);
+            }
+            else {
+                setBaselineYear(2022); // fallback default
+            }
+        }
+        catch (error) {
+            console.error("Error fetching baseline year:", error);
+            setBaselineYear(2022); // fallback
+        }
+    });
     // 🔹 Fetch activity data
     const fetchActivityData = () => __awaiter(void 0, void 0, void 0, function* () {
         if (!props.uxpContext)
@@ -1005,6 +1058,9 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
                 value: parseFloat(row.value),
             }))) || [];
             setActivityData(cleanedData);
+            // Build available years for baseline dropdown
+            const years = Array.from(new Set(cleanedData.map((d) => d.year))).sort();
+            setAvailableYears(years);
         }
         catch (error) {
             console.error("Error loading emission data:", error);
@@ -1014,6 +1070,11 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
             setLoading(false);
         }
     });
+    (0, react_1.useEffect)(() => {
+        fetchAvailableActivities();
+        fetchBaselineYear(); // fetch baseline year on mount
+        fetchBaselineYears(); // 👈 added
+    }, []);
     (0, react_1.useEffect)(() => {
         fetchActivityData();
     }, [yearFilter, activityName]);
@@ -1048,8 +1109,49 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
         }));
     };
     const annualData = calculateAnnualEmissions();
-    const baselineData = annualData.find((d) => d.year === baselineYear);
-    const baselineValue = baselineData ? baselineData.total : 4000;
+    // 🔹 Calculate baseline value from baseline data
+    const calculateBaselineValue = () => {
+        if (baselineData.length === 0 || !baselineYear) {
+            console.log("No baseline data or year, using fallback");
+            return 4000; // fallback
+        }
+        // Filter baseline data for the selected year and activity
+        const filteredBaselines = baselineData.filter((item) => {
+            const yearMatches = item.year === baselineYear;
+            const activityMatches = !activityName || item.activity === activityName;
+            return yearMatches && activityMatches;
+        });
+        console.log("Filtered baselines:", filteredBaselines);
+        if (filteredBaselines.length === 0) {
+            console.log("No matching baseline found, using fallback");
+            return 4000; // fallback if no matching baseline found
+        }
+        // If the baseline data already contains calculated emissions (tCO2e), use it directly
+        // Otherwise, apply emission factors
+        let totalBaseline = 0;
+        filteredBaselines.forEach((item) => {
+            // Check if the value is already in tCO2e (likely if it's a large number like 1293)
+            // or if it needs to be multiplied by emission factor
+            const rawValue = parseFloat(item.value || 0);
+            // If the baseline value is already calculated emissions, use it directly
+            // You can identify this by checking if it's a reasonable emission value
+            if (rawValue > 100) {
+                // Likely already calculated emissions
+                totalBaseline += rawValue;
+            }
+            else {
+                // Apply emission factor
+                const emissionFactor = emissionFactors[item.activity] || 0;
+                totalBaseline += rawValue * emissionFactor;
+            }
+        });
+        console.log("Calculated baseline value:", totalBaseline);
+        return totalBaseline;
+    };
+    const baselineValue = calculateBaselineValue();
+    console.log('baselineYear:', baselineYear);
+    console.log('baselineValue:', baselineValue);
+    console.log('baselineData:', baselineData);
     // 🔹 Build chart
     (0, react_1.useEffect)(() => {
         if (chartRef.current && annualData.length > 0) {
@@ -1065,7 +1167,7 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
                     backgroundColor: "transparent",
                 },
                 title: {
-                    text: "Annual Scope 1 & 2 Carbon Emissions vs Baseline (2022)",
+                    text: `Annual Scope 1 & 2 Carbon Emissions vs Baseline (${baselineYear})`,
                     style: { fontSize: "20px", fontWeight: "bold" },
                 },
                 xAxis: {
@@ -1080,14 +1182,19 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
                             {
                                 color: "red",
                                 dashStyle: "Dash",
-                                width: 2,
+                                width: 3,
                                 value: baselineValue,
-                                zIndex: 5,
+                                zIndex: 10,
                                 label: {
-                                    text: `Baseline 2022: ${baselineValue.toLocaleString()} tCO₂e`,
+                                    text: `Baseline ${baselineYear}: ${Math.round(baselineValue).toLocaleString()} tCO₂e`,
                                     align: "right",
                                     verticalAlign: "bottom",
-                                    style: { color: "red", fontWeight: "bold" },
+                                    style: {
+                                        color: "red",
+                                        fontWeight: "bold",
+                                        backgroundColor: "white",
+                                        padding: "2px"
+                                    },
                                     y: -5,
                                 },
                             },
@@ -1119,7 +1226,7 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
                         color: "#ff7f0e",
                     },
                     {
-                        name: "Baseline (2022)",
+                        name: `Baseline (${baselineYear})`,
                         data: baselineSeries,
                         type: "line",
                         color: "red",
@@ -1138,15 +1245,30 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
             chartInstance.current = highcharts_1.default.chart(chartRef.current, chartConfig);
             // 🔹 Add % change annotations above bars
             if (baselineValue > 0) {
-                annualData.forEach((d, i) => {
-                    var _a;
-                    const pctChange = ((d.total - baselineValue) / baselineValue) * 100 || 0;
-                    const label = `${pctChange >= 0 ? "+" : ""}${pctChange.toFixed(1)}% vs 2022`;
-                    (_a = chartInstance.current) === null || _a === void 0 ? void 0 : _a.renderer.text(label, chartInstance.current.xAxis[0].toPixels(i) + 20, chartInstance.current.yAxis[0].toPixels(d.total) - 10).css({ color: "#000", fontSize: "11px", fontWeight: "bold" }).add();
-                });
+                setTimeout(() => {
+                    annualData.forEach((d, i) => {
+                        const pctChange = ((d.total - baselineValue) / baselineValue) * 100 || 0;
+                        const label = `${pctChange >= 0 ? "+" : ""}${pctChange.toFixed(1)}% vs ${baselineYear}`;
+                        if (chartInstance.current && chartInstance.current.xAxis && chartInstance.current.yAxis) {
+                            const xPos = chartInstance.current.xAxis[0].toPixels(i);
+                            const yPos = chartInstance.current.yAxis[0].toPixels(d.total) - 15;
+                            console.log(`Adding annotation at position: x=${xPos}, y=${yPos}, label=${label}`);
+                            chartInstance.current.renderer
+                                .text(label, xPos - 30, // Center the text better
+                            yPos)
+                                .css({
+                                color: "#000",
+                                fontSize: "11px",
+                                fontWeight: "bold",
+                                textAnchor: "middle"
+                            })
+                                .add();
+                        }
+                    });
+                }, 100); // Small delay to ensure chart is fully rendered
             }
         }
-    }, [annualData, baselineValue]);
+    }, [annualData, baselineValue, baselineYear]);
     // 🔹 Activity dropdown options
     const activityOptions = [
         { label: "All Activities", value: "" },
@@ -1155,21 +1277,303 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
         react_1.default.createElement(components_1.TitleBar, { title: "Annual Carbon Emissions with Baseline Comparison" },
             react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
-                    setYearFilter(null);
-                    setActivityName("");
+                    setYearFilter(new Date().getFullYear()); // Current year
+                    setActivityName(""); // All activities
+                    // Set to lowest available baseline year
+                    if (availableBaselineYears.length > 0) {
+                        const lowestYear = Math.min(...availableBaselineYears);
+                        setBaselineYear(lowestYear);
+                    }
+                    else {
+                        setBaselineYear(2022);
+                    }
                 } },
                 react_1.default.createElement(components_1.FormField, null,
                     react_1.default.createElement(components_1.Label, null, "Filter by Year"),
                     react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter || "", onChange: (val) => setYearFilter(val ? parseInt(val) : null), placeholder: "Enter year" })),
                 react_1.default.createElement(components_1.FormField, null,
                     react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
-                    react_1.default.createElement(components_1.Select, { options: activityOptions, selected: activityName, onChange: (val) => setActivityName(val), placeholder: "Select activity" })))),
+                    react_1.default.createElement(components_1.Select, { options: activityOptions, selected: activityName, onChange: (val) => setActivityName(val), placeholder: "Select activity" })),
+                react_1.default.createElement(components_1.FormField, null,
+                    react_1.default.createElement(components_1.Label, null, "Select Baseline Year"),
+                    react_1.default.createElement(components_1.Select, { options: availableBaselineYears.map((y) => ({ label: y.toString(), value: y })), selected: baselineYear, onChange: (val) => setBaselineYear(val), placeholder: "Select baseline year" })))),
         react_1.default.createElement("div", { className: "annual-carbon-chart" },
             loading && react_1.default.createElement("div", null, "\uD83D\uDCCA Loading emission data..."),
             !loading && annualData.length === 0 && (react_1.default.createElement("div", null, "\uD83D\uDCC8 No emission data found for selected filters.")),
             !loading && annualData.length > 0 && (react_1.default.createElement("div", { ref: chartRef, className: "annual-carbon-chart__chart" })))));
 };
 exports["default"] = AnnualCarbonEmissionWithBaselineComparison;
+
+
+/***/ }),
+
+/***/ "./src/BaselineValueManagement.scss":
+/*!******************************************!*\
+  !*** ./src/BaselineValueManagement.scss ***!
+  \******************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var api = __webpack_require__(/*! !../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+            var content = __webpack_require__(/*! !!../node_modules/css-loader/dist/cjs.js!../node_modules/sass-loader/dist/cjs.js!./BaselineValueManagement.scss */ "./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src/BaselineValueManagement.scss");
+
+            content = content.__esModule ? content.default : content;
+
+            if (typeof content === 'string') {
+              content = [[module.id, content, '']];
+            }
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = api(content, options);
+
+
+
+module.exports = content.locals || {};
+
+/***/ }),
+
+/***/ "./src/BaselineValueManagement.tsx":
+/*!*****************************************!*\
+  !*** ./src/BaselineValueManagement.tsx ***!
+  \*****************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const react_1 = __importStar(__webpack_require__(/*! react */ "react"));
+const components_1 = __webpack_require__(/*! uxp/components */ "uxp/components");
+__webpack_require__(/*! ./BaselineValueManagement.scss */ "./src/BaselineValueManagement.scss");
+const BaselineValueManagement = (props) => {
+    const toast = (0, components_1.useToast)();
+    const [loading, setLoading] = (0, react_1.useState)(false);
+    const [saving, setSaving] = (0, react_1.useState)(false);
+    const [availableActivities, setAvailableActivities] = (0, react_1.useState)([]);
+    const [existingBaselines, setExistingBaselines] = (0, react_1.useState)([]);
+    // Form state
+    const [activityName, setActivityName] = (0, react_1.useState)("");
+    const [year, setYear] = (0, react_1.useState)(new Date().getFullYear());
+    const [value, setValue] = (0, react_1.useState)("");
+    // Modal state
+    const [showConfirmModal, setShowConfirmModal] = (0, react_1.useState)(false);
+    const [existingBaseline, setExistingBaseline] = (0, react_1.useState)(null);
+    // 📹 Fetch available activities
+    const fetchAvailableActivities = () => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
+        try {
+            const result = yield ((_a = props.uxpContext) === null || _a === void 0 ? void 0 : _a.executeAction("carbon_reporting_80rr", "getAllActivities", {}, { json: true }));
+            setAvailableActivities(result || []);
+        }
+        catch (error) {
+            console.error("Error fetching activities:", error);
+            toast.error("Failed to load activities.");
+        }
+    });
+    // 📹 Fetch existing baseline values
+    const fetchExistingBaselines = () => __awaiter(void 0, void 0, void 0, function* () {
+        var _b;
+        setLoading(true);
+        try {
+            const result = yield ((_b = props.uxpContext) === null || _b === void 0 ? void 0 : _b.executeAction("carbon_reporting_80rr", "getAllBaselines", {}, { json: true }));
+            setExistingBaselines(result || []);
+        }
+        catch (error) {
+            console.error("Error fetching baselines:", error);
+            setExistingBaselines([]);
+        }
+        finally {
+            setLoading(false);
+        }
+    });
+    (0, react_1.useEffect)(() => {
+        fetchAvailableActivities();
+        fetchExistingBaselines();
+    }, []);
+    // 📹 Check if baseline exists (case-insensitive + trimmed activity name, exact year match)
+    const checkExistingBaseline = (activity, yearToCheck) => {
+        const normalizedActivity = activity.trim().toLowerCase();
+        return (existingBaselines.find((baseline) => baseline.activityName.trim().toLowerCase() === normalizedActivity &&
+            Number(baseline.year) === Number(yearToCheck)) || null);
+    };
+    // 📹 Validate form
+    const validateForm = () => {
+        if (!activityName.trim()) {
+            return "Please select an activity.";
+        }
+        if (!year || year < 1900 || year > 2100) {
+            return "Please enter a valid year.";
+        }
+        if (!value.trim() || isNaN(Number(value)) || Number(value) < 0) {
+            return "Please enter a valid positive number for the baseline value.";
+        }
+        return null;
+    };
+    // 📹 Handle form submission
+    const handleSubmit = () => __awaiter(void 0, void 0, void 0, function* () {
+        const validationError = validateForm();
+        if (validationError) {
+            toast.error(validationError);
+            return;
+        }
+        const existing = checkExistingBaseline(activityName, year);
+        console.log("Submitting", { activityName, year, value, existing });
+        if (existing) {
+            // Existing baseline found → confirm with user
+            setExistingBaseline(existing);
+            setShowConfirmModal(true);
+        }
+        else {
+            // No existing → safe to insert
+            yield saveBaseline();
+        }
+    });
+    // 📹 Save baseline value
+    const saveBaseline = () => __awaiter(void 0, void 0, void 0, function* () {
+        var _c;
+        setSaving(true);
+        try {
+            const baselineData = {
+                activityName: activityName.trim(),
+                year,
+                value: Number(value),
+            };
+            console.log("Calling InsertBaselineValue with:", baselineData);
+            yield ((_c = props.uxpContext) === null || _c === void 0 ? void 0 : _c.executeAction("carbon_reporting_80rr", "InsertBaselineValue", baselineData, { json: true }));
+            toast.success("Baseline value saved successfully!");
+            resetForm();
+            yield fetchExistingBaselines();
+            closeConfirmModal();
+        }
+        catch (error) {
+            console.error("Error saving baseline:", error);
+            toast.error("Failed to save baseline value. Please try again.");
+        }
+        finally {
+            setSaving(false);
+        }
+    });
+    // 📹 Reset form to initial state
+    const resetForm = () => {
+        setActivityName("");
+        setYear(new Date().getFullYear());
+        setValue("");
+    };
+    // 📹 Close confirmation modal
+    const closeConfirmModal = () => {
+        setShowConfirmModal(false);
+        setExistingBaseline(null);
+    };
+    // 📹 Handle confirmation to update existing baseline
+    const handleConfirmUpdate = () => __awaiter(void 0, void 0, void 0, function* () {
+        yield saveBaseline();
+    });
+    // 📹 Handle cancellation of update
+    const handleCancelUpdate = () => {
+        closeConfirmModal();
+        toast.info("Update cancelled. No changes were made.");
+    };
+    // 📹 Activity dropdown options
+    const activityOptions = availableActivities.map((activity) => ({
+        label: activity,
+        value: activity,
+    }));
+    return (react_1.default.createElement(components_1.WidgetWrapper, null,
+        react_1.default.createElement(components_1.TitleBar, { title: "Baseline Value Management" }),
+        react_1.default.createElement("div", { className: "baseline-management" },
+            loading && react_1.default.createElement("div", { className: "loading" }, "\uD83D\uDCCA Loading baseline data..."),
+            !loading && (react_1.default.createElement("div", { className: "baseline-form" },
+                react_1.default.createElement("div", { className: "form-section" },
+                    react_1.default.createElement("h3", null, "Add/Update Baseline Value"),
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Activity Name *"),
+                        react_1.default.createElement(components_1.Select, { options: activityOptions, selected: activityName, onChange: (val) => setActivityName(val), placeholder: "Select an activity" })),
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Year *"),
+                        react_1.default.createElement("div", { className: "year-input-container" },
+                            react_1.default.createElement(components_1.Input, { type: "number", value: year.toString(), onChange: (val) => setYear(val ? parseInt(val) : new Date().getFullYear()), placeholder: "Enter year", className: "year-input" }))),
+                    react_1.default.createElement(components_1.FormField, null,
+                        react_1.default.createElement(components_1.Label, null, "Baseline Value (tCO\u2082e) *"),
+                        react_1.default.createElement(components_1.Input, { type: "text", value: value, onChange: (val) => setValue(val), placeholder: "Enter baseline emission value" })),
+                    react_1.default.createElement("div", { className: "form-actions" },
+                        react_1.default.createElement(components_1.Button, { title: "submit", onClick: handleSubmit, loading: saving, disabled: saving }, saving ? "Saving..." : "Save Baseline"),
+                        react_1.default.createElement(components_1.Button, { title: "cancel", onClick: resetForm }, "Clear"))),
+                existingBaselines.length > 0 && (react_1.default.createElement("div", { className: "existing-baselines" },
+                    react_1.default.createElement("h3", null, "Existing Baseline Values"),
+                    react_1.default.createElement("div", { className: "baseline-table" },
+                        react_1.default.createElement("table", null,
+                            react_1.default.createElement("thead", null,
+                                react_1.default.createElement("tr", null,
+                                    react_1.default.createElement("th", null, "Activity"),
+                                    react_1.default.createElement("th", null, "Year"),
+                                    react_1.default.createElement("th", null, "Value (tCO\u2082e)"))),
+                            react_1.default.createElement("tbody", null, existingBaselines.map((baseline, index) => (react_1.default.createElement("tr", { key: index },
+                                react_1.default.createElement("td", null, baseline.activityName),
+                                react_1.default.createElement("td", null, baseline.year),
+                                react_1.default.createElement("td", null, baseline.value.toLocaleString()))))))))))),
+            showConfirmModal && existingBaseline && (react_1.default.createElement(components_1.Modal, { show: showConfirmModal, onClose: handleCancelUpdate, title: "\u26A0\uFE0F Baseline Value Already Exists" },
+                react_1.default.createElement("div", { className: "modal-body" },
+                    react_1.default.createElement("p", null,
+                        "A baseline value already exists for ",
+                        react_1.default.createElement("strong", null, activityName),
+                        " in",
+                        " ",
+                        react_1.default.createElement("strong", null, year),
+                        ":"),
+                    react_1.default.createElement("div", { className: "baseline-comparison" },
+                        react_1.default.createElement("div", { className: "existing-value" },
+                            react_1.default.createElement("span", { className: "label" }, "Current Value:"),
+                            react_1.default.createElement("span", { className: "value" },
+                                existingBaseline.value.toLocaleString(),
+                                " tCO\u2082e")),
+                        react_1.default.createElement("div", { className: "new-value" },
+                            react_1.default.createElement("span", { className: "label" }, "New Value:"),
+                            react_1.default.createElement("span", { className: "value" },
+                                Number(value).toLocaleString(),
+                                " tCO\u2082e"))),
+                    react_1.default.createElement("p", { className: "confirmation-message" },
+                        react_1.default.createElement("strong", null, "Do you want to update the existing baseline value?")),
+                    react_1.default.createElement("div", { className: "warning-note" },
+                        react_1.default.createElement("small", null, "\u26A0\uFE0F This action will replace the current baseline value permanently."))),
+                react_1.default.createElement("div", { className: "modal-footer" },
+                    react_1.default.createElement(components_1.Button, { title: "Yes, Update Baseline", onClick: handleConfirmUpdate, loading: saving, disabled: saving, className: "btn-primary" }, saving ? "Updating..." : "Yes, Update"),
+                    react_1.default.createElement(components_1.Button, { title: "Cancel", onClick: handleCancelUpdate, disabled: saving, className: "btn-secondary" }, "Cancel")))))));
+};
+exports["default"] = BaselineValueManagement;
 
 
 /***/ }),
@@ -3618,10 +4022,12 @@ const ESGAreaChart_1 = __importDefault(__webpack_require__(/*! ./ESGAreaChart */
 const AnnualCarbonEmissionChart_1 = __importDefault(__webpack_require__(/*! ./AnnualCarbonEmissionChart */ "./src/AnnualCarbonEmissionChart.tsx"));
 const upload_1 = __importDefault(__webpack_require__(/*! ./upload */ "./src/upload.tsx"));
 const AnnualCarbonEmissionWithBaselineComparison_1 = __importDefault(__webpack_require__(/*! ./AnnualCarbonEmissionWithBaselineComparison */ "./src/AnnualCarbonEmissionWithBaselineComparison.tsx"));
+const BaselineValueManagement_1 = __importDefault(__webpack_require__(/*! ./BaselineValueManagement */ "./src/BaselineValueManagement.tsx"));
 (0, uxp_1.registerWidget)({ id: "CarbonReportingTool", widget: upload_1.default });
 (0, uxp_1.registerWidget)({ id: "all_data", widget: all_data_1.default });
 (0, uxp_1.registerWidget)({ id: "bar_chart", widget: bar_cahrt_1.default });
 (0, uxp_1.registerWidget)({ id: "ESG_Donut_Chart", widget: carbon_emissions_1.default });
+(0, uxp_1.registerWidget)({ id: "BaselineValueManagement", widget: BaselineValueManagement_1.default });
 (0, uxp_1.registerWidget)({ id: "ESGEmissionFactorsTable", widget: ESGEmissionFactorsTable_1.default });
 (0, uxp_1.registerWidget)({ id: "ESGStackedBarChart", widget: ESGStackedBarChart_1.default });
 (0, uxp_1.registerWidget)({ id: "AnnualCarbonEmissionChart", widget: AnnualCarbonEmissionChart_1.default });
