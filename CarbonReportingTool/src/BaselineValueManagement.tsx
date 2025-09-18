@@ -3,7 +3,6 @@ import {
   WidgetWrapper,
   TitleBar,
   FormField,
-  Select,
   Input,
   Label,
   Button,
@@ -20,7 +19,6 @@ export interface IWidgetProps {
 }
 
 interface BaselineValue {
-  activityName: string;
   year: number;
   value: number;
 }
@@ -30,11 +28,9 @@ const BaselineValueManagement: React.FunctionComponent<IWidgetProps> = (props) =
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [availableActivities, setAvailableActivities] = useState<string[]>([]);
   const [existingBaselines, setExistingBaselines] = useState<BaselineValue[]>([]);
   
   // Form state
-  const [activityName, setActivityName] = useState<string>("");
   const [year, setYear] = useState<number>(new Date().getFullYear());
   const [value, setValue] = useState<string>("");
 
@@ -42,23 +38,7 @@ const BaselineValueManagement: React.FunctionComponent<IWidgetProps> = (props) =
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [existingBaseline, setExistingBaseline] = useState<BaselineValue | null>(null);
 
-  // 📹 Fetch available activities
-  const fetchAvailableActivities = async () => {
-    try {
-      const result = await props.uxpContext?.executeAction(
-        "carbon_reporting_80rr",
-        "getAllActivities",
-        {},
-        { json: true }
-      );
-      setAvailableActivities(result || []);
-    } catch (error) {
-      console.error("Error fetching activities:", error);
-      toast.error("Failed to load activities.");
-    }
-  };
-
-  // 📹 Fetch existing baseline values
+  // 🔹 Fetch existing baseline values
   const fetchExistingBaselines = async () => {
     setLoading(true);
     try {
@@ -78,27 +58,20 @@ const BaselineValueManagement: React.FunctionComponent<IWidgetProps> = (props) =
   };
 
   useEffect(() => {
-    fetchAvailableActivities();
     fetchExistingBaselines();
   }, []);
 
-  // 📹 Check if baseline exists (case-insensitive + trimmed activity name, exact year match)
-  const checkExistingBaseline = (activity: string, yearToCheck: number): BaselineValue | null => {
-    const normalizedActivity = activity.trim().toLowerCase();
+  // 🔹 Check if baseline exists (exact year match)
+  const checkExistingBaseline = (yearToCheck: number): BaselineValue | null => {
     return (
       existingBaselines.find(
-        (baseline) =>
-          baseline.activityName.trim().toLowerCase() === normalizedActivity &&
-          Number(baseline.year) === Number(yearToCheck)
+        (baseline) => Number(baseline.year) === Number(yearToCheck)
       ) || null
     );
   };
 
-  // 📹 Validate form
+  // 🔹 Validate form
   const validateForm = (): string | null => {
-    if (!activityName.trim()) {
-      return "Please select an activity.";
-    }
     if (!year || year < 1900 || year > 2100) {
       return "Please enter a valid year.";
     }
@@ -108,7 +81,7 @@ const BaselineValueManagement: React.FunctionComponent<IWidgetProps> = (props) =
     return null;
   };
 
-  // 📹 Handle form submission
+  // 🔹 Handle form submission
 const handleSubmit = async () => {
   const validationError = validateForm();
   if (validationError) {
@@ -116,8 +89,8 @@ const handleSubmit = async () => {
     return;
   }
 
-  const existing = checkExistingBaseline(activityName, year);
-  console.log("Submitting", { activityName, year, value, existing });
+  const existing = checkExistingBaseline(year);
+  console.log("Submitting", { year, value, existing });
 
   if (existing) {
     // Existing baseline found → confirm with user
@@ -129,12 +102,11 @@ const handleSubmit = async () => {
   }
 };
 
-  // 📹 Save baseline value
+  // 🔹 Save baseline value
 const saveBaseline = async () => {
   setSaving(true);
   try {
     const baselineData = {
-      activityName: activityName.trim(),
       year,
       value: Number(value),
     };
@@ -161,35 +133,28 @@ const saveBaseline = async () => {
   }
 };
 
-  // 📹 Reset form to initial state
+  // 🔹 Reset form to initial state
   const resetForm = () => {
-    setActivityName("");
     setYear(new Date().getFullYear());
     setValue("");
   };
 
-  // 📹 Close confirmation modal
+  // 🔹 Close confirmation modal
   const closeConfirmModal = () => {
     setShowConfirmModal(false);
     setExistingBaseline(null);
   };
 
-  // 📹 Handle confirmation to update existing baseline
+  // 🔹 Handle confirmation to update existing baseline
   const handleConfirmUpdate = async () => {
     await saveBaseline();
   };
 
-  // 📹 Handle cancellation of update
+  // 🔹 Handle cancellation of update
   const handleCancelUpdate = () => {
     closeConfirmModal();
     toast.info("Update cancelled. No changes were made.");
   };
-
-  // 📹 Activity dropdown options
-  const activityOptions = availableActivities.map((activity) => ({
-    label: activity,
-    value: activity,
-  }));
 
   return (
     <WidgetWrapper>
@@ -202,16 +167,6 @@ const saveBaseline = async () => {
           <div className="baseline-form">
             <div className="form-section">
               <h3>Add/Update Baseline Value</h3>
-              
-              <FormField>
-                <Label>Activity Name *</Label>
-                <Select
-                  options={activityOptions}
-                  selected={activityName}
-                  onChange={(val) => setActivityName(val)}
-                  placeholder="Select an activity"
-                />
-              </FormField>
 
               <FormField>
                 <Label>Year *</Label>
@@ -263,7 +218,6 @@ const saveBaseline = async () => {
                   <table>
                     <thead>
                       <tr>
-                        <th>Activity</th>
                         <th>Year</th>
                         <th>Value (tCO₂e)</th>
                       </tr>
@@ -271,7 +225,6 @@ const saveBaseline = async () => {
                     <tbody>
                       {existingBaselines.map((baseline, index) => (
                         <tr key={index}>
-                          <td>{baseline.activityName}</td>
                           <td>{baseline.year}</td>
                           <td>{baseline.value.toLocaleString()}</td>
                         </tr>
@@ -293,8 +246,7 @@ const saveBaseline = async () => {
           >
             <div className="modal-body">
               <p>
-                A baseline value already exists for <strong>{activityName}</strong> in{" "}
-                <strong>{year}</strong>:
+                A baseline value already exists for <strong>{year}</strong>:
               </p>
               
               <div className="baseline-comparison">
@@ -344,4 +296,4 @@ const saveBaseline = async () => {
   );
 };
 
-export default BaselineValueManagement;
+export default BaselineValueManagement; 

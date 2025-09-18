@@ -14,7 +14,7 @@ export interface IWidgetProps {
 const emissionFactors: { [key: string]: number } = {
   "Generator Fuel Consumption": 3.761, // kgCO₂e per litre
   "Refrigerant Leakages/Refilling": 1.000, // kgCO₂e per litre
-  "Electricity Consumption – HVAC": 0.412 // kgCO₂e per kWh
+  "Electricity Consumption": 0.412 // kgCO₂e per kWh
 };
 
 const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props) => {

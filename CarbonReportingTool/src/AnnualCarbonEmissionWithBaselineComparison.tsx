@@ -23,7 +23,7 @@ export interface IWidgetProps {
 const emissionFactors: { [key: string]: number } = {
   "Generator Fuel Consumption": 3.761, // kgCO₂e per litre
   "Refrigerant Leakages/Refilling": 1.0, // kgCO₂e per litre
-  "Electricity Consumption – HVAC": 0.412, // kgCO₂e per kWh
+  "Electricity Consumption": 0.412, // kgCO₂e per kWh
 };
 
 const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
@@ -35,15 +35,15 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
 
   const [loading, setLoading] = useState(false);
   const [activityData, setActivityData] = useState<any[]>([]);
-  const [yearFilter, setYearFilter] = useState<any>(new Date().getFullYear());
-  const [activityName, setActivityName] = useState<string>("");
+  const [yearFilter, setYearFilter] = useState<any>(null); // Changed: Start with null to show all years
+
   const [availableActivities, setAvailableActivities] = useState<string[]>([]);
   const [baselineYear, setBaselineYear] = useState<any>(2022); // default baseline year
   const [availableYears, setAvailableYears] = useState<any[]>([]); // dropdown years
   const [availableBaselineYears, setAvailableBaselineYears] = useState<any[]>([]);
-  const [baselineData, setBaselineData] = useState<any[]>([]); // 🔹 Store baseline data
+  const [baselineData, setBaselineData] = useState<any[]>([]); // Store baseline data
 
-  // 🔹 Fetch available activities
+  // Fetch available activities
   const fetchAvailableActivities = async () => {
     try {
       const result = await props.uxpContext?.executeAction(
@@ -58,7 +58,7 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
     }
   };
 
-  // 🔹 Fetch baseline data and years
+  // Fetch baseline data and years
   const fetchBaselineYears = async () => {
     try {
       const result = await props.uxpContext?.executeAction(
@@ -69,7 +69,7 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
       );
 
       if (result && Array.isArray(result)) {
-        setBaselineData(result); // 🔹 Store the full baseline data
+        setBaselineData(result); // Store the full baseline data
         const years = Array.from(new Set(result.map((r: any) => r.year))).sort();
         setAvailableBaselineYears(years);
         if (years.length > 0 && !years.includes(baselineYear)) {
@@ -79,11 +79,11 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
     } catch (error) {
       console.error("Error fetching baseline years:", error);
       setAvailableBaselineYears([2022]); // fallback
-      setBaselineData([]); // 🔹 Clear baseline data on error
+      setBaselineData([]); // Clear baseline data on error
     }
   };
 
-  // 🔹 Fetch baseline year from backend
+  // Fetch baseline year from backend
   const fetchBaselineYear = async () => {
     try {
       const result = await props.uxpContext?.executeAction(
@@ -104,7 +104,7 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
     }
   };
 
-  // 🔹 Fetch activity data
+  // Modified: Fetch activity data - pass null for year to get all years, or specific year for filtering
   const fetchActivityData = async () => {
     if (!props.uxpContext) return;
 
@@ -113,7 +113,10 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
       const result = await props.uxpContext.executeAction(
         "carbon_reporting_80rr",
         "GetAllData",
-        { year: yearFilter, month: null, activityName: activityName },
+        { 
+          year: yearFilter, // This will be null for all years, or specific year for filtering
+          month: null, 
+        },
         { json: true }
       );
 
@@ -141,16 +144,18 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
   useEffect(() => {
     fetchAvailableActivities();
     fetchBaselineYear(); // fetch baseline year on mount
-    fetchBaselineYears(); // 👈 added
+    fetchBaselineYears();
   }, []);
 
   useEffect(() => {
     fetchActivityData();
-  }, [yearFilter, activityName]);
+  }, [yearFilter]);
 
-  // 🔹 Calculate annual emissions by year
+  // Calculate annual emissions by year
   const calculateAnnualEmissions = () => {
     if (activityData.length === 0) return [];
+
+    console.log("Raw activity data:", activityData);
 
     const yearlyEmissions: { [key: string]: { scope1: number; scope2: number } } =
       {};
@@ -164,9 +169,10 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
       const emissionFactor = emissionFactors[item.activity] || 0;
       const calculatedEmission = item.value * emissionFactor;
 
-      const isScope1 =
-        item.activity.includes("Generator") ||
-        item.activity.includes("Refrigerant");
+      // Use exact same logic as working ESGStackedBarChart
+      const isScope1 = item.activity.includes("Generator") || item.activity.includes("Refrigerant");
+      
+      console.log(`Activity: "${item.activity}", isScope1: ${isScope1}, emission: ${calculatedEmission}, emissionFactor: ${emissionFactor}`);
 
       if (isScope1) {
         yearlyEmissions[year].scope1 += calculatedEmission;
@@ -175,7 +181,7 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
       }
     });
 
-    return Object.keys(yearlyEmissions)
+    const result = Object.keys(yearlyEmissions)
       .sort((a, b) => parseInt(a) - parseInt(b))
       .map((year) => ({
         year: parseInt(year),
@@ -183,11 +189,16 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
         scope2: yearlyEmissions[year].scope2,
         total: yearlyEmissions[year].scope1 + yearlyEmissions[year].scope2,
       }));
+
+    console.log("Calculated annual emissions:", result);
+    console.log("Yearly emissions breakdown:", yearlyEmissions);
+
+    return result;
   };
 
   const annualData = calculateAnnualEmissions();
 
-  // 🔹 Calculate baseline value from baseline data
+  // Calculate baseline value from baseline data
   const calculateBaselineValue = () => {
     if (baselineData.length === 0 || !baselineYear) {
       console.log("No baseline data or year, using fallback");
@@ -197,8 +208,7 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
     // Filter baseline data for the selected year and activity
     const filteredBaselines = baselineData.filter((item: any) => {
       const yearMatches = item.year === baselineYear;
-      const activityMatches = !activityName || item.activity === activityName;
-      return yearMatches && activityMatches;
+      return yearMatches 
     });
 
     console.log("Filtered baselines:", filteredBaselines);
@@ -238,7 +248,15 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
   console.log('baselineValue:', baselineValue);
   console.log('baselineData:', baselineData);
 
-  // 🔹 Build chart
+  // Modified: Chart title to reflect filtering state
+  const getChartTitle = () => {
+    if (yearFilter) {
+      return `${yearFilter} Scope 1 & 2 Carbon Emissions vs Baseline (${baselineYear})`;
+    }
+    return `Annual Scope 1 & 2 Carbon Emissions vs Baseline (${baselineYear})`;
+  };
+
+  // Build chart
   useEffect(() => {
     if (chartRef.current && annualData.length > 0) {
       const years = annualData.map((d) => d.year.toString());
@@ -255,7 +273,7 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
           backgroundColor: "transparent",
         },
         title: {
-          text: `Annual Scope 1 & 2 Carbon Emissions vs Baseline (${baselineYear})`,
+          text: getChartTitle(),
           style: { fontSize: "20px", fontWeight: "bold" },
         },
         xAxis: {
@@ -335,7 +353,7 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
 
       chartInstance.current = Highcharts.chart(chartRef.current, chartConfig);
 
-      // 🔹 Add % change annotations above bars
+      // Add % change annotations above bars
       if (baselineValue > 0) {
         setTimeout(() => {
           annualData.forEach((d, i) => {
@@ -371,10 +389,16 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
     }
   }, [annualData, baselineValue, baselineYear]);
 
-  // 🔹 Activity dropdown options
+  // Activity dropdown options
   const activityOptions = [
     { label: "All Activities", value: "" },
     ...availableActivities.map((a) => ({ label: a, value: a })),
+  ];
+
+  // Modified: Year dropdown options - include "All Years" option
+  const yearOptions = [
+    { label: "All Years", value: null },
+    ...availableYears.map((y) => ({ label: y.toString(), value: y })),
   ];
 
   return (
@@ -382,8 +406,7 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
       <TitleBar title="Annual Carbon Emissions with Baseline Comparison">
         <FilterPanel
           onClear={() => {
-            setYearFilter(new Date().getFullYear()); // Current year
-            setActivityName(""); // All activities
+            setYearFilter(null); // Changed: Clear to show all years
             // Set to lowest available baseline year
             if (availableBaselineYears.length > 0) {
               const lowestYear = Math.min(...availableBaselineYears);
@@ -395,25 +418,15 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
         >
           <FormField>
             <Label>Filter by Year</Label>
-            <Input
-              type="number"
-              value={yearFilter || ""}
-              onChange={(val) => setYearFilter(val ? parseInt(val) : null)}
-              placeholder="Enter year"
-            />
-          </FormField>
-
-          <FormField>
-            <Label>Filter by Activity</Label>
             <Select
-              options={activityOptions}
-              selected={activityName}
-              onChange={(val) => setActivityName(val)}
-              placeholder="Select activity"
+              options={yearOptions}
+              selected={yearFilter}
+              onChange={(val) => setYearFilter(val)}
+              placeholder="Select year or show all"
             />
           </FormField>
 
-          <FormField>
+          <FormField> 
             <Label>Select Baseline Year</Label>
             <Select
               options={availableBaselineYears.map((y) => ({ label: y.toString(), value: y }))}

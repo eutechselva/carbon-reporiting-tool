@@ -24,7 +24,7 @@ const emissionFactorsData = [
   },
   {
     scope: "Scope 2",
-    activity: "Electricity Consumption – HVAC", 
+    activity: "Electricity Consumption", 
     unit: "kWh",
     emissionFactor: 0.412,
     source: "Singapore EMA – Energy Statistics 2023",
