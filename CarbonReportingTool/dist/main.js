@@ -981,7 +981,7 @@ __webpack_require__(/*! ./AnnualCarbonChart.scss */ "./src/AnnualCarbonChart.scs
 const emissionFactors = {
     "Generator Fuel Consumption": 3.761,
     "Refrigerant Leakages/Refilling": 1.0,
-    "Electricity Consumption – HVAC": 0.412, // kgCO₂e per kWh
+    "Electricity Consumption": 0.412, // kgCO₂e per kWh
 };
 const AnnualCarbonEmissionWithBaselineComparison = (props) => {
     const chartRef = (0, react_1.useRef)(null);
@@ -989,14 +989,13 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
     const toast = (0, components_1.useToast)();
     const [loading, setLoading] = (0, react_1.useState)(false);
     const [activityData, setActivityData] = (0, react_1.useState)([]);
-    const [yearFilter, setYearFilter] = (0, react_1.useState)(new Date().getFullYear());
-    const [activityName, setActivityName] = (0, react_1.useState)("");
+    const [yearFilter, setYearFilter] = (0, react_1.useState)(null); // Changed: Start with null to show all years
     const [availableActivities, setAvailableActivities] = (0, react_1.useState)([]);
     const [baselineYear, setBaselineYear] = (0, react_1.useState)(2022); // default baseline year
     const [availableYears, setAvailableYears] = (0, react_1.useState)([]); // dropdown years
     const [availableBaselineYears, setAvailableBaselineYears] = (0, react_1.useState)([]);
-    const [baselineData, setBaselineData] = (0, react_1.useState)([]); // 🔹 Store baseline data
-    // 🔹 Fetch available activities
+    const [baselineData, setBaselineData] = (0, react_1.useState)([]); // Store baseline data
+    // Fetch available activities
     const fetchAvailableActivities = () => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
         try {
@@ -1007,13 +1006,13 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
             console.error("Error fetching activities:", error);
         }
     });
-    // 🔹 Fetch baseline data and years
+    // Fetch baseline data and years
     const fetchBaselineYears = () => __awaiter(void 0, void 0, void 0, function* () {
         var _b;
         try {
             const result = yield ((_b = props.uxpContext) === null || _b === void 0 ? void 0 : _b.executeAction("carbon_reporting_80rr", "getAllBaselines", {}, { json: true }));
             if (result && Array.isArray(result)) {
-                setBaselineData(result); // 🔹 Store the full baseline data
+                setBaselineData(result); // Store the full baseline data
                 const years = Array.from(new Set(result.map((r) => r.year))).sort();
                 setAvailableBaselineYears(years);
                 if (years.length > 0 && !years.includes(baselineYear)) {
@@ -1024,10 +1023,10 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
         catch (error) {
             console.error("Error fetching baseline years:", error);
             setAvailableBaselineYears([2022]); // fallback
-            setBaselineData([]); // 🔹 Clear baseline data on error
+            setBaselineData([]); // Clear baseline data on error
         }
     });
-    // 🔹 Fetch baseline year from backend
+    // Fetch baseline year from backend
     const fetchBaselineYear = () => __awaiter(void 0, void 0, void 0, function* () {
         var _c;
         try {
@@ -1044,13 +1043,16 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
             setBaselineYear(2022); // fallback
         }
     });
-    // 🔹 Fetch activity data
+    // Modified: Fetch activity data - pass null for year to get all years, or specific year for filtering
     const fetchActivityData = () => __awaiter(void 0, void 0, void 0, function* () {
         if (!props.uxpContext)
             return;
         setLoading(true);
         try {
-            const result = yield props.uxpContext.executeAction("carbon_reporting_80rr", "GetAllData", { year: yearFilter, month: null, activityName: activityName }, { json: true });
+            const result = yield props.uxpContext.executeAction("carbon_reporting_80rr", "GetAllData", {
+                year: yearFilter,
+                month: null,
+            }, { json: true });
             const cleanedData = (result === null || result === void 0 ? void 0 : result.map((row) => ({
                 activity: row.activity,
                 year: row.year,
@@ -1073,15 +1075,16 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
     (0, react_1.useEffect)(() => {
         fetchAvailableActivities();
         fetchBaselineYear(); // fetch baseline year on mount
-        fetchBaselineYears(); // 👈 added
+        fetchBaselineYears();
     }, []);
     (0, react_1.useEffect)(() => {
         fetchActivityData();
-    }, [yearFilter, activityName]);
-    // 🔹 Calculate annual emissions by year
+    }, [yearFilter]);
+    // Calculate annual emissions by year
     const calculateAnnualEmissions = () => {
         if (activityData.length === 0)
             return [];
+        console.log("Raw activity data:", activityData);
         const yearlyEmissions = {};
         activityData.forEach((item) => {
             const year = item.year.toString();
@@ -1090,8 +1093,9 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
             }
             const emissionFactor = emissionFactors[item.activity] || 0;
             const calculatedEmission = item.value * emissionFactor;
-            const isScope1 = item.activity.includes("Generator") ||
-                item.activity.includes("Refrigerant");
+            // Use exact same logic as working ESGStackedBarChart
+            const isScope1 = item.activity.includes("Generator") || item.activity.includes("Refrigerant");
+            console.log(`Activity: "${item.activity}", isScope1: ${isScope1}, emission: ${calculatedEmission}, emissionFactor: ${emissionFactor}`);
             if (isScope1) {
                 yearlyEmissions[year].scope1 += calculatedEmission;
             }
@@ -1099,7 +1103,7 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
                 yearlyEmissions[year].scope2 += calculatedEmission;
             }
         });
-        return Object.keys(yearlyEmissions)
+        const result = Object.keys(yearlyEmissions)
             .sort((a, b) => parseInt(a) - parseInt(b))
             .map((year) => ({
             year: parseInt(year),
@@ -1107,9 +1111,12 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
             scope2: yearlyEmissions[year].scope2,
             total: yearlyEmissions[year].scope1 + yearlyEmissions[year].scope2,
         }));
+        console.log("Calculated annual emissions:", result);
+        console.log("Yearly emissions breakdown:", yearlyEmissions);
+        return result;
     };
     const annualData = calculateAnnualEmissions();
-    // 🔹 Calculate baseline value from baseline data
+    // Calculate baseline value from baseline data
     const calculateBaselineValue = () => {
         if (baselineData.length === 0 || !baselineYear) {
             console.log("No baseline data or year, using fallback");
@@ -1118,8 +1125,7 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
         // Filter baseline data for the selected year and activity
         const filteredBaselines = baselineData.filter((item) => {
             const yearMatches = item.year === baselineYear;
-            const activityMatches = !activityName || item.activity === activityName;
-            return yearMatches && activityMatches;
+            return yearMatches;
         });
         console.log("Filtered baselines:", filteredBaselines);
         if (filteredBaselines.length === 0) {
@@ -1152,7 +1158,14 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
     console.log('baselineYear:', baselineYear);
     console.log('baselineValue:', baselineValue);
     console.log('baselineData:', baselineData);
-    // 🔹 Build chart
+    // Modified: Chart title to reflect filtering state
+    const getChartTitle = () => {
+        if (yearFilter) {
+            return `${yearFilter} Scope 1 & 2 Carbon Emissions vs Baseline (${baselineYear})`;
+        }
+        return `Annual Scope 1 & 2 Carbon Emissions vs Baseline (${baselineYear})`;
+    };
+    // Build chart
     (0, react_1.useEffect)(() => {
         if (chartRef.current && annualData.length > 0) {
             const years = annualData.map((d) => d.year.toString());
@@ -1167,7 +1180,7 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
                     backgroundColor: "transparent",
                 },
                 title: {
-                    text: `Annual Scope 1 & 2 Carbon Emissions vs Baseline (${baselineYear})`,
+                    text: getChartTitle(),
                     style: { fontSize: "20px", fontWeight: "bold" },
                 },
                 xAxis: {
@@ -1243,7 +1256,7 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
                 credits: { enabled: false },
             };
             chartInstance.current = highcharts_1.default.chart(chartRef.current, chartConfig);
-            // 🔹 Add % change annotations above bars
+            // Add % change annotations above bars
             if (baselineValue > 0) {
                 setTimeout(() => {
                     annualData.forEach((d, i) => {
@@ -1269,16 +1282,20 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
             }
         }
     }, [annualData, baselineValue, baselineYear]);
-    // 🔹 Activity dropdown options
+    // Activity dropdown options
     const activityOptions = [
         { label: "All Activities", value: "" },
         ...availableActivities.map((a) => ({ label: a, value: a })),
     ];
+    // Modified: Year dropdown options - include "All Years" option
+    const yearOptions = [
+        { label: "All Years", value: null },
+        ...availableYears.map((y) => ({ label: y.toString(), value: y })),
+    ];
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
         react_1.default.createElement(components_1.TitleBar, { title: "Annual Carbon Emissions with Baseline Comparison" },
             react_1.default.createElement(components_1.FilterPanel, { onClear: () => {
-                    setYearFilter(new Date().getFullYear()); // Current year
-                    setActivityName(""); // All activities
+                    setYearFilter(null); // Changed: Clear to show all years
                     // Set to lowest available baseline year
                     if (availableBaselineYears.length > 0) {
                         const lowestYear = Math.min(...availableBaselineYears);
@@ -1290,10 +1307,7 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
                 } },
                 react_1.default.createElement(components_1.FormField, null,
                     react_1.default.createElement(components_1.Label, null, "Filter by Year"),
-                    react_1.default.createElement(components_1.Input, { type: "number", value: yearFilter || "", onChange: (val) => setYearFilter(val ? parseInt(val) : null), placeholder: "Enter year" })),
-                react_1.default.createElement(components_1.FormField, null,
-                    react_1.default.createElement(components_1.Label, null, "Filter by Activity"),
-                    react_1.default.createElement(components_1.Select, { options: activityOptions, selected: activityName, onChange: (val) => setActivityName(val), placeholder: "Select activity" })),
+                    react_1.default.createElement(components_1.Select, { options: yearOptions, selected: yearFilter, onChange: (val) => setYearFilter(val), placeholder: "Select year or show all" })),
                 react_1.default.createElement(components_1.FormField, null,
                     react_1.default.createElement(components_1.Label, null, "Select Baseline Year"),
                     react_1.default.createElement(components_1.Select, { options: availableBaselineYears.map((y) => ({ label: y.toString(), value: y })), selected: baselineYear, onChange: (val) => setBaselineYear(val), placeholder: "Select baseline year" })))),
@@ -1383,33 +1397,19 @@ const BaselineValueManagement = (props) => {
     const toast = (0, components_1.useToast)();
     const [loading, setLoading] = (0, react_1.useState)(false);
     const [saving, setSaving] = (0, react_1.useState)(false);
-    const [availableActivities, setAvailableActivities] = (0, react_1.useState)([]);
     const [existingBaselines, setExistingBaselines] = (0, react_1.useState)([]);
     // Form state
-    const [activityName, setActivityName] = (0, react_1.useState)("");
     const [year, setYear] = (0, react_1.useState)(new Date().getFullYear());
     const [value, setValue] = (0, react_1.useState)("");
     // Modal state
     const [showConfirmModal, setShowConfirmModal] = (0, react_1.useState)(false);
     const [existingBaseline, setExistingBaseline] = (0, react_1.useState)(null);
-    // 📹 Fetch available activities
-    const fetchAvailableActivities = () => __awaiter(void 0, void 0, void 0, function* () {
-        var _a;
-        try {
-            const result = yield ((_a = props.uxpContext) === null || _a === void 0 ? void 0 : _a.executeAction("carbon_reporting_80rr", "getAllActivities", {}, { json: true }));
-            setAvailableActivities(result || []);
-        }
-        catch (error) {
-            console.error("Error fetching activities:", error);
-            toast.error("Failed to load activities.");
-        }
-    });
-    // 📹 Fetch existing baseline values
+    // 🔹 Fetch existing baseline values
     const fetchExistingBaselines = () => __awaiter(void 0, void 0, void 0, function* () {
-        var _b;
+        var _a;
         setLoading(true);
         try {
-            const result = yield ((_b = props.uxpContext) === null || _b === void 0 ? void 0 : _b.executeAction("carbon_reporting_80rr", "getAllBaselines", {}, { json: true }));
+            const result = yield ((_a = props.uxpContext) === null || _a === void 0 ? void 0 : _a.executeAction("carbon_reporting_80rr", "getAllBaselines", {}, { json: true }));
             setExistingBaselines(result || []);
         }
         catch (error) {
@@ -1421,20 +1421,14 @@ const BaselineValueManagement = (props) => {
         }
     });
     (0, react_1.useEffect)(() => {
-        fetchAvailableActivities();
         fetchExistingBaselines();
     }, []);
-    // 📹 Check if baseline exists (case-insensitive + trimmed activity name, exact year match)
-    const checkExistingBaseline = (activity, yearToCheck) => {
-        const normalizedActivity = activity.trim().toLowerCase();
-        return (existingBaselines.find((baseline) => baseline.activityName.trim().toLowerCase() === normalizedActivity &&
-            Number(baseline.year) === Number(yearToCheck)) || null);
+    // 🔹 Check if baseline exists (exact year match)
+    const checkExistingBaseline = (yearToCheck) => {
+        return (existingBaselines.find((baseline) => Number(baseline.year) === Number(yearToCheck)) || null);
     };
-    // 📹 Validate form
+    // 🔹 Validate form
     const validateForm = () => {
-        if (!activityName.trim()) {
-            return "Please select an activity.";
-        }
         if (!year || year < 1900 || year > 2100) {
             return "Please enter a valid year.";
         }
@@ -1443,15 +1437,15 @@ const BaselineValueManagement = (props) => {
         }
         return null;
     };
-    // 📹 Handle form submission
+    // 🔹 Handle form submission
     const handleSubmit = () => __awaiter(void 0, void 0, void 0, function* () {
         const validationError = validateForm();
         if (validationError) {
             toast.error(validationError);
             return;
         }
-        const existing = checkExistingBaseline(activityName, year);
-        console.log("Submitting", { activityName, year, value, existing });
+        const existing = checkExistingBaseline(year);
+        console.log("Submitting", { year, value, existing });
         if (existing) {
             // Existing baseline found → confirm with user
             setExistingBaseline(existing);
@@ -1462,18 +1456,17 @@ const BaselineValueManagement = (props) => {
             yield saveBaseline();
         }
     });
-    // 📹 Save baseline value
+    // 🔹 Save baseline value
     const saveBaseline = () => __awaiter(void 0, void 0, void 0, function* () {
-        var _c;
+        var _b;
         setSaving(true);
         try {
             const baselineData = {
-                activityName: activityName.trim(),
                 year,
                 value: Number(value),
             };
             console.log("Calling InsertBaselineValue with:", baselineData);
-            yield ((_c = props.uxpContext) === null || _c === void 0 ? void 0 : _c.executeAction("carbon_reporting_80rr", "InsertBaselineValue", baselineData, { json: true }));
+            yield ((_b = props.uxpContext) === null || _b === void 0 ? void 0 : _b.executeAction("carbon_reporting_80rr", "InsertBaselineValue", baselineData, { json: true }));
             toast.success("Baseline value saved successfully!");
             resetForm();
             yield fetchExistingBaselines();
@@ -1487,31 +1480,25 @@ const BaselineValueManagement = (props) => {
             setSaving(false);
         }
     });
-    // 📹 Reset form to initial state
+    // 🔹 Reset form to initial state
     const resetForm = () => {
-        setActivityName("");
         setYear(new Date().getFullYear());
         setValue("");
     };
-    // 📹 Close confirmation modal
+    // 🔹 Close confirmation modal
     const closeConfirmModal = () => {
         setShowConfirmModal(false);
         setExistingBaseline(null);
     };
-    // 📹 Handle confirmation to update existing baseline
+    // 🔹 Handle confirmation to update existing baseline
     const handleConfirmUpdate = () => __awaiter(void 0, void 0, void 0, function* () {
         yield saveBaseline();
     });
-    // 📹 Handle cancellation of update
+    // 🔹 Handle cancellation of update
     const handleCancelUpdate = () => {
         closeConfirmModal();
         toast.info("Update cancelled. No changes were made.");
     };
-    // 📹 Activity dropdown options
-    const activityOptions = availableActivities.map((activity) => ({
-        label: activity,
-        value: activity,
-    }));
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
         react_1.default.createElement(components_1.TitleBar, { title: "Baseline Value Management" }),
         react_1.default.createElement("div", { className: "baseline-management" },
@@ -1519,9 +1506,6 @@ const BaselineValueManagement = (props) => {
             !loading && (react_1.default.createElement("div", { className: "baseline-form" },
                 react_1.default.createElement("div", { className: "form-section" },
                     react_1.default.createElement("h3", null, "Add/Update Baseline Value"),
-                    react_1.default.createElement(components_1.FormField, null,
-                        react_1.default.createElement(components_1.Label, null, "Activity Name *"),
-                        react_1.default.createElement(components_1.Select, { options: activityOptions, selected: activityName, onChange: (val) => setActivityName(val), placeholder: "Select an activity" })),
                     react_1.default.createElement(components_1.FormField, null,
                         react_1.default.createElement(components_1.Label, null, "Year *"),
                         react_1.default.createElement("div", { className: "year-input-container" },
@@ -1538,20 +1522,15 @@ const BaselineValueManagement = (props) => {
                         react_1.default.createElement("table", null,
                             react_1.default.createElement("thead", null,
                                 react_1.default.createElement("tr", null,
-                                    react_1.default.createElement("th", null, "Activity"),
                                     react_1.default.createElement("th", null, "Year"),
                                     react_1.default.createElement("th", null, "Value (tCO\u2082e)"))),
                             react_1.default.createElement("tbody", null, existingBaselines.map((baseline, index) => (react_1.default.createElement("tr", { key: index },
-                                react_1.default.createElement("td", null, baseline.activityName),
                                 react_1.default.createElement("td", null, baseline.year),
                                 react_1.default.createElement("td", null, baseline.value.toLocaleString()))))))))))),
             showConfirmModal && existingBaseline && (react_1.default.createElement(components_1.Modal, { show: showConfirmModal, onClose: handleCancelUpdate, title: "\u26A0\uFE0F Baseline Value Already Exists" },
                 react_1.default.createElement("div", { className: "modal-body" },
                     react_1.default.createElement("p", null,
                         "A baseline value already exists for ",
-                        react_1.default.createElement("strong", null, activityName),
-                        " in",
-                        " ",
                         react_1.default.createElement("strong", null, year),
                         ":"),
                     react_1.default.createElement("div", { className: "baseline-comparison" },
