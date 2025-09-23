@@ -721,7 +721,7 @@ const AnnualCarbonEmissionChart = (props) => {
                     spacing: [20, 20, 20, 20]
                 },
                 title: {
-                    text: 'Annual Carbon Emissions by Scope',
+                    text: `Annual Carbon Emissions by Scope (${yearFilter})`,
                     style: {
                         fontSize: '22px',
                         fontWeight: 'bold',
@@ -1230,13 +1230,13 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
                         name: "Scope 1",
                         data: scope1Data,
                         type: "column",
-                        color: "#1f77b4",
+                        color: "#FF6B6B",
                     },
                     {
                         name: "Scope 2",
                         data: scope2Data,
                         type: "column",
-                        color: "#ff7f0e",
+                        color: "#4ECDC4",
                     }
                 ],
                 tooltip: {
@@ -1301,7 +1301,7 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
                     react_1.default.createElement(components_1.Select, { options: yearOptions, selected: yearFilter, onChange: (val) => setYearFilter(val), placeholder: "Select year or show all" })),
                 react_1.default.createElement(components_1.FormField, null,
                     react_1.default.createElement(components_1.Label, null, "Select Baseline Year"),
-                    react_1.default.createElement(components_1.Select, { options: availableBaselineYears.map((y) => ({ label: y.toString(), value: y })), selected: baselineYear, onChange: (val) => setBaselineYear(val), placeholder: "Select baseline year" })))),
+                    react_1.default.createElement(components_1.Select, { options: availableBaselineYears.map((y) => ({ label: y.toString(), value: y })), selected: baselineYear, onChange: (val) => setBaselineYear(val), placeholder: "Select baseline" })))),
         react_1.default.createElement("div", { className: "annual-carbon-chart" },
             loading && react_1.default.createElement("div", null, "\uD83D\uDCCA Loading emission data..."),
             !loading && annualData.length === 0 && (react_1.default.createElement("div", null, "\uD83D\uDCC8 No emission data found for selected filters.")),
@@ -1793,7 +1793,7 @@ const ESGAreaChart = (props) => {
                     spacing: [20, 20, 20, 20],
                 },
                 title: {
-                    text: 'Carbon Emissions (Area Chart)',
+                    text: `Carbon Emissions (Area Chart) from from ${fromYear} to ${toYear}`,
                     style: {
                         fontSize: '20px',
                         fontWeight: 'bold',
@@ -2461,11 +2461,24 @@ const ESGStackedBarChart = (props) => {
         if (chartRef.current && Object.keys(monthlyEmissions).length > 0) {
             // Get sorted months
             const months = Object.keys(monthlyEmissions).sort((a, b) => monthOrder[a] - monthOrder[b]);
-            // Monthly total (Scope1 + Scope2) across all activities
-            const totalSeriesData = months.map(month => {
+            // // Monthly total (Scope1 + Scope2) across all activities
+            // const totalSeriesData = months.map(month => {
+            //   const monthData = monthlyEmissions[month] || {};
+            //   const sum = Object.values(monthData).reduce((acc, val) => acc + val, 0);
+            //   return sum;
+            // });
+            // For each month, calculate totals
+            const totalScope1Series = months.map(month => {
                 const monthData = monthlyEmissions[month] || {};
-                const sum = Object.values(monthData).reduce((acc, val) => acc + val, 0);
-                return sum;
+                return Object.keys(monthData)
+                    .filter(a => a.includes("Generator") || a.includes("Refrigerant")) // scope 1
+                    .reduce((sum, act) => sum + (monthData[act] || 0), 0);
+            });
+            const totalScope2Series = months.map(month => {
+                const monthData = monthlyEmissions[month] || {};
+                return Object.keys(monthData)
+                    .filter(a => a.includes("Electricity")) // scope 2
+                    .reduce((sum, act) => sum + (monthData[act] || 0), 0);
             });
             // Get all activities
             const activities = Array.from(new Set(Object.values(monthlyEmissions).flatMap(monthData => Object.keys(monthData))));
@@ -2489,14 +2502,24 @@ const ESGStackedBarChart = (props) => {
                     borderRadius: 2
                 };
             });
+            // Add Total as 2 stacked series with different green shades
             series.push({
-                name: "Total (Scope 1 + Scope 2)",
-                data: totalSeriesData,
+                name: "Total (Scope 1 part)",
+                data: totalScope1Series,
+                type: "column",
+                stack: "Total",
+                color: "#27ae60",
+                borderWidth: 0,
+                borderRadius: 0
+            });
+            series.push({
+                name: "Total (Scope 2 part)",
+                data: totalScope2Series,
                 type: "column",
                 stack: "Total",
                 color: "#2ecc71",
                 borderWidth: 0,
-                borderRadius: 2
+                borderRadius: 0
             });
             // Highcharts configuration for stacked bar chart
             const chartConfig = {
@@ -2507,7 +2530,7 @@ const ESGStackedBarChart = (props) => {
                     spacing: [20, 20, 20, 20]
                 },
                 title: {
-                    text: 'Carbon Emissions (Stacked)',
+                    text: `Carbon Emissions (Stacked) (${yearFilter})`,
                     style: {
                         fontSize: '20px',
                         fontWeight: 'bold',
@@ -2893,7 +2916,7 @@ const AllData = (props) => {
                 backgroundColor: 'transparent'
             },
             title: {
-                text: 'Activity Data (Line Chart)',
+                text: `Activity Data (Line Chart) ${yearFilter}`,
                 style: { fontSize: '18px', fontWeight: 'bold', color: '#333' }
             },
             xAxis: {
@@ -3206,7 +3229,7 @@ const BarChartComponent = (props) => {
                 spacing: [20, 20, 20, 20]
             },
             title: {
-                text: 'Activity Data (Bar Chart)',
+                text: `Activity Data (Bar Chart)(${yearFilter})`,
                 style: {
                     fontSize: '18px',
                     fontWeight: 'bold',
@@ -3633,7 +3656,7 @@ const ESGDonutChart = (props) => {
                     spacing: [20, 20, 20, 20]
                 },
                 title: {
-                    text: 'Carbon Emissions by Scope',
+                    text: `Carbon Emissions by Scope from ${fromYear} to ${toYear}`,
                     style: {
                         fontSize: '20px',
                         fontWeight: 'bold',
