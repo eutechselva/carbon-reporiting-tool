@@ -1132,11 +1132,11 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
             console.log("No matching baseline found, using fallback");
             return 4000; // fallback if no matching baseline found
         }
-        // If the baseline data already contains calculated emissions (tCO2e), use it directly
+        // If the baseline data already contains calculated emissions (kgCO2e), use it directly
         // Otherwise, apply emission factors
         let totalBaseline = 0;
         filteredBaselines.forEach((item) => {
-            // Check if the value is already in tCO2e (likely if it's a large number like 1293)
+            // Check if the value is already in kgCO2e (likely if it's a large number like 1293)
             // or if it needs to be multiplied by emission factor
             const rawValue = parseFloat(item.value || 0);
             // If the baseline value is already calculated emissions, use it directly
@@ -1189,7 +1189,7 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
                 },
                 yAxis: {
                     min: 0,
-                    title: { text: "Emissions (tCO₂e)" },
+                    title: { text: "Carbon Emissions (kgCO₂e)" },
                     plotLines: baselineValue > 0
                         ? [
                             {
@@ -1199,7 +1199,7 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
                                 value: baselineValue,
                                 zIndex: 10,
                                 label: {
-                                    text: `Baseline ${baselineYear}: ${Math.round(baselineValue).toLocaleString()} tCO₂e`,
+                                    text: `Baseline ${baselineYear}: ${Math.round(baselineValue).toLocaleString()} kgCO₂e`,
                                     align: "right",
                                     verticalAlign: "bottom",
                                     style: {
@@ -1237,20 +1237,11 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
                         data: scope2Data,
                         type: "column",
                         color: "#ff7f0e",
-                    },
-                    {
-                        name: `Baseline (${baselineYear})`,
-                        data: baselineSeries,
-                        type: "line",
-                        color: "red",
-                        dashStyle: "Dash",
-                        marker: { enabled: false },
-                        enableMouseTracking: false,
-                    },
+                    }
                 ],
                 tooltip: {
                     shared: true,
-                    footerFormat: "Total: <b>{point.total}</b> tCO₂e",
+                    footerFormat: "Total: <b>{point.total}</b> kgCO₂e",
                 },
                 legend: { enabled: true },
                 credits: { enabled: false },
@@ -1399,11 +1390,8 @@ const BaselineValueManagement = (props) => {
     const [saving, setSaving] = (0, react_1.useState)(false);
     const [existingBaselines, setExistingBaselines] = (0, react_1.useState)([]);
     // Form state
-    const [year, setYear] = (0, react_1.useState)(new Date().getFullYear());
+    const [year, setYear] = (0, react_1.useState)(new Date().getFullYear().toString());
     const [value, setValue] = (0, react_1.useState)("");
-    // Modal state
-    const [showConfirmModal, setShowConfirmModal] = (0, react_1.useState)(false);
-    const [existingBaseline, setExistingBaseline] = (0, react_1.useState)(null);
     // 🔹 Fetch existing baseline values
     const fetchExistingBaselines = () => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
@@ -1428,9 +1416,10 @@ const BaselineValueManagement = (props) => {
         return (existingBaselines.find((baseline) => Number(baseline.year) === Number(yearToCheck)) || null);
     };
     // 🔹 Validate form
+    // Validation (only ensure year is not empty)
     const validateForm = () => {
-        if (!year || year < 1900 || year > 2100) {
-            return "Please enter a valid year.";
+        if (!year.trim()) {
+            return "Please enter a valid year or name.";
         }
         if (!value.trim() || isNaN(Number(value)) || Number(value) < 0) {
             return "Please enter a valid positive number for the baseline value.";
@@ -1447,12 +1436,15 @@ const BaselineValueManagement = (props) => {
         const existing = checkExistingBaseline(year);
         console.log("Submitting", { year, value, existing });
         if (existing) {
-            // Existing baseline found → confirm with user
-            setExistingBaseline(existing);
-            setShowConfirmModal(true);
+            const confirmUpdate = window.confirm(`A baseline value already exists for year ${year}. Do you want to override it?`);
+            if (confirmUpdate) {
+                yield saveBaseline();
+            }
+            else {
+                toast.info("Update cancelled. No changes were made.");
+            }
         }
         else {
-            // No existing → safe to insert
             yield saveBaseline();
         }
     });
@@ -1462,7 +1454,7 @@ const BaselineValueManagement = (props) => {
         setSaving(true);
         try {
             const baselineData = {
-                year,
+                year: year.trim(),
                 value: Number(value),
             };
             console.log("Calling InsertBaselineValue with:", baselineData);
@@ -1470,7 +1462,6 @@ const BaselineValueManagement = (props) => {
             toast.success("Baseline value saved successfully!");
             resetForm();
             yield fetchExistingBaselines();
-            closeConfirmModal();
         }
         catch (error) {
             console.error("Error saving baseline:", error);
@@ -1482,22 +1473,8 @@ const BaselineValueManagement = (props) => {
     });
     // 🔹 Reset form to initial state
     const resetForm = () => {
-        setYear(new Date().getFullYear());
+        setYear(new Date().getFullYear().toString());
         setValue("");
-    };
-    // 🔹 Close confirmation modal
-    const closeConfirmModal = () => {
-        setShowConfirmModal(false);
-        setExistingBaseline(null);
-    };
-    // 🔹 Handle confirmation to update existing baseline
-    const handleConfirmUpdate = () => __awaiter(void 0, void 0, void 0, function* () {
-        yield saveBaseline();
-    });
-    // 🔹 Handle cancellation of update
-    const handleCancelUpdate = () => {
-        closeConfirmModal();
-        toast.info("Update cancelled. No changes were made.");
     };
     return (react_1.default.createElement(components_1.WidgetWrapper, null,
         react_1.default.createElement(components_1.TitleBar, { title: "Baseline Value Management" }),
@@ -1507,11 +1484,11 @@ const BaselineValueManagement = (props) => {
                 react_1.default.createElement("div", { className: "form-section" },
                     react_1.default.createElement("h3", null, "Add/Update Baseline Value"),
                     react_1.default.createElement(components_1.FormField, null,
-                        react_1.default.createElement(components_1.Label, null, "Year *"),
+                        react_1.default.createElement(components_1.Label, null, "Year / Name *"),
                         react_1.default.createElement("div", { className: "year-input-container" },
-                            react_1.default.createElement(components_1.Input, { type: "number", value: year.toString(), onChange: (val) => setYear(val ? parseInt(val) : new Date().getFullYear()), placeholder: "Enter year", className: "year-input" }))),
+                            react_1.default.createElement(components_1.Input, { type: "text", value: year, onChange: (val) => setYear(val), placeholder: "Enter year or name", className: "year-input" }))),
                     react_1.default.createElement(components_1.FormField, null,
-                        react_1.default.createElement(components_1.Label, null, "Baseline Value (tCO\u2082e) *"),
+                        react_1.default.createElement(components_1.Label, null, "Baseline Value (kgCO\u2082e) *"),
                         react_1.default.createElement(components_1.Input, { type: "text", value: value, onChange: (val) => setValue(val), placeholder: "Enter baseline emission value" })),
                     react_1.default.createElement("div", { className: "form-actions" },
                         react_1.default.createElement(components_1.Button, { title: "submit", onClick: handleSubmit, loading: saving, disabled: saving }, saving ? "Saving..." : "Save Baseline"),
@@ -1523,34 +1500,10 @@ const BaselineValueManagement = (props) => {
                             react_1.default.createElement("thead", null,
                                 react_1.default.createElement("tr", null,
                                     react_1.default.createElement("th", null, "Year"),
-                                    react_1.default.createElement("th", null, "Value (tCO\u2082e)"))),
+                                    react_1.default.createElement("th", null, "Value (kgCO\u2082e)"))),
                             react_1.default.createElement("tbody", null, existingBaselines.map((baseline, index) => (react_1.default.createElement("tr", { key: index },
                                 react_1.default.createElement("td", null, baseline.year),
-                                react_1.default.createElement("td", null, baseline.value.toLocaleString()))))))))))),
-            showConfirmModal && existingBaseline && (react_1.default.createElement(components_1.Modal, { show: showConfirmModal, onClose: handleCancelUpdate, title: "\u26A0\uFE0F Baseline Value Already Exists" },
-                react_1.default.createElement("div", { className: "modal-body" },
-                    react_1.default.createElement("p", null,
-                        "A baseline value already exists for ",
-                        react_1.default.createElement("strong", null, year),
-                        ":"),
-                    react_1.default.createElement("div", { className: "baseline-comparison" },
-                        react_1.default.createElement("div", { className: "existing-value" },
-                            react_1.default.createElement("span", { className: "label" }, "Current Value:"),
-                            react_1.default.createElement("span", { className: "value" },
-                                existingBaseline.value.toLocaleString(),
-                                " tCO\u2082e")),
-                        react_1.default.createElement("div", { className: "new-value" },
-                            react_1.default.createElement("span", { className: "label" }, "New Value:"),
-                            react_1.default.createElement("span", { className: "value" },
-                                Number(value).toLocaleString(),
-                                " tCO\u2082e"))),
-                    react_1.default.createElement("p", { className: "confirmation-message" },
-                        react_1.default.createElement("strong", null, "Do you want to update the existing baseline value?")),
-                    react_1.default.createElement("div", { className: "warning-note" },
-                        react_1.default.createElement("small", null, "\u26A0\uFE0F This action will replace the current baseline value permanently."))),
-                react_1.default.createElement("div", { className: "modal-footer" },
-                    react_1.default.createElement(components_1.Button, { title: "Yes, Update Baseline", onClick: handleConfirmUpdate, loading: saving, disabled: saving, className: "btn-primary" }, saving ? "Updating..." : "Yes, Update"),
-                    react_1.default.createElement(components_1.Button, { title: "Cancel", onClick: handleCancelUpdate, disabled: saving, className: "btn-secondary" }, "Cancel")))))));
+                                react_1.default.createElement("td", null, baseline.value.toLocaleString()))))))))))))));
 };
 exports["default"] = BaselineValueManagement;
 
@@ -2508,6 +2461,12 @@ const ESGStackedBarChart = (props) => {
         if (chartRef.current && Object.keys(monthlyEmissions).length > 0) {
             // Get sorted months
             const months = Object.keys(monthlyEmissions).sort((a, b) => monthOrder[a] - monthOrder[b]);
+            // Monthly total (Scope1 + Scope2) across all activities
+            const totalSeriesData = months.map(month => {
+                const monthData = monthlyEmissions[month] || {};
+                const sum = Object.values(monthData).reduce((acc, val) => acc + val, 0);
+                return sum;
+            });
             // Get all activities
             const activities = Array.from(new Set(Object.values(monthlyEmissions).flatMap(monthData => Object.keys(monthData))));
             // Filter based on selectedLegend
@@ -2529,6 +2488,15 @@ const ESGStackedBarChart = (props) => {
                     borderWidth: 0,
                     borderRadius: 2
                 };
+            });
+            series.push({
+                name: "Total (Scope 1 + Scope 2)",
+                data: totalSeriesData,
+                type: "column",
+                stack: "Total",
+                color: "#2ecc71",
+                borderWidth: 0,
+                borderRadius: 2
             });
             // Highcharts configuration for stacked bar chart
             const chartConfig = {
@@ -2592,7 +2560,13 @@ const ESGStackedBarChart = (props) => {
                 },
                 tooltip: {
                     headerFormat: '<b>{point.key}</b><br/>',
-                    pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y:.1f} kgCO₂e</b> ({series.options.stack})<br/>',
+                    pointFormatter: function () {
+                        var _a, _b;
+                        if (this.series.name.includes("Total")) {
+                            return `<span style="color:${this.color}">${this.series.name}</span>: <b>${(_a = this.y) === null || _a === void 0 ? void 0 : _a.toFixed(1)} kgCO₂e</b><br/>`;
+                        }
+                        return `<span style="color:${this.color}">${this.series.name}</span>: <b>${(_b = this.y) === null || _b === void 0 ? void 0 : _b.toFixed(1)} kgCO₂e</b> (${this.series.options.stack})<br/>`;
+                    },
                     footerFormat: 'Total: <b>{point.total:.1f} kgCO₂e</b>',
                     shared: false,
                     backgroundColor: 'rgba(255, 255, 255, 0.95)',
