@@ -97,7 +97,13 @@ const AnnualCarbonEmissionChart: React.FunctionComponent<IWidgetProps> = (props)
         yearlyEmissions[year] = { scope1: 0, scope2: 0 };
       }
 
-      const emissionFactor = emissionFactors[item.activity] || 0;
+      let emissionFactor = 0;
+      for (const key in emissionFactors) {
+        if (item.activity.startsWith(key)) {
+          emissionFactor = emissionFactors[key];
+          break;
+        }
+      }
       const calculatedEmission = item.value * emissionFactor;
 
       // Determine scope based on activity type

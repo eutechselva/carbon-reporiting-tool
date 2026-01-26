@@ -166,12 +166,18 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
         yearlyEmissions[year] = { scope1: 0, scope2: 0 };
       }
 
-      const emissionFactor = emissionFactors[item.activity] || 0;
+      let emissionFactor = 0;
+      for (const key in emissionFactors) {
+        if (item.activity.startsWith(key)) {
+          emissionFactor = emissionFactors[key];
+          break;
+        }
+      }
       const calculatedEmission = item.value * emissionFactor;
 
       // Use exact same logic as working ESGStackedBarChart
       const isScope1 = item.activity.includes("Generator") || item.activity.includes("Refrigerant");
-      
+
       console.log(`Activity: "${item.activity}", isScope1: ${isScope1}, emission: ${calculatedEmission}, emissionFactor: ${emissionFactor}`);
 
       if (isScope1) {
@@ -233,7 +239,13 @@ const AnnualCarbonEmissionWithBaselineComparison: React.FunctionComponent<
         totalBaseline += rawValue;
       } else {
         // Apply emission factor
-        const emissionFactor = emissionFactors[item.activity] || 0;
+        let emissionFactor = 0;
+        for (const key in emissionFactors) {
+          if (item.activity.startsWith(key)) {
+            emissionFactor = emissionFactors[key];
+            break;
+          }
+        }
         totalBaseline += rawValue * emissionFactor;
       }
     });

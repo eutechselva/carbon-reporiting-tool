@@ -137,7 +137,13 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
         monthlyEmissions[item.month][item.activity] = 0;
       }
       // Apply emission factors immediately
-      const emissionFactor = emissionFactors[item.activity] || 0;
+      let emissionFactor = 0;
+      for (const key in emissionFactors) {
+        if (item.activity.startsWith(key)) {
+          emissionFactor = emissionFactors[key];
+          break;
+        }
+      }
       monthlyEmissions[item.month][item.activity] += item.value * emissionFactor;
     });
 
@@ -148,7 +154,13 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
       if (!emissionsByActivity[item.activity]) {
         emissionsByActivity[item.activity] = 0;
       }
-      const emissionFactor = emissionFactors[item.activity] || 0;
+      let emissionFactor = 0;
+      for (const key in emissionFactors) {
+        if (item.activity.startsWith(key)) {
+          emissionFactor = emissionFactors[key];
+          break;
+        }
+      }
       emissionsByActivity[item.activity] += item.value * emissionFactor;
     });
 
@@ -218,7 +230,13 @@ const ESGAreaChart: React.FunctionComponent<IWidgetProps> = (props) => {
   
     const headers = ["Activity", "Year", "Month", "Value (raw)", "Value (KgCO2e)"];
     const rows = activityData.map(row => {
-      const emissionFactor = emissionFactors[row.activity] || 0;
+      let emissionFactor = 0;
+      for (const key in emissionFactors) {
+        if (row.activity.startsWith(key)) {
+          emissionFactor = emissionFactors[key];
+          break;
+        }
+      }
       const co2eValue = row.value * emissionFactor;
       return [row.activity, row.year, row.month, row.value, co2eValue.toFixed(2)];
     });

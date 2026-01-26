@@ -123,7 +123,13 @@ const ESGStackedBarChart: React.FunctionComponent<IWidgetProps> = (props) => {
         monthlyEmissions[item.month][item.activity] = 0;
       }
       // Apply emission factors immediately
-      const emissionFactor = emissionFactors[item.activity] || 0;
+      let emissionFactor = 0;
+      for (const key in emissionFactors) {
+        if (item.activity.startsWith(key)) {
+          emissionFactor = emissionFactors[key];
+          break;
+        }
+      }
       monthlyEmissions[item.month][item.activity] += item.value * emissionFactor;
     });
 
@@ -134,7 +140,13 @@ const ESGStackedBarChart: React.FunctionComponent<IWidgetProps> = (props) => {
       if (!emissionsByActivity[item.activity]) {
         emissionsByActivity[item.activity] = 0;
       }
-      const emissionFactor = emissionFactors[item.activity] || 0;
+      let emissionFactor = 0;
+      for (const key in emissionFactors) {
+        if (item.activity.startsWith(key)) {
+          emissionFactor = emissionFactors[key];
+          break;
+        }
+      }
       emissionsByActivity[item.activity] += item.value * emissionFactor;
     });
 

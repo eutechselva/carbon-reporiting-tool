@@ -642,7 +642,13 @@ const AnnualCarbonEmissionChart = (props) => {
             if (!yearlyEmissions[year]) {
                 yearlyEmissions[year] = { scope1: 0, scope2: 0 };
             }
-            const emissionFactor = emissionFactors[item.activity] || 0;
+            let emissionFactor = 0;
+            for (const key in emissionFactors) {
+                if (item.activity.startsWith(key)) {
+                    emissionFactor = emissionFactors[key];
+                    break;
+                }
+            }
             const calculatedEmission = item.value * emissionFactor;
             // Determine scope based on activity type
             const isScope1 = item.activity.includes("Generator") || item.activity.includes("Refrigerant");
@@ -1091,7 +1097,13 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
             if (!yearlyEmissions[year]) {
                 yearlyEmissions[year] = { scope1: 0, scope2: 0 };
             }
-            const emissionFactor = emissionFactors[item.activity] || 0;
+            let emissionFactor = 0;
+            for (const key in emissionFactors) {
+                if (item.activity.startsWith(key)) {
+                    emissionFactor = emissionFactors[key];
+                    break;
+                }
+            }
             const calculatedEmission = item.value * emissionFactor;
             // Use exact same logic as working ESGStackedBarChart
             const isScope1 = item.activity.includes("Generator") || item.activity.includes("Refrigerant");
@@ -1147,7 +1159,13 @@ const AnnualCarbonEmissionWithBaselineComparison = (props) => {
             }
             else {
                 // Apply emission factor
-                const emissionFactor = emissionFactors[item.activity] || 0;
+                let emissionFactor = 0;
+                for (const key in emissionFactors) {
+                    if (item.activity.startsWith(key)) {
+                        emissionFactor = emissionFactors[key];
+                        break;
+                    }
+                }
                 totalBaseline += rawValue * emissionFactor;
             }
         });
@@ -1663,7 +1681,13 @@ const ESGAreaChart = (props) => {
                 monthlyEmissions[item.month][item.activity] = 0;
             }
             // Apply emission factors immediately
-            const emissionFactor = emissionFactors[item.activity] || 0;
+            let emissionFactor = 0;
+            for (const key in emissionFactors) {
+                if (item.activity.startsWith(key)) {
+                    emissionFactor = emissionFactors[key];
+                    break;
+                }
+            }
             monthlyEmissions[item.month][item.activity] += item.value * emissionFactor;
         });
         const emissionsByActivity = {};
@@ -1672,7 +1696,13 @@ const ESGAreaChart = (props) => {
             if (!emissionsByActivity[item.activity]) {
                 emissionsByActivity[item.activity] = 0;
             }
-            const emissionFactor = emissionFactors[item.activity] || 0;
+            let emissionFactor = 0;
+            for (const key in emissionFactors) {
+                if (item.activity.startsWith(key)) {
+                    emissionFactor = emissionFactors[key];
+                    break;
+                }
+            }
             emissionsByActivity[item.activity] += item.value * emissionFactor;
         });
         const dynamicEmissionData = Object.keys(emissionsByActivity).map(activity => {
@@ -1734,7 +1764,13 @@ const ESGAreaChart = (props) => {
         }
         const headers = ["Activity", "Year", "Month", "Value (raw)", "Value (KgCO2e)"];
         const rows = activityData.map(row => {
-            const emissionFactor = emissionFactors[row.activity] || 0;
+            let emissionFactor = 0;
+            for (const key in emissionFactors) {
+                if (row.activity.startsWith(key)) {
+                    emissionFactor = emissionFactors[key];
+                    break;
+                }
+            }
             const co2eValue = row.value * emissionFactor;
             return [row.activity, row.year, row.month, row.value, co2eValue.toFixed(2)];
         });
@@ -2368,7 +2404,13 @@ const ESGStackedBarChart = (props) => {
                 monthlyEmissions[item.month][item.activity] = 0;
             }
             // Apply emission factors immediately
-            const emissionFactor = emissionFactors[item.activity] || 0;
+            let emissionFactor = 0;
+            for (const key in emissionFactors) {
+                if (item.activity.startsWith(key)) {
+                    emissionFactor = emissionFactors[key];
+                    break;
+                }
+            }
             monthlyEmissions[item.month][item.activity] += item.value * emissionFactor;
         });
         const emissionsByActivity = {};
@@ -2377,7 +2419,13 @@ const ESGStackedBarChart = (props) => {
             if (!emissionsByActivity[item.activity]) {
                 emissionsByActivity[item.activity] = 0;
             }
-            const emissionFactor = emissionFactors[item.activity] || 0;
+            let emissionFactor = 0;
+            for (const key in emissionFactors) {
+                if (item.activity.startsWith(key)) {
+                    emissionFactor = emissionFactors[key];
+                    break;
+                }
+            }
             emissionsByActivity[item.activity] += item.value * emissionFactor;
         });
         const dynamicEmissionData = Object.keys(emissionsByActivity).map(activity => {
@@ -3474,6 +3522,7 @@ const ESGDonutChart = (props) => {
                 activityName: activityName
             }, { json: true });
             console.log("Fetched emission data:", result);
+            debugger;
             const cleanedData = (result === null || result === void 0 ? void 0 : result.map((row) => ({
                 activity: row.activity,
                 year: row.year,
@@ -3515,7 +3564,14 @@ const ESGDonutChart = (props) => {
         // Apply emission factors to calculate real CO2e emissions
         const dynamicEmissionData = Object.keys(emissionsByActivity).map(activity => {
             const totalActivityValue = emissionsByActivity[activity];
-            const emissionFactor = emissionFactors[activity] || 0;
+            // Find matching emission factor by checking if activity starts with any key
+            let emissionFactor = 0;
+            for (const key in emissionFactors) {
+                if (activity.startsWith(key)) {
+                    emissionFactor = emissionFactors[key];
+                    break;
+                }
+            }
             const calculatedCO2e = totalActivityValue * emissionFactor;
             const isScope1 = activity.includes("Generator") || activity.includes("Refrigerant");
             return {
@@ -3592,7 +3648,14 @@ const ESGDonutChart = (props) => {
             // Apply emission factors to calculate real CO2e emissions
             const dynamicEmissionData = Object.keys(emissionsByActivity).map(activity => {
                 const totalActivityValue = emissionsByActivity[activity];
-                const emissionFactor = emissionFactors[activity] || 0;
+                // Find matching emission factor by checking if activity starts with any key
+                let emissionFactor = 0;
+                for (const key in emissionFactors) {
+                    if (activity.startsWith(key)) {
+                        emissionFactor = emissionFactors[key];
+                        break;
+                    }
+                }
                 const calculatedCO2e = totalActivityValue * emissionFactor;
                 const isScope1 = activity.includes("Generator") || activity.includes("Refrigerant");
                 return {

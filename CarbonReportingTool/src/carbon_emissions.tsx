@@ -72,6 +72,7 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
       );
 
       console.log("Fetched emission data:", result);
+      debugger;
       
       const cleanedData = result?.map((row: any) => ({
         activity: row.activity,
@@ -118,11 +119,20 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
     // Apply emission factors to calculate real CO2e emissions
     const dynamicEmissionData = Object.keys(emissionsByActivity).map(activity => {
       const totalActivityValue = emissionsByActivity[activity];
-      const emissionFactor = emissionFactors[activity] || 0;
+
+      // Find matching emission factor by checking if activity starts with any key
+      let emissionFactor = 0;
+      for (const key in emissionFactors) {
+        if (activity.startsWith(key)) {
+          emissionFactor = emissionFactors[key];
+          break;
+        }
+      }
+
       const calculatedCO2e = totalActivityValue * emissionFactor;
-      
+
       const isScope1 = activity.includes("Generator") || activity.includes("Refrigerant");
-      
+
       return {
         source: activity,
         totalCO2e: calculatedCO2e,
@@ -213,11 +223,20 @@ const ESGDonutChart: React.FunctionComponent<IWidgetProps> = (props) => {
       // Apply emission factors to calculate real CO2e emissions
       const dynamicEmissionData = Object.keys(emissionsByActivity).map(activity => {
         const totalActivityValue = emissionsByActivity[activity];
-        const emissionFactor = emissionFactors[activity] || 0;
+
+        // Find matching emission factor by checking if activity starts with any key
+        let emissionFactor = 0;
+        for (const key in emissionFactors) {
+          if (activity.startsWith(key)) {
+            emissionFactor = emissionFactors[key];
+            break;
+          }
+        }
+
         const calculatedCO2e = totalActivityValue * emissionFactor;
-        
+
         const isScope1 = activity.includes("Generator") || activity.includes("Refrigerant");
-        
+
         return {
           source: activity,
           totalCO2e: calculatedCO2e,
